@@ -1,0 +1,58 @@
+name: Publish on Modrinth, CurseForge and GitHub
+on: workflow_dispatch
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'corretto'
+          java-version: '21'
+
+      # Extract properties required for publishing the JAR file
+      - name: Extract properties
+        run: |
+          VERSION=$(grep '^projectVersion=' gradle.properties | cut -d '=' -f2)
+          GAME_VERSIONS=$(grep '^supportedGameVersions=' gradle.properties | cut -d '=' -f2)
+          TYPE=$(grep '^versionType=' gradle.properties | cut -d '=' -f2)
+          
+          echo "projectVersion=$VERSION" >> $GITHUB_ENV
+          echo "supportedGameVersions=$GAME_VERSIONS" >> $GITHUB_ENV
+          echo "versionType=$TYPE" >> $GITHUB_ENV
+          
+          echo "✅ Project version: $VERSION"
+          echo "✅ Supported Minecraft version(s): $GAME_VERSIONS"
+          echo "✅ Version type: $TYPE"
+
+      # Run unit tests and build JAR file
+      - name: Build plugin with Gradle
+        run: ./gradlew build
+
+      - name: List output files
+        run: ls -R ./build/libs/
+
+      # Publish JAR file - Documentation of mc-publish: https://github.com/Kira-NT/mc-publish/blob/master/README.md
+      - name: Publishing plugin on Modrinth, CurseForge and GitHub
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          files: build/libs/*.jar
+          version: ${{ env.projectVersion }}              # Version of the plugin itself
+          game-versions: ${{ env.supportedGameVersions }} # Supported Minecraft version(s)
+          version-type: ${{ env.versionType }}            # Either 'alpha', 'beta' or 'release'
+          loaders: paper
+          changelog-file: changelogs/${{ env.projectVersion }}.md
+
+          modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+
+          curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+
+          github-tag: ${{ env.projectVersion }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,11 @@
+# This is a simple YAML example file
+example:
+  ultimate-answer: 42
+  pangram: The quick brown fox jumps over the lazy dog
+  boolean: true
+  player:
+    uuid: 00000000-0000-0000-0000-000000000000
+    location:
+      x: 1.0
+      y: 2.0
+      z: 3.0
