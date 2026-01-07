@@ -1,20 +1,12 @@
-name: PaperPluginTemplate
-version: 2.0.0
-main: io.github.atrimilan.paperplugintemplate.PaperPluginTemplate
-description: Example project to get started with Paper plugin development
+name: LockBlockState
+version: 1.0.0
+main: io.github.atrimilan.lockblockstate.LockBlockState
+description: Prevent blocks from breaking when players interact with an adjacent block
 author: Atrimilan
-website: https://github.com/Atrimilan/PaperPluginTemplate
+website: https://github.com/Atrimilan/LockBlockState
 api-version: '1.20.6'
 
-permissions :
-  ppt.flyspeed.self:
-    description: Set the flight speed of the player executing the command - /flyspeed <speed>
-    default: true
-  ppt.flyspeed.others:
-    description: Set the flight speed of any player - /flyspeed <player> <speed>
-    default: op
-  ppt.read-config:
-    description: Read config.yml values - /read-config <ultimate-answer|pangram|boolean|player>
-    default: true
-
-# No need to add "commands", as it would conflict with the new PaperMC command registration system
+permissions:
+#  lbs.perm:
+#    description: Description of the permission
+#    default: true/fasle/op/notop

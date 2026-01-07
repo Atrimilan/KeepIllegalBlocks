@@ -1,4 +1,4 @@
-package io.github.atrimilan.paperplugintemplate.services;
+package io.github.atrimilan.lockblockstate.services;
 
 import com.mojang.brigadier.Command;
 import net.kyori.adventure.text.Component;

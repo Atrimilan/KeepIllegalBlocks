@@ -1,4 +1,4 @@
-name: Publish on Modrinth, CurseForge and GitHub
+name: Publish on Modrinth
 on: workflow_dispatch
 jobs:
   release:
@@ -38,7 +38,7 @@ jobs:
         run: ls -R ./build/libs/
 
       # Publish JAR file - Documentation of mc-publish: https://github.com/Kira-NT/mc-publish/blob/master/README.md
-      - name: Publishing plugin on Modrinth, CurseForge and GitHub
+      - name: Publishing plugin on Modrinth,
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           files: build/libs/*.jar
@@ -50,9 +50,3 @@ jobs:
 
           modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-
-          curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
-          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
-
-          github-tag: ${{ env.projectVersion }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,1 +1,1 @@
-rootProject.name = "PaperPluginTemplate"
+rootProject.name = "LockBlockState"

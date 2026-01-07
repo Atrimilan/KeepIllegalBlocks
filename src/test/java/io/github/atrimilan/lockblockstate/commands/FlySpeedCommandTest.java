@@ -1,9 +1,9 @@
-package io.github.atrimilan.paperplugintemplate.commands;
+package io.github.atrimilan.lockblockstate.commands;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.CommandNode;
-import io.github.atrimilan.paperplugintemplate.services.FlySpeedService;
+import io.github.atrimilan.lockblockstate.services.FlySpeedService;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import org.bukkit.entity.Player;

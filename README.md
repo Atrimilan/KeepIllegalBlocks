@@ -1,8 +1,8 @@
-# Paper Plugin Template
+# Lock Block State
 
-[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Atrimilan/PaperPluginTemplate/release.yml?branch=master&event=workflow_dispatch&style=flat-square)](https://github.com/Atrimilan/PaperPluginTemplate/actions/workflows/release.yml)
-[![GitHub Tag](https://img.shields.io/github/v/tag/Atrimilan/PaperPluginTemplate?style=flat-square)](https://github.com/Atrimilan/PaperPluginTemplate/releases)
-[![GitHub License](https://img.shields.io/github/license/Atrimilan/PaperPluginTemplate?style=flat-square)](https://github.com/Atrimilan/PaperPluginTemplate/blob/master/LICENSE)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Atrimilan/LockBlockState/release.yml?branch=master&event=workflow_dispatch&style=flat-square)](https://github.com/Atrimilan/LockBlockState/actions/workflows/release.yml)
+[![GitHub Tag](https://img.shields.io/github/v/tag/Atrimilan/LockBlockState?style=flat-square)](https://github.com/Atrimilan/LockBlockState/releases)
+[![GitHub License](https://img.shields.io/github/license/Atrimilan/LockBlockState?style=flat-square)](https://github.com/Atrimilan/LockBlockState/blob/master/LICENSE)
 
 A template to get started with Paper plugin development and publishing.
 

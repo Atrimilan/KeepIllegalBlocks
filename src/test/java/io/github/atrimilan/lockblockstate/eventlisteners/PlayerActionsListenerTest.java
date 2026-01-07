@@ -1,4 +1,4 @@
-package io.github.atrimilan.paperplugintemplate.eventlisteners;
+package io.github.atrimilan.lockblockstate.eventlisteners;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
