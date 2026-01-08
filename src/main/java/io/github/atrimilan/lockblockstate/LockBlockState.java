@@ -2,7 +2,8 @@ package io.github.atrimilan.lockblockstate;
 
 import io.github.atrimilan.lockblockstate.commands.FlySpeedCommand;
 import io.github.atrimilan.lockblockstate.commands.ReadConfigCommand;
-import io.github.atrimilan.lockblockstate.eventlisteners.PlayerActionsListener;
+import io.github.atrimilan.lockblockstate.eventlisteners.BlockInteractionListener;
+import io.github.atrimilan.lockblockstate.services.BlockInteractionService;
 import io.github.atrimilan.lockblockstate.services.FlySpeedService;
 import io.github.atrimilan.lockblockstate.services.ReadConfigService;
 import io.papermc.paper.command.brigadier.Commands;
@@ -25,7 +26,7 @@ public class LockBlockState extends JavaPlugin {
     }
 
     private void registerPluginCommands() {
-        FlySpeedCommand   flySpeedCommand   = new FlySpeedCommand(new FlySpeedService());
+        FlySpeedCommand flySpeedCommand = new FlySpeedCommand(new FlySpeedService());
         ReadConfigCommand readConfigCommand = new ReadConfigCommand(new ReadConfigService(this.getConfig()));
 
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
@@ -36,6 +37,7 @@ public class LockBlockState extends JavaPlugin {
     }
 
     private void registerPluginEvents() {
-        getServer().getPluginManager().registerEvents(new PlayerActionsListener(), this);
+        getServer().getPluginManager().registerEvents( //
+                new BlockInteractionListener(this, new BlockInteractionService()), this);
     }
 }
