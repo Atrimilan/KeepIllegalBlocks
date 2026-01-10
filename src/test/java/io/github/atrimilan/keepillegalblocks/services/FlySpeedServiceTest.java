@@ -1,4 +1,4 @@
-package io.github.atrimilan.lockblockstate.services;
+package io.github.atrimilan.keepillegalblocks.services;
 
 import com.mojang.brigadier.Command;
 import net.kyori.adventure.text.Component;

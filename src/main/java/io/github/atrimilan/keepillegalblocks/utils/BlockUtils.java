@@ -1,4 +1,4 @@
-package io.github.atrimilan.lockblockstate.utils;
+package io.github.atrimilan.keepillegalblocks.utils;
 
 import com.destroystokyo.paper.MaterialTags;
 import org.bukkit.Material;
@@ -8,7 +8,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.data.*;
 import org.bukkit.block.data.type.*;
 
-import static io.github.atrimilan.lockblockstate.utils.DebugUtils.MessageType.*;
+import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType.*;
 
 public class BlockUtils {
 

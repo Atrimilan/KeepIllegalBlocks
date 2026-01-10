@@ -1,8 +1,8 @@
-package io.github.atrimilan.lockblockstate.commands;
+package io.github.atrimilan.keepillegalblocks.commands;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.CommandNode;
-import io.github.atrimilan.lockblockstate.services.ReadConfigService;
+import io.github.atrimilan.keepillegalblocks.services.ReadConfigService;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.command.CommandSender;
 import org.junit.jupiter.api.BeforeEach;

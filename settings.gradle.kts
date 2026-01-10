@@ -1,1 +1,1 @@
-rootProject.name = "LockBlockState"
+rootProject.name = "KeepIllegalBlocks"

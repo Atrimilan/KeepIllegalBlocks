@@ -1,4 +1,4 @@
-package io.github.atrimilan.lockblockstate.commands;
+package io.github.atrimilan.keepillegalblocks.commands;
 
 
 import com.mojang.brigadier.arguments.FloatArgumentType;
@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import io.github.atrimilan.lockblockstate.services.FlySpeedService;
+import io.github.atrimilan.keepillegalblocks.services.FlySpeedService;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;

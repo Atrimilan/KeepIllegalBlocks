@@ -1,7 +1,7 @@
-package io.github.atrimilan.lockblockstate.eventlisteners;
+package io.github.atrimilan.keepillegalblocks.eventlisteners;
 
-import io.github.atrimilan.lockblockstate.services.BlockDependencyService;
-import io.github.atrimilan.lockblockstate.utils.BlockUtils;
+import io.github.atrimilan.keepillegalblocks.services.BlockDependencyService;
+import io.github.atrimilan.keepillegalblocks.utils.BlockUtils;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.event.EventHandler;

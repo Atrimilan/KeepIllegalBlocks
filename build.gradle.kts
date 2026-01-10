@@ -45,7 +45,7 @@ tasks {
             "-Dcom.mojang.eula.agree=true", "-Dserver.port=$serverPort"
         )
 
-        if (providers.gradleProperty("lockblockstate.debug").isPresent) customJvmArgs.add("-Dlockblockstate.debug=true")
+        if (providers.gradleProperty("keepillegalblocks.debug").isPresent) customJvmArgs.add("-Dkeepillegalblocks.debug=true")
 
         jvmArgs(customJvmArgs)
         println("Starting with JVM args: $jvmArgs")

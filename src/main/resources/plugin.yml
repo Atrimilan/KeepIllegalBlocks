@@ -1,12 +1,12 @@
-name: LockBlockState
+name: KeepIllegalBlocks
 version: 1.0.0
-main: io.github.atrimilan.lockblockstate.LockBlockState
+main: io.github.atrimilan.keepillegalblocks.KeepIllegalBlocks
 description: Prevent illegal blocks from breaking due to physic when players interact with an adjacent block
 author: Atrimilan
-website: https://github.com/Atrimilan/LockBlockState
+website: https://github.com/Atrimilan/KeepIllegalBlocks
 api-version: '1.20.6'
 
 permissions:
-#  lbs.perm:
+#  kib.perm:
 #    description: Description of the permission
 #    default: true/fasle/op/notop

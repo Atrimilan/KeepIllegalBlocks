@@ -1,16 +1,16 @@
-package io.github.atrimilan.lockblockstate;
+package io.github.atrimilan.keepillegalblocks;
 
-import io.github.atrimilan.lockblockstate.commands.FlySpeedCommand;
-import io.github.atrimilan.lockblockstate.commands.ReadConfigCommand;
-import io.github.atrimilan.lockblockstate.eventlisteners.BlockInteractionListener;
-import io.github.atrimilan.lockblockstate.services.BlockDependencyService;
-import io.github.atrimilan.lockblockstate.services.FlySpeedService;
-import io.github.atrimilan.lockblockstate.services.ReadConfigService;
+import io.github.atrimilan.keepillegalblocks.commands.FlySpeedCommand;
+import io.github.atrimilan.keepillegalblocks.commands.ReadConfigCommand;
+import io.github.atrimilan.keepillegalblocks.eventlisteners.BlockInteractionListener;
+import io.github.atrimilan.keepillegalblocks.services.BlockDependencyService;
+import io.github.atrimilan.keepillegalblocks.services.FlySpeedService;
+import io.github.atrimilan.keepillegalblocks.services.ReadConfigService;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class LockBlockState extends JavaPlugin {
+public class KeepIllegalBlocks extends JavaPlugin {
 
     @Override
     public void onEnable() {

@@ -1,7 +1,7 @@
-package io.github.atrimilan.lockblockstate.services;
+package io.github.atrimilan.keepillegalblocks.services;
 
-import io.github.atrimilan.lockblockstate.utils.BlockUtils;
-import io.github.atrimilan.lockblockstate.utils.DebugUtils;
+import io.github.atrimilan.keepillegalblocks.utils.BlockUtils;
+import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -10,7 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 
-import static io.github.atrimilan.lockblockstate.utils.DebugUtils.MessageType.INFO;
+import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType.INFO;
 
 public class BlockDependencyService {
 
