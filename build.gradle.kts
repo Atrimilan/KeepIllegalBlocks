@@ -41,12 +41,17 @@ tasks {
     runServer {
         runDirectory.set(file(localServerDir))
 
-        jvmArgs(
+        val customJvmArgs = mutableListOf( // Add custom JVM arguments here
             "-Dcom.mojang.eula.agree=true", "-Dserver.port=$serverPort"
         )
 
+        if (providers.gradleProperty("lockblockstate.debug").isPresent) customJvmArgs.add("-Dlockblockstate.debug=true")
+
+        jvmArgs(customJvmArgs)
+        println("Starting with JVM args: $jvmArgs")
+
         doFirst {
-            // Note: if you have already run the server once, you must manually delete the following files in order to modify them
+            // Note: if you have already run the server once, the following files will not be overwritten; you must first delete them manually
             val serverProperties = file("$localServerDir/server.properties")
             val bukkitYml = file("$localServerDir/bukkit.yml")
 
@@ -69,6 +74,10 @@ tasks {
                 """.trimIndent()
             )
         }
+    }
+
+    named("runDevBundleServer") {
+        group = null
     }
 
     test {

@@ -1,7 +1,7 @@
 name: LockBlockState
 version: 1.0.0
 main: io.github.atrimilan.lockblockstate.LockBlockState
-description: Prevent blocks from breaking when players interact with an adjacent block
+description: Prevent illegal blocks from breaking due to physic when players interact with an adjacent block
 author: Atrimilan
 website: https://github.com/Atrimilan/LockBlockState
 api-version: '1.20.6'

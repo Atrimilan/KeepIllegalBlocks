@@ -1,7 +1,10 @@
 <component name="ProjectCodeStyleConfiguration">
   <code_scheme name="Project" version="173">
     <codeStyleSettings language="JAVA">
+      <option name="ALIGN_MULTILINE_PARAMETERS_IN_CALLS" value="true" />
+      <option name="ALIGN_MULTILINE_BINARY_OPERATION" value="true" />
       <option name="ALIGN_MULTILINE_ASSIGNMENT" value="true" />
+      <option name="ALIGN_MULTILINE_TERNARY_OPERATION" value="true" />
       <option name="ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION" value="true" />
       <option name="CALL_PARAMETERS_WRAP" value="1" />
       <option name="METHOD_PARAMETERS_WRAP" value="1" />
@@ -10,9 +13,11 @@
       <option name="EXTENDS_KEYWORD_WRAP" value="1" />
       <option name="THROWS_KEYWORD_WRAP" value="1" />
       <option name="METHOD_CALL_CHAIN_WRAP" value="1" />
+      <option name="BINARY_OPERATION_WRAP" value="1" />
       <option name="TERNARY_OPERATION_WRAP" value="1" />
       <option name="ARRAY_INITIALIZER_WRAP" value="1" />
       <option name="WRAP_COMMENTS" value="true" />
+      <option name="ENUM_CONSTANTS_WRAP" value="1" />
     </codeStyleSettings>
   </code_scheme>
 </component>
