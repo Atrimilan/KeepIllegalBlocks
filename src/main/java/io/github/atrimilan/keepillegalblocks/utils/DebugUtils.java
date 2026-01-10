@@ -7,10 +7,8 @@ import java.util.function.Supplier;
 
 /**
  * To enable debug mode:
- * <ul>
  * <li>If you are using the "runServer" Gradle task, add the Gradle script parameter {@code -Pkeepillegalblocks.debug} in your run configuration.</li>
  * <li>Otherwise, add {@code -Dkeepillegalblocks.debug=true} to the JVM arguments of your Minecraft server.</li>
- * </ul>
  */
 public class DebugUtils {
 

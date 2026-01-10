@@ -1,26 +1,40 @@
-package io.github.atrimilan.keepillegalblocks.utils;
+package io.github.atrimilan.keepillegalblocks.utils.blocks;
 
 import com.destroystokyo.paper.MaterialTags;
+import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.data.*;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Rail;
 import org.bukkit.block.data.type.*;
 
-import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType.*;
+import java.util.EnumMap;
+import java.util.Map;
 
-public class BlockUtils {
+import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType.WARN;
 
-    enum FragileType {
+/**
+ * A "fragile" block is an illegally placed block, such as a door on another door, a torch attached to a sign, or
+ * anything that the game physic would generally not allow. Fragile blocks can commonly be placed with a Debug Stick, or
+ * a plugin like WorldEdit.
+ *
+ * @see InteractableBlockUtils
+ */
+public class FragileBlockUtils {
+
+    private static final Map<Material, FragileType> CACHE = new EnumMap<>(Material.class);
+
+    private enum FragileType {
         AMETHYST_CLUSTER, BANNER, BED, BELL, BUTTON, CACTUS, CAKE, CARPET, CAVE_VINES, CHORUS, COCOA, COMPARATOR, CORAL,
         CROP, DEAD_BUSH, DOOR, DRIPLEAF, FERN, FLOWER, FROGSPAWN, FUNGUS, GLOW_LICHEN, GRASS, HANGING_ROOTS,
         HANGING_SIGN, LADDER, LANTERN, LEVER, LILY_PAD, MANGROVE_PROPAGULE, MUSHROOM, NETHER_ROOTS, NETHER_SPROUTS,
-        NETHER_WART, POINTED_DRIPSTONE, PRESSURE_PLATE, RAIL, REDSTONE_WIRE, REPEATER, SAPLING, SCAFFOLDING, SCULK_VEIN,
-        SEA_PICKLE, SIGN, SNOW, SUGAR_CANE, SWEET_BERRY_BUSH, TORCH, TRIPWIRE_HOOK, TWISTING_VINES, VINE, WEEPING_VINES
+        NETHER_WART, NONE, POINTED_DRIPSTONE, PRESSURE_PLATE, RAIL, REDSTONE_WIRE, REPEATER, SAPLING, SCAFFOLDING,
+        SCULK_VEIN, SEA_PICKLE, SIGN, SNOW, SUGAR_CANE, SWEET_BERRY_BUSH, TORCH, TRIPWIRE_HOOK, TWISTING_VINES, VINE,
+        WEEPING_VINES,
     }
 
-    static FragileType getFragileType(BlockData data) {
+    private static FragileType compute(BlockData data) {
         return switch (data) {
             case AmethystCluster ignored -> FragileType.AMETHYST_CLUSTER;
             case Bed ignored -> FragileType.BED;
@@ -83,51 +97,26 @@ public class BlockUtils {
                 case VINE -> FragileType.VINE;
                 case WEEPING_VINES, WEEPING_VINES_PLANT -> FragileType.WEEPING_VINES;
 
-                default -> null;
+                default -> FragileType.NONE;
             };
         };
     }
 
-    enum InteractableType {
-        OPENABLE, POWERABLE, LIGHTABLE, DISPENSER
-    }
-
-    static InteractableType getInteractableType(BlockData data) {
-        return switch (data) {
-            case Openable ignored -> InteractableType.OPENABLE;
-            case Powerable ignored -> InteractableType.POWERABLE;
-            case Lightable ignored -> InteractableType.LIGHTABLE;
-            case Dispenser ignored -> InteractableType.DISPENSER;
-            default -> null;
-        };
-    }
-
+    /**
+     * Check if a block is fragile.
+     *
+     * @param block The block to check whether it is fragile
+     * @return True if the block is fragile, false otherwise
+     */
     public static boolean isFragile(Block block) {
         if (block == null || block.getType().isAir()) return false;
 
-        FragileType type = getFragileType(block.getBlockData());
-        boolean isFragile = type != null;
+        FragileType type = CACHE.computeIfAbsent(block.getType(), mat -> compute(mat.createBlockData()));
+        boolean isFragile = type != FragileType.NONE;
 
         if (isFragile)
             DebugUtils.sendChat(() -> "Block <white>" + block.getType() + "</white> is fragile: <white>" + type, WARN);
 
         return isFragile;
-    }
-
-    public static boolean isInteractable(Block block) {
-        if (block == null || block.getType().isAir()) return false;
-
-        InteractableType type = getInteractableType(block.getBlockData());
-        boolean isInteractable = type != null;
-
-        DebugUtils.sendChat(() -> "Block <white>" + block.getType() + "</white> " +
-                                  (isInteractable ? ("is interactable: <white>" + type) : "is not interactable"),
-                            isInteractable ? OK : ERROR);
-
-        return isInteractable;
-    }
-
-    public static boolean willTriggerAdditionalUpdate(BlockState state) {
-        return Tag.BUTTONS.isTagged(state.getType());
     }
 }

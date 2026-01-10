@@ -1,7 +1,8 @@
 package io.github.atrimilan.keepillegalblocks.services;
 
-import io.github.atrimilan.keepillegalblocks.utils.BlockUtils;
+import io.github.atrimilan.keepillegalblocks.utils.blocks.FragileBlockUtils;
 import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
+import io.github.atrimilan.keepillegalblocks.utils.blocks.InteractableBlockUtils;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -50,7 +51,7 @@ public class BlockDependencyService {
             for (BlockFace face : FACES) {
                 Block relative = currentBlock.getRelative(face);
                 Location relativeLoc = relative.getLocation();
-                if (!visited.contains(relativeLoc) && visited.size() < MAX_BLOCKS && BlockUtils.isFragile(relative)) {
+                if (!visited.contains(relativeLoc) && visited.size() < MAX_BLOCKS && FragileBlockUtils.isFragile(relative)) {
                     visited.add(relativeLoc); // Mark as visited
                     queue.add(relative); // Add to queue for next BFS iteration
                 }
@@ -66,10 +67,6 @@ public class BlockDependencyService {
     //   Known blocks: CACTUS, CAVE_VINES, CAVE_VINES_PLANT, CHORUS_FLOWER, CHORUS_PLANT, POINTED_DRIPSTONE, SCAFFOLDING,
     //   SUGAR_CANE, TWISTING_VINES, TWISTING_VINES_PLANT, WEEPING_VINES, WEEPING_VINES_PLANT.
 
-    /**
-     *
-     * @param fragileBlockStates
-     */
     public void scheduleRestoration(List<BlockState> fragileBlockStates) {
         if (fragileBlockStates.isEmpty()) return; // Return if there's nothing to restore
 
@@ -84,7 +81,7 @@ public class BlockDependencyService {
 
             // Restore the first block if it causes an additional update (e.g. a button) and if there are adjacent fragile blocks
             BlockState firstState = fragileBlockStates.getFirst();
-            if (BlockUtils.willTriggerAdditionalUpdate(firstState) && fragileBlockStates.size() > 1)
+            if (InteractableBlockUtils.willTriggerAdditionalUpdate(firstState) && fragileBlockStates.size() > 1)
                 firstState.update(true, false); // Force restore without physic
 
         }, 2L); // Schedule restoration in 2 ticks
