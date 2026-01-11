@@ -1,7 +1,7 @@
 package io.github.atrimilan.keepillegalblocks.utils.blocks;
 
 import com.destroystokyo.paper.MaterialTags;
-import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
+import io.github.atrimilan.keepillegalblocks.utils.debug.DebugUtils;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
@@ -11,9 +11,10 @@ import org.bukkit.block.data.type.*;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
-import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType.ERROR;
-import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType.OK;
+import static io.github.atrimilan.keepillegalblocks.utils.debug.DebugUtils.MessageType.ERROR;
+import static io.github.atrimilan.keepillegalblocks.utils.debug.DebugUtils.MessageType.OK;
 
 /**
  * An “interactable” is a block that a player can interact with directly (with right-clicking), and which physically
@@ -26,11 +27,31 @@ import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType
  */
 public class InteractableBlockUtils {
 
-    private static final Map<Material, InteractableType> CACHE = new EnumMap<>(Material.class);
+    private static final Map<Material, InteractableType> INTERACTABLE_BLOCKS = new EnumMap<>(Material.class);
 
     private enum InteractableType {
         CAMPFIRE, CANDLE, CAULDRON, COMPARATOR, COMPOSTER, COPPER_BLOCK, DAYLIGHT_DETECTOR, DOOR, END_PORTAL_FRAME,
         GATE, LECTERN, NONE, REPEATER, SWITCH, TRAP_DOOR,
+    }
+
+    public static void init(Logger logger) {
+        loadInteractableBlocks();
+        logger.info(() -> "Interactable blocks loaded: " +
+                          INTERACTABLE_BLOCKS.values().stream().filter(type -> type != InteractableType.NONE).count());
+    }
+
+    private static void loadInteractableBlocks() {
+        for (Material mat : Material.values()) {
+            if (!mat.isBlock() || mat.isAir() || mat.isLegacy()) {
+                INTERACTABLE_BLOCKS.put(mat, InteractableType.NONE);
+            } else {
+                try {
+                    INTERACTABLE_BLOCKS.put(mat, compute(mat.createBlockData()));
+                } catch (Exception e) {
+                    INTERACTABLE_BLOCKS.put(mat, InteractableType.NONE);
+                }
+            }
+        }
     }
 
     private static InteractableType compute(BlockData data) {
@@ -56,7 +77,6 @@ public class InteractableBlockUtils {
                 default -> InteractableType.NONE;
             };
         };
-
     }
 
     /**
@@ -66,9 +86,9 @@ public class InteractableBlockUtils {
      * @return True if the block is interactable, false otherwise
      */
     public static boolean isInteractable(Block block) {
-        if (block == null || block.getType().isAir()) return false;
+        if (block == null || INTERACTABLE_BLOCKS.isEmpty()) return false;
 
-        InteractableType type = CACHE.computeIfAbsent(block.getType(), mat -> compute(mat.createBlockData()));
+        InteractableType type = INTERACTABLE_BLOCKS.getOrDefault(block.getType(), InteractableType.NONE);
         boolean isInteractable = type != InteractableType.NONE;
 
         DebugUtils.sendChat(() -> "Block <white>" + block.getType() + "</white> " +

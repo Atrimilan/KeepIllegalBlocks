@@ -1,7 +1,7 @@
 package io.github.atrimilan.keepillegalblocks.utils.blocks;
 
 import com.destroystokyo.paper.MaterialTags;
-import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
+import io.github.atrimilan.keepillegalblocks.utils.debug.DebugUtils;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
@@ -11,8 +11,9 @@ import org.bukkit.block.data.type.*;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
-import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType.WARN;
+import static io.github.atrimilan.keepillegalblocks.utils.debug.DebugUtils.MessageType.WARN;
 
 /**
  * A "fragile" block is an illegally placed block, such as a door on another door, a torch attached to a sign, or
@@ -23,7 +24,7 @@ import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType
  */
 public class FragileBlockUtils {
 
-    private static final Map<Material, FragileType> CACHE = new EnumMap<>(Material.class);
+    private static final Map<Material, FragileType> FRAGILE_BLOCKS = new EnumMap<>(Material.class);
 
     private enum FragileType {
         AMETHYST_CLUSTER, BANNER, BED, BELL, BUTTON, CACTUS, CAKE, CARPET, CAVE_VINES, CHORUS, COCOA, COMPARATOR, CORAL,
@@ -32,6 +33,26 @@ public class FragileBlockUtils {
         NETHER_WART, NONE, POINTED_DRIPSTONE, PRESSURE_PLATE, RAIL, REDSTONE_WIRE, REPEATER, SAPLING, SCAFFOLDING,
         SCULK_VEIN, SEA_PICKLE, SIGN, SNOW, SUGAR_CANE, SWEET_BERRY_BUSH, TORCH, TRIPWIRE_HOOK, TWISTING_VINES, VINE,
         WEEPING_VINES,
+    }
+
+    public static void init(Logger logger) {
+        loadFragileBlocks();
+        logger.info(() -> "Fragile blocks loaded: " +
+                          FRAGILE_BLOCKS.values().stream().filter(type -> type != FragileType.NONE).count());
+    }
+
+    private static void loadFragileBlocks() {
+        for (Material mat : Material.values()) {
+            if (!mat.isBlock() || mat.isAir() || mat.isLegacy()) {
+                FRAGILE_BLOCKS.put(mat, FragileType.NONE);
+            } else {
+                try {
+                    FRAGILE_BLOCKS.put(mat, compute(mat.createBlockData()));
+                } catch (Exception e) {
+                    FRAGILE_BLOCKS.put(mat, FragileType.NONE);
+                }
+            }
+        }
     }
 
     private static FragileType compute(BlockData data) {
@@ -111,7 +132,7 @@ public class FragileBlockUtils {
     public static boolean isFragile(Block block) {
         if (block == null || block.getType().isAir()) return false;
 
-        FragileType type = CACHE.computeIfAbsent(block.getType(), mat -> compute(mat.createBlockData()));
+        FragileType type = FRAGILE_BLOCKS.getOrDefault(block.getType(), FragileType.NONE);
         boolean isFragile = type != FragileType.NONE;
 
         if (isFragile)

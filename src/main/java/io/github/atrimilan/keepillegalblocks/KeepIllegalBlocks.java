@@ -3,14 +3,22 @@ package io.github.atrimilan.keepillegalblocks;
 import io.github.atrimilan.keepillegalblocks.commands.FlySpeedCommand;
 import io.github.atrimilan.keepillegalblocks.commands.ReadConfigCommand;
 import io.github.atrimilan.keepillegalblocks.eventlisteners.BlockInteractionListener;
-import io.github.atrimilan.keepillegalblocks.services.BlockDependencyService;
+import io.github.atrimilan.keepillegalblocks.services.BlockRestorerService;
 import io.github.atrimilan.keepillegalblocks.services.FlySpeedService;
 import io.github.atrimilan.keepillegalblocks.services.ReadConfigService;
+import io.github.atrimilan.keepillegalblocks.utils.blocks.FragileBlockUtils;
+import io.github.atrimilan.keepillegalblocks.utils.blocks.InteractableBlockUtils;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class KeepIllegalBlocks extends JavaPlugin {
+
+    @Override
+    public void onLoad() {
+        InteractableBlockUtils.init(this.getLogger());
+        FragileBlockUtils.init(this.getLogger());
+    }
 
     @Override
     public void onEnable() {
@@ -37,7 +45,7 @@ public class KeepIllegalBlocks extends JavaPlugin {
     }
 
     private void registerPluginEvents() {
-        BlockDependencyService blockDependencyService = new BlockDependencyService(this);
-        getServer().getPluginManager().registerEvents(new BlockInteractionListener(blockDependencyService), this);
+        BlockRestorerService blockRestorerService = new BlockRestorerService(this);
+        getServer().getPluginManager().registerEvents(new BlockInteractionListener(blockRestorerService), this);
     }
 }

@@ -1,7 +1,7 @@
 package io.github.atrimilan.keepillegalblocks.services;
 
 import io.github.atrimilan.keepillegalblocks.utils.blocks.FragileBlockUtils;
-import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
+import io.github.atrimilan.keepillegalblocks.utils.debug.DebugUtils;
 import io.github.atrimilan.keepillegalblocks.utils.blocks.InteractableBlockUtils;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -11,9 +11,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 
-import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType.INFO;
+import static io.github.atrimilan.keepillegalblocks.utils.debug.DebugUtils.MessageType.INFO;
 
-public class BlockDependencyService {
+public class BlockRestorerService {
 
     private final JavaPlugin plugin;
 
@@ -22,7 +22,7 @@ public class BlockDependencyService {
     private static final BlockFace[] FACES = {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH,
                                               BlockFace.EAST, BlockFace.WEST};
 
-    public BlockDependencyService(JavaPlugin plugin) {
+    public BlockRestorerService(JavaPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -51,7 +51,8 @@ public class BlockDependencyService {
             for (BlockFace face : FACES) {
                 Block relative = currentBlock.getRelative(face);
                 Location relativeLoc = relative.getLocation();
-                if (!visited.contains(relativeLoc) && visited.size() < MAX_BLOCKS && FragileBlockUtils.isFragile(relative)) {
+                if (!visited.contains(relativeLoc) && visited.size() < MAX_BLOCKS &&
+                    FragileBlockUtils.isFragile(relative)) {
                     visited.add(relativeLoc); // Mark as visited
                     queue.add(relative); // Add to queue for next BFS iteration
                 }
@@ -62,11 +63,19 @@ public class BlockDependencyService {
         return statesToSave;
     }
 
-    // TODO - Schedule the following task in 1 tick (not 2).
-    //   At the moment, we need to wait an additional tick because some blocks are destroyed in cascade (tick by tick).
-    //   Known blocks: CACTUS, CAVE_VINES, CAVE_VINES_PLANT, CHORUS_FLOWER, CHORUS_PLANT, POINTED_DRIPSTONE, SCAFFOLDING,
-    //   SUGAR_CANE, TWISTING_VINES, TWISTING_VINES_PLANT, WEEPING_VINES, WEEPING_VINES_PLANT.
+    // TODO - Schedule restoration in 1 tick for non-cascade-destructible fragile blocks
 
+    /**
+     * Schedule restoration of fragile blocks that might have been broken after the update of an interactable block.
+     * <p>
+     * Note: Restoration is scheduled in 2 ticks, because some fragile blocks are not broken within the first tick.
+     * Known blocks doing so are blocks breaking in cascade (tick by tick): {@code CACTUS}, {@code CAVE_VINES},
+     * {@code CAVE_VINES_PLANT}, {@code CHORUS_FLOWER}, {@code CHORUS_PLANT}, {@code POINTED_DRIPSTONE},
+     * {@code SCAFFOLDING}, {@code SUGAR_CANE}, {@code TWISTING_VINES}, {@code TWISTING_VINES_PLANT},
+     * {@code WEEPING_VINES}, {@code WEEPING_VINES_PLANT}.
+     *
+     * @param fragileBlockStates List of fragile blocks to restore (if they have been broken)
+     */
     public void scheduleRestoration(List<BlockState> fragileBlockStates) {
         if (fragileBlockStates.isEmpty()) return; // Return if there's nothing to restore
 

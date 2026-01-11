@@ -1,6 +1,6 @@
 package io.github.atrimilan.keepillegalblocks.eventlisteners;
 
-import io.github.atrimilan.keepillegalblocks.services.BlockDependencyService;
+import io.github.atrimilan.keepillegalblocks.services.BlockRestorerService;
 import io.github.atrimilan.keepillegalblocks.utils.blocks.InteractableBlockUtils;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -17,9 +17,9 @@ import java.util.List;
  */
 public class BlockInteractionListener implements Listener {
 
-    private final BlockDependencyService service;
+    private final BlockRestorerService service;
 
-    public BlockInteractionListener(BlockDependencyService service) {
+    public BlockInteractionListener(BlockRestorerService service) {
         this.service = service;
     }
 
