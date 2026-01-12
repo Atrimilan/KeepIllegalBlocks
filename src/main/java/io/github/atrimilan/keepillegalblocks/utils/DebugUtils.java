@@ -1,4 +1,4 @@
-package io.github.atrimilan.keepillegalblocks.utils.debug;
+package io.github.atrimilan.keepillegalblocks.utils;
 
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;

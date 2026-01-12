@@ -1,6 +1,6 @@
-package io.github.atrimilan.keepillegalblocks.enums;
+package io.github.atrimilan.keepillegalblocks.configuration.types;
 
-public enum FragileType implements KibBlockType {
+public enum FragileType implements BlockType {
     AMETHYST_CLUSTER("amethyst-clusters"),
     BANNER("banners"),
     BED("beds"),
@@ -63,5 +63,10 @@ public enum FragileType implements KibBlockType {
     @Override
     public String getConfigKey() {
         return configKey;
+    }
+
+    @Override
+    public FragileType getNone() {
+        return NONE;
     }
 }

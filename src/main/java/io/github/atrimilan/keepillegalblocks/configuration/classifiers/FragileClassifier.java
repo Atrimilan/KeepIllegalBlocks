@@ -1,57 +1,25 @@
-package io.github.atrimilan.keepillegalblocks.utils.blocks;
+package io.github.atrimilan.keepillegalblocks.configuration.classifiers;
 
 import com.destroystokyo.paper.MaterialTags;
-import io.github.atrimilan.keepillegalblocks.enums.FragileType;
-import io.github.atrimilan.keepillegalblocks.enums.InteractableType;
-import io.github.atrimilan.keepillegalblocks.utils.debug.DebugUtils;
+import io.github.atrimilan.keepillegalblocks.configuration.types.FragileType;
 import org.bukkit.Material;
 import org.bukkit.Tag;
-import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Rail;
 import org.bukkit.block.data.type.*;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.EnumMap;
-import java.util.Map;
-
-import static io.github.atrimilan.keepillegalblocks.utils.debug.DebugUtils.MessageType.WARN;
 
 /**
  * A "fragile" block is an illegally placed block, such as a door on another door, a torch attached to a sign, or
  * anything that the game physic would generally not allow. Fragile blocks can commonly be placed with a Debug Stick, or
- * a plugin like WorldEdit.
+ * plugins like WorldEdit.
  *
- * @see InteractableBlockUtils
+ * @see InteractableClassifier
  */
-public final class FragileBlockUtils extends AbstractKibBlockUtils {
+public class FragileClassifier {
 
-    public static final Map<Material, FragileType> FRAGILE_BLOCKS = new EnumMap<>(Material.class);
+    public FragileType classify(Material mat) {
+        BlockData data = mat.createBlockData();
 
-    /**
-     * Load all fragile blocks, ignoring the materials and categories blacklisted in the {@code "fragile-blocks"}
-     * section of the config.yml file.
-     *
-     * @param plugin The JavaPlugin instance
-     */
-    public static void init(JavaPlugin plugin) {
-        int blacklisted = loadFragileBlocks(plugin.getConfig());
-        plugin.getLogger().info(() -> "Fragile blocks loaded: " + FRAGILE_BLOCKS.values().stream() //
-                .filter(type -> type != FragileType.NONE).count() + //
-                                      (blacklisted > 0 ? " (" + blacklisted + " blacklisted in config.yml)" : ""));
-    }
-
-    public static int reload(JavaPlugin plugin) {
-        FRAGILE_BLOCKS.clear();
-        return loadFragileBlocks(plugin.getConfig());
-    }
-
-    private static int loadFragileBlocks(FileConfiguration config) {
-        return loadKibBlocks(config, "fragile-blocks.", FRAGILE_BLOCKS, mat -> compute(mat.createBlockData()));
-    }
-
-    private static FragileType compute(BlockData data) {
         return switch (data) {
             case AmethystCluster ignored -> FragileType.AMETHYST_CLUSTER;
             case Bed ignored -> FragileType.BED;
@@ -76,7 +44,7 @@ public final class FragileBlockUtils extends AbstractKibBlockUtils {
             case SculkVein ignored -> FragileType.SCULK_VEIN;
             case SeaPickle ignored -> FragileType.SEA_PICKLE;
             case Snow ignored -> FragileType.SNOW;
-            case Switch ignored -> FragileType.SWITCH;
+            case Switch ignored -> FragileType.SWITCH; // Lever + Button
             case TripwireHook ignored -> FragileType.TRIPWIRE_HOOK;
 
             default -> switch (data.getMaterial()) {
@@ -116,23 +84,5 @@ public final class FragileBlockUtils extends AbstractKibBlockUtils {
                 default -> FragileType.NONE;
             };
         };
-    }
-
-    /**
-     * Check if a block is fragile.
-     *
-     * @param block The block to check whether it is fragile
-     * @return True if the block is fragile, false otherwise
-     */
-    public static boolean isFragile(Block block) {
-        if (block == null || block.getType().isAir()) return false;
-
-        FragileType type = FRAGILE_BLOCKS.getOrDefault(block.getType(), FragileType.NONE);
-        boolean isFragile = type != FragileType.NONE;
-
-        if (isFragile)
-            DebugUtils.sendChat(() -> "Block <white>" + block.getType() + "</white> is fragile: <white>" + type, WARN);
-
-        return isFragile;
     }
 }

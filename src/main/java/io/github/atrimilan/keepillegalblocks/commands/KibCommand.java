@@ -1,22 +1,31 @@
 package io.github.atrimilan.keepillegalblocks.commands;
 
+import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import io.github.atrimilan.keepillegalblocks.services.KibService;
+import io.github.atrimilan.keepillegalblocks.configuration.KibConfig;
+import io.github.atrimilan.keepillegalblocks.models.LoadResult;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 public class KibCommand {
 
     public static final String DESCRIPTION = "Reload KeepIllegalBlocks";
     public static final Set<String> ALIASES = Set.of("keepillegalblocks");
 
-    private final KibService kibService;
+    private final Logger logger;
+    private final KibConfig kibConfig;
 
-    public KibCommand(KibService kibService) {
-        this.kibService = kibService;
+    public KibCommand(Logger logger, KibConfig kibConfig) {
+        this.logger = logger;
+        this.kibConfig = kibConfig;
     }
 
     /**
@@ -31,6 +40,15 @@ public class KibCommand {
     }
 
     private int reloadKib(CommandContext<CommandSourceStack> ctx) {
-        return kibService.reloadKib();
+        List<LoadResult> results = kibConfig.reload();
+        CommandSender sender = ctx.getSource().getSender();
+
+        for (LoadResult result : results) {
+            if (ctx.getSource().getExecutor() instanceof Player)
+                sender.sendMessage(MiniMessage.miniMessage().deserialize(result.chatFormat()));
+
+            else logger.info(result::consoleFormat);
+        }
+        return Command.SINGLE_SUCCESS;
     }
 }

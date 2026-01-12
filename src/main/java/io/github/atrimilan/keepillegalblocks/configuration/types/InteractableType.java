@@ -1,6 +1,6 @@
-package io.github.atrimilan.keepillegalblocks.enums;
+package io.github.atrimilan.keepillegalblocks.configuration.types;
 
-public enum InteractableType implements KibBlockType {
+public enum InteractableType implements BlockType {
     CAMPFIRE("campfires"),
     CANDLE("candles"),
     CAULDRON("cauldrons"),
@@ -26,5 +26,10 @@ public enum InteractableType implements KibBlockType {
     @Override
     public String getConfigKey() {
         return configKey;
+    }
+
+    @Override
+    public InteractableType getNone() {
+        return NONE;
     }
 }

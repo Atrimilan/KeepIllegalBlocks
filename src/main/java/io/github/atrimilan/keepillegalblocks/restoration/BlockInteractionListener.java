@@ -1,7 +1,6 @@
-package io.github.atrimilan.keepillegalblocks.eventlisteners;
+package io.github.atrimilan.keepillegalblocks.restoration;
 
-import io.github.atrimilan.keepillegalblocks.services.BlockRestorerService;
-import io.github.atrimilan.keepillegalblocks.utils.blocks.InteractableBlockUtils;
+import io.github.atrimilan.keepillegalblocks.configuration.KibConfig;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.event.EventHandler;
@@ -12,15 +11,14 @@ import org.bukkit.inventory.EquipmentSlot;
 
 import java.util.List;
 
-/**
- * Listen to the player's interaction with a block adjacent to another that could break.
- */
 public class BlockInteractionListener implements Listener {
 
-    private final BlockRestorerService service;
+    private final BlockRestorationService service;
+    private final KibConfig config;
 
-    public BlockInteractionListener(BlockRestorerService service) {
+    public BlockInteractionListener(BlockRestorationService service, KibConfig config) {
         this.service = service;
+        this.config = config;
     }
 
     /**
@@ -45,7 +43,7 @@ public class BlockInteractionListener implements Listener {
         if (sourceBlock == null) return;
 
         // Check if the block is interactable
-        if (!InteractableBlockUtils.isInteractable(sourceBlock)) return;
+        if (!config.isInteractable(sourceBlock.getType())) return;
 
         // Perform a BFS to scan and save all fragile blocks that will break as a result of the player interaction
         List<BlockState> snapshot = service.recordFragileBlockStates(sourceBlock);
