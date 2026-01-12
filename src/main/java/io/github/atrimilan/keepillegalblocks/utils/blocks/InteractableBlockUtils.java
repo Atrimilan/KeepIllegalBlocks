@@ -29,7 +29,7 @@ import static io.github.atrimilan.keepillegalblocks.utils.debug.DebugUtils.Messa
  */
 public final class InteractableBlockUtils extends AbstractKibBlockUtils {
 
-    private static final Map<Material, InteractableType> INTERACTABLE_BLOCKS = new EnumMap<>(Material.class);
+    public static final Map<Material, InteractableType> INTERACTABLE_BLOCKS = new EnumMap<>(Material.class);
 
     /**
      * Load all interactable blocks, ignoring the materials and categories blacklisted in the
@@ -42,6 +42,11 @@ public final class InteractableBlockUtils extends AbstractKibBlockUtils {
         plugin.getLogger().info(() -> "Interactable blocks loaded: " + INTERACTABLE_BLOCKS.values().stream() //
                 .filter(type -> type != InteractableType.NONE).count() + //
                                       (blacklisted > 0 ? " (" + blacklisted + " blacklisted in config.yml)" : ""));
+    }
+
+    public static int reload(JavaPlugin plugin) {
+        INTERACTABLE_BLOCKS.clear();
+        return loadInteractableBlocks(plugin.getConfig());
     }
 
     private static int loadInteractableBlocks(FileConfiguration config) {

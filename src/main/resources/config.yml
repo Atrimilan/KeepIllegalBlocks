@@ -1,21 +1,19 @@
-#  _  _____ ___
-# | |/ /_ _| _ )   This configuration file can be used to exclude some interactable and fragile blocks,
-# | ' < | || _ \   either by blacklisting them or by disabling preconfigured categories.
-# |_|\_\___|___/   See all block names here: https://jd.papermc.io/paper/1.20.6/org/bukkit/Material.html
+#   _  _____ ___
+#  | |/ /_ _| _ )   This configuration file can be used to exclude some interactable and fragile blocks,
+#  | ' < | || _ \   either by blacklisting them or by disabling preconfigured categories.
+#  |_|\_\___|___/   See all block names here: https://jd.papermc.io/paper/1.20.6/org/bukkit/Material.html
 #
 
-###########################################################
-#---------- Configure interactable blocks below ----------#
-###########################################################
+#########################################################
+#---------- Interactable blocks configuration ----------#
+#########################################################
 
 interactable-blocks:
-  # Blacklist specific blocks from their names below:
-  blacklist:
-  #  - STONE_BUTTON
-  #  - OAK_DOOR
-  #  - ...
+  # You can blacklist specific blocks below
+  # See all block names here: https://jd.papermc.io/paper/1.20.6/org/bukkit/Material.html
+  blacklist: []
 
-  # Otherwise, you can disable preconfigured categories below:
+  # You can disable preconfigured categories below
   categories:
     campfires: true
     candles: true
@@ -32,20 +30,18 @@ interactable-blocks:
     switches: true # Levers + Buttons
     trap-doors: true
 
-######################################################
-#---------- Configure fragile blocks below ----------#
-######################################################
+####################################################
+#---------- Fragile blocks configuration ----------#
+####################################################
 
 fragile-blocks:
-  # Blacklist specific blocks from their names below:
-  blacklist:
-  #  - RED_BED
-  #  - OAK_DOOR
-  #  - ...
+  # You can blacklist specific blocks below
+  # See all block names here: https://jd.papermc.io/paper/1.20.6/org/bukkit/Material.html
+  blacklist: []
 
-  # Otherwise, you can disable preconfigured categories below:
+  # You can disable preconfigured categories below
   categories:
-    amethyst-clustbaers: true
+    amethyst-clusters: true
     banners: true
     beds: true
     bells: true

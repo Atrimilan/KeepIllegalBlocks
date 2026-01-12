@@ -2,6 +2,7 @@ package io.github.atrimilan.keepillegalblocks.utils.blocks;
 
 import com.destroystokyo.paper.MaterialTags;
 import io.github.atrimilan.keepillegalblocks.enums.FragileType;
+import io.github.atrimilan.keepillegalblocks.enums.InteractableType;
 import io.github.atrimilan.keepillegalblocks.utils.debug.DebugUtils;
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -26,7 +27,7 @@ import static io.github.atrimilan.keepillegalblocks.utils.debug.DebugUtils.Messa
  */
 public final class FragileBlockUtils extends AbstractKibBlockUtils {
 
-    private static final Map<Material, FragileType> FRAGILE_BLOCKS = new EnumMap<>(Material.class);
+    public static final Map<Material, FragileType> FRAGILE_BLOCKS = new EnumMap<>(Material.class);
 
     /**
      * Load all fragile blocks, ignoring the materials and categories blacklisted in the {@code "fragile-blocks"}
@@ -39,6 +40,11 @@ public final class FragileBlockUtils extends AbstractKibBlockUtils {
         plugin.getLogger().info(() -> "Fragile blocks loaded: " + FRAGILE_BLOCKS.values().stream() //
                 .filter(type -> type != FragileType.NONE).count() + //
                                       (blacklisted > 0 ? " (" + blacklisted + " blacklisted in config.yml)" : ""));
+    }
+
+    public static int reload(JavaPlugin plugin) {
+        FRAGILE_BLOCKS.clear();
+        return loadFragileBlocks(plugin.getConfig());
     }
 
     private static int loadFragileBlocks(FileConfiguration config) {

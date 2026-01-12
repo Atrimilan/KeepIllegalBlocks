@@ -1,11 +1,9 @@
 package io.github.atrimilan.keepillegalblocks;
 
-import io.github.atrimilan.keepillegalblocks.commands.FlySpeedCommand;
-import io.github.atrimilan.keepillegalblocks.commands.ReadConfigCommand;
+import io.github.atrimilan.keepillegalblocks.commands.KibCommand;
 import io.github.atrimilan.keepillegalblocks.eventlisteners.BlockInteractionListener;
 import io.github.atrimilan.keepillegalblocks.services.BlockRestorerService;
-import io.github.atrimilan.keepillegalblocks.services.FlySpeedService;
-import io.github.atrimilan.keepillegalblocks.services.ReadConfigService;
+import io.github.atrimilan.keepillegalblocks.services.KibService;
 import io.github.atrimilan.keepillegalblocks.utils.blocks.FragileBlockUtils;
 import io.github.atrimilan.keepillegalblocks.utils.blocks.InteractableBlockUtils;
 import io.papermc.paper.command.brigadier.Commands;
@@ -29,18 +27,16 @@ public class KeepIllegalBlocks extends JavaPlugin {
 
     @Override
     public void onEnable() {
-//        registerPluginCommands();
+        registerPluginCommands();
         registerPluginEvents();
     }
 
     private void registerPluginCommands() {
-        FlySpeedCommand flySpeedCommand = new FlySpeedCommand(new FlySpeedService());
-        ReadConfigCommand readConfigCommand = new ReadConfigCommand(new ReadConfigService(this.getConfig()));
+        KibCommand kibCommand = new KibCommand(new KibService(this));
 
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             final Commands commands = event.registrar();
-            commands.register(flySpeedCommand.create(), FlySpeedCommand.DESCRIPTION, FlySpeedCommand.ALIASES);
-            commands.register(readConfigCommand.create(), ReadConfigCommand.DESCRIPTION, ReadConfigCommand.ALIASES);
+            commands.register(kibCommand.create(), KibCommand.DESCRIPTION, KibCommand.ALIASES);
         });
     }
 
