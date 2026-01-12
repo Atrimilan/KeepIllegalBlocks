@@ -1,6 +1,7 @@
 package io.github.atrimilan.keepillegalblocks.utils.blocks;
 
 import com.destroystokyo.paper.MaterialTags;
+import io.github.atrimilan.keepillegalblocks.enums.FragileType;
 import io.github.atrimilan.keepillegalblocks.utils.debug.DebugUtils;
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -8,10 +9,11 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Rail;
 import org.bukkit.block.data.type.*;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import static io.github.atrimilan.keepillegalblocks.utils.debug.DebugUtils.MessageType.WARN;
 
@@ -22,37 +24,25 @@ import static io.github.atrimilan.keepillegalblocks.utils.debug.DebugUtils.Messa
  *
  * @see InteractableBlockUtils
  */
-public class FragileBlockUtils {
+public final class FragileBlockUtils extends AbstractKibBlockUtils {
 
     private static final Map<Material, FragileType> FRAGILE_BLOCKS = new EnumMap<>(Material.class);
 
-    private enum FragileType {
-        AMETHYST_CLUSTER, BANNER, BED, BELL, BUTTON, CACTUS, CAKE, CARPET, CAVE_VINES, CHORUS, COCOA, COMPARATOR, CORAL,
-        CROP, DEAD_BUSH, DOOR, DRIPLEAF, FERN, FLOWER, FROGSPAWN, FUNGUS, GLOW_LICHEN, GRASS, HANGING_ROOTS,
-        HANGING_SIGN, LADDER, LANTERN, LEVER, LILY_PAD, MANGROVE_PROPAGULE, MUSHROOM, NETHER_ROOTS, NETHER_SPROUTS,
-        NETHER_WART, NONE, POINTED_DRIPSTONE, PRESSURE_PLATE, RAIL, REDSTONE_WIRE, REPEATER, SAPLING, SCAFFOLDING,
-        SCULK_VEIN, SEA_PICKLE, SIGN, SNOW, SUGAR_CANE, SWEET_BERRY_BUSH, TORCH, TRIPWIRE_HOOK, TWISTING_VINES, VINE,
-        WEEPING_VINES,
+    /**
+     * Load all fragile blocks, ignoring the materials and categories blacklisted in the {@code "fragile-blocks"}
+     * section of the config.yml file.
+     *
+     * @param plugin The JavaPlugin instance
+     */
+    public static void init(JavaPlugin plugin) {
+        int blacklisted = loadFragileBlocks(plugin.getConfig());
+        plugin.getLogger().info(() -> "Fragile blocks loaded: " + FRAGILE_BLOCKS.values().stream() //
+                .filter(type -> type != FragileType.NONE).count() + //
+                                      (blacklisted > 0 ? " (" + blacklisted + " blacklisted in config.yml)" : ""));
     }
 
-    public static void init(Logger logger) {
-        loadFragileBlocks();
-        logger.info(() -> "Fragile blocks loaded: " +
-                          FRAGILE_BLOCKS.values().stream().filter(type -> type != FragileType.NONE).count());
-    }
-
-    private static void loadFragileBlocks() {
-        for (Material mat : Material.values()) {
-            if (!mat.isBlock() || mat.isAir() || mat.isLegacy()) {
-                FRAGILE_BLOCKS.put(mat, FragileType.NONE);
-            } else {
-                try {
-                    FRAGILE_BLOCKS.put(mat, compute(mat.createBlockData()));
-                } catch (Exception e) {
-                    FRAGILE_BLOCKS.put(mat, FragileType.NONE);
-                }
-            }
-        }
+    private static int loadFragileBlocks(FileConfiguration config) {
+        return loadKibBlocks(config, "fragile-blocks.", FRAGILE_BLOCKS, mat -> compute(mat.createBlockData()));
     }
 
     private static FragileType compute(BlockData data) {
@@ -80,11 +70,11 @@ public class FragileBlockUtils {
             case SculkVein ignored -> FragileType.SCULK_VEIN;
             case SeaPickle ignored -> FragileType.SEA_PICKLE;
             case Snow ignored -> FragileType.SNOW;
+            case Switch ignored -> FragileType.SWITCH;
             case TripwireHook ignored -> FragileType.TRIPWIRE_HOOK;
 
             default -> switch (data.getMaterial()) {
                 case Material m when Tag.BANNERS.isTagged(m) -> FragileType.BANNER; // Normal + Wall
-                case Material m when Tag.BUTTONS.isTagged(m) -> FragileType.BUTTON;
                 case Material m when Tag.WOOL_CARPETS.isTagged(m) -> FragileType.CARPET;
                 case Material m when MaterialTags.CORAL.isTagged(m) -> FragileType.CORAL; // Normal + Wall
                 case Material m when Tag.CROPS.isTagged(m) -> FragileType.CROP;
@@ -97,7 +87,7 @@ public class FragileBlockUtils {
 
                 case CACTUS -> FragileType.CACTUS;
                 case MOSS_CARPET -> FragileType.CARPET;
-                case CHORUS_FLOWER, CHORUS_PLANT -> FragileType.CHORUS;
+                case CHORUS_FLOWER, CHORUS_PLANT -> FragileType.CHORUS_PLANT;
                 case ATTACHED_MELON_STEM, ATTACHED_PUMPKIN_STEM -> FragileType.CROP;
                 case DEAD_BUSH -> FragileType.DEAD_BUSH;
                 case BIG_DRIPLEAF_STEM -> FragileType.DRIPLEAF;
@@ -107,7 +97,6 @@ public class FragileBlockUtils {
                 case GLOW_LICHEN -> FragileType.GLOW_LICHEN;
                 case SHORT_GRASS, TALL_GRASS -> FragileType.GRASS;
                 case HANGING_ROOTS -> FragileType.HANGING_ROOTS;
-                case LEVER -> FragileType.LEVER;
                 case LILY_PAD -> FragileType.LILY_PAD;
                 case CRIMSON_ROOTS, WARPED_ROOTS -> FragileType.NETHER_ROOTS;
                 case NETHER_SPROUTS -> FragileType.NETHER_SPROUTS;

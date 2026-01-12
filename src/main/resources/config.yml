@@ -1,11 +1,98 @@
-# This is a simple YAML example file
-example:
-  ultimate-answer: 42
-  pangram: The quick brown fox jumps over the lazy dog
-  boolean: true
-  player:
-    uuid: 00000000-0000-0000-0000-000000000000
-    location:
-      x: 1.0
-      y: 2.0
-      z: 3.0
+#  _  _____ ___
+# | |/ /_ _| _ )   This configuration file can be used to exclude some interactable and fragile blocks,
+# | ' < | || _ \   either by blacklisting them or by disabling preconfigured categories.
+# |_|\_\___|___/   See all block names here: https://jd.papermc.io/paper/1.20.6/org/bukkit/Material.html
+#
+
+###########################################################
+#---------- Configure interactable blocks below ----------#
+###########################################################
+
+interactable-blocks:
+  # Blacklist specific blocks from their names below:
+  blacklist:
+  #  - STONE_BUTTON
+  #  - OAK_DOOR
+  #  - ...
+
+  # Otherwise, you can disable preconfigured categories below:
+  categories:
+    campfires: true
+    candles: true
+    cauldrons: true
+    comparators: true
+    composters: true
+    copper-blocks: true # Non-plain copper blocks that can be waxed or scraped
+    daylight-detectors: true
+    doors: true
+    end-portal-frames: true
+    gates: true
+    lecterns: true # Putting a book on them
+    repeaters: true
+    switches: true # Levers + Buttons
+    trap-doors: true
+
+######################################################
+#---------- Configure fragile blocks below ----------#
+######################################################
+
+fragile-blocks:
+  # Blacklist specific blocks from their names below:
+  blacklist:
+  #  - RED_BED
+  #  - OAK_DOOR
+  #  - ...
+
+  # Otherwise, you can disable preconfigured categories below:
+  categories:
+    amethyst-clustbaers: true
+    banners: true
+    beds: true
+    bells: true
+    cactus: true
+    cakes: true
+    carpets: true
+    cave-vines: true # Cave vines + Cave vine plants
+    chorus-plants: true # Chorus plants + Chorus flowers
+    cocoa: true
+    comparators: true
+    corals: true # Does not apply to waterlogged corals
+    crops: true
+    dead-bushes: true
+    doors: true
+    dripleaves: true
+    ferns: true # Ferns + Large ferns
+    flowers: true
+    frogspawn: true
+    fungus: true
+    glow-lichens: true
+    grass: true
+    hanging-roots: true
+    hanging-signs: true
+    ladders: true
+    lanterns: true
+    lily-pads: true
+    mangrove-propagules: true
+    mushrooms: true
+    nether-roots: true
+    nether-sprouts: true
+    nether-warts: true
+    pointed-dripstones: true
+    pressure-plates: true
+    rails: true
+    redstone-wires: true
+    repeaters: true
+    saplings: true
+    scaffolding: true
+    sculk-veins: true
+    sea-pickles: true
+    signs: true
+    snow: true
+    sugar-canes: true
+    sweet-berry-bushes: true
+    switches: true # Levers + Buttons
+    torches: true
+    tripwire-hooks: true
+    twisting-vines: true # Twisting vines + Twisting vine plants
+    vines: true
+    weeping-vines: true # Weeping vines + Weeping vine plants

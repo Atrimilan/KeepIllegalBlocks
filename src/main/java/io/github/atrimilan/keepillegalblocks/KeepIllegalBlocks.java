@@ -16,21 +16,21 @@ public class KeepIllegalBlocks extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        InteractableBlockUtils.init(this.getLogger());
-        FragileBlockUtils.init(this.getLogger());
-    }
-
-    @Override
-    public void onEnable() {
-//        initConfigFile();
-//        registerPluginCommands();
-        registerPluginEvents();
+        initConfigFile();
+        InteractableBlockUtils.init(this);
+        FragileBlockUtils.init(this);
     }
 
     private void initConfigFile() {
         this.saveDefaultConfig(); // Save a full copy of the default config.yml file
         this.getConfig().options().copyDefaults(true); // For any missing value, copy them from the default config.yml
         this.saveConfig();
+    }
+
+    @Override
+    public void onEnable() {
+//        registerPluginCommands();
+        registerPluginEvents();
     }
 
     private void registerPluginCommands() {

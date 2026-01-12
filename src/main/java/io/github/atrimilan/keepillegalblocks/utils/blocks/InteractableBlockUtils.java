@@ -1,6 +1,7 @@
 package io.github.atrimilan.keepillegalblocks.utils.blocks;
 
 import com.destroystokyo.paper.MaterialTags;
+import io.github.atrimilan.keepillegalblocks.enums.InteractableType;
 import io.github.atrimilan.keepillegalblocks.utils.debug.DebugUtils;
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -8,10 +9,11 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.*;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import static io.github.atrimilan.keepillegalblocks.utils.debug.DebugUtils.MessageType.ERROR;
 import static io.github.atrimilan.keepillegalblocks.utils.debug.DebugUtils.MessageType.OK;
@@ -25,33 +27,26 @@ import static io.github.atrimilan.keepillegalblocks.utils.debug.DebugUtils.Messa
  *
  * @see FragileBlockUtils
  */
-public class InteractableBlockUtils {
+public final class InteractableBlockUtils extends AbstractKibBlockUtils {
 
     private static final Map<Material, InteractableType> INTERACTABLE_BLOCKS = new EnumMap<>(Material.class);
 
-    private enum InteractableType {
-        CAMPFIRE, CANDLE, CAULDRON, COMPARATOR, COMPOSTER, COPPER_BLOCK, DAYLIGHT_DETECTOR, DOOR, END_PORTAL_FRAME,
-        GATE, LECTERN, NONE, REPEATER, SWITCH, TRAP_DOOR,
+    /**
+     * Load all interactable blocks, ignoring the materials and categories blacklisted in the
+     * {@code "interactable-blocks"} section of the config.yml file.
+     *
+     * @param plugin The JavaPlugin instance
+     */
+    public static void init(JavaPlugin plugin) {
+        int blacklisted = loadInteractableBlocks(plugin.getConfig());
+        plugin.getLogger().info(() -> "Interactable blocks loaded: " + INTERACTABLE_BLOCKS.values().stream() //
+                .filter(type -> type != InteractableType.NONE).count() + //
+                                      (blacklisted > 0 ? " (" + blacklisted + " blacklisted in config.yml)" : ""));
     }
 
-    public static void init(Logger logger) {
-        loadInteractableBlocks();
-        logger.info(() -> "Interactable blocks loaded: " +
-                          INTERACTABLE_BLOCKS.values().stream().filter(type -> type != InteractableType.NONE).count());
-    }
-
-    private static void loadInteractableBlocks() {
-        for (Material mat : Material.values()) {
-            if (!mat.isBlock() || mat.isAir() || mat.isLegacy()) {
-                INTERACTABLE_BLOCKS.put(mat, InteractableType.NONE);
-            } else {
-                try {
-                    INTERACTABLE_BLOCKS.put(mat, compute(mat.createBlockData()));
-                } catch (Exception e) {
-                    INTERACTABLE_BLOCKS.put(mat, InteractableType.NONE);
-                }
-            }
-        }
+    private static int loadInteractableBlocks(FileConfiguration config) {
+        return loadKibBlocks(config, "interactable-blocks.", INTERACTABLE_BLOCKS,
+                             mat -> compute(mat.createBlockData()));
     }
 
     private static InteractableType compute(BlockData data) {
@@ -80,7 +75,7 @@ public class InteractableBlockUtils {
     }
 
     /**
-     * Check if a block is interactable and can trigger an update to any adjacent fragile blocks.
+     * Check if a block is interactable.
      *
      * @param block The block to check
      * @return True if the block is interactable, false otherwise
@@ -99,8 +94,8 @@ public class InteractableBlockUtils {
     }
 
     /**
-     * Check if the interactable block will trigger an additional update. For example, a button resets to its initial
-     * state after being pressed.
+     * Check if the interactable block will trigger an additional update. For example, a button will reset to its
+     * initial state 1 second after being pressed.
      *
      * @param state The block state to check
      * @return True if the block will trigger an additional update, false otherwise
