@@ -1,7 +1,7 @@
 package io.github.atrimilan.keepillegalblocks.utils;
 
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
+import org.bukkit.Server;
 
 import java.util.function.Supplier;
 
@@ -12,7 +12,17 @@ import java.util.function.Supplier;
  */
 public class DebugUtils {
 
-    private static final boolean DEBUG_ENABLED = Boolean.parseBoolean(System.getProperty("keepillegalblocks.debug"));
+    private static boolean debugEnabled = Boolean.parseBoolean(System.getProperty("keepillegalblocks.debug"));
+
+    private static Server server;
+
+    public static void setServer(Server s) {
+        server = s;
+    }
+
+    public static void setDebugEnabled(boolean enabled) {
+        debugEnabled = enabled;
+    }
 
     public enum MessageType {
         OK, INFO, WARN, ERROR
@@ -25,8 +35,8 @@ public class DebugUtils {
      * @param type            Type of the message
      */
     public static void sendChat(Supplier<String> messageSupplier, MessageType type) {
-        if (DEBUG_ENABLED) {
-            Bukkit.getServer().broadcast(MiniMessage.miniMessage().deserialize(switch (type) {
+        if (debugEnabled) {
+            server.broadcast(MiniMessage.miniMessage().deserialize(switch (type) {
                 case OK -> "<green>";
                 case INFO -> "<aqua>";
                 case WARN -> "<yellow>";

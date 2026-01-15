@@ -1,9 +1,7 @@
 package io.github.atrimilan.keepillegalblocks.configuration.classifiers;
 
-import com.destroystokyo.paper.MaterialTags;
 import io.github.atrimilan.keepillegalblocks.configuration.types.FragileType;
 import org.bukkit.Material;
-import org.bukkit.Tag;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Rail;
 import org.bukkit.block.data.type.*;
@@ -15,7 +13,7 @@ import org.bukkit.block.data.type.*;
  *
  * @see InteractableClassifier
  */
-public class FragileClassifier {
+public class FragileClassifier extends AbstractClassifier {
 
     public FragileType classify(Material mat) {
         BlockData data = mat.createBlockData();
@@ -48,21 +46,19 @@ public class FragileClassifier {
             case TripwireHook ignored -> FragileType.TRIPWIRE_HOOK;
 
             default -> switch (data.getMaterial()) {
-                case Material m when Tag.BANNERS.isTagged(m) -> FragileType.BANNER; // Normal + Wall
-                case Material m when Tag.WOOL_CARPETS.isTagged(m) -> FragileType.CARPET;
-                case Material m when MaterialTags.CORAL.isTagged(m) -> FragileType.CORAL; // Normal + Wall
-                case Material m when Tag.CROPS.isTagged(m) -> FragileType.CROP;
-                case Material m when Tag.FLOWERS.isTagged(m) -> FragileType.FLOWER;
-                case Material m when MaterialTags.MUSHROOMS.isTagged(m) -> FragileType.MUSHROOM;
-                case Material m when Tag.PRESSURE_PLATES.isTagged(m) -> FragileType.PRESSURE_PLATE;
-                case Material m when Tag.SAPLINGS.isTagged(m) -> FragileType.SAPLING;
-                case Material m when MaterialTags.SIGNS.isTagged(m) -> FragileType.SIGN; // Normal + Wall
-                case Material m when MaterialTags.TORCHES.isTagged(m) -> FragileType.TORCH; // Normal + Redstone + Soul
+                case Material m when isBanner(m) -> FragileType.BANNER; // Normal + Wall
+                case Material m when isCarpet(m) -> FragileType.CARPET;
+                case Material m when isCoral(m) -> FragileType.CORAL; // Normal + Wall
+                case Material m when isCrop(m) -> FragileType.CROP;
+                case Material m when isFlower(m) -> FragileType.FLOWER;
+                case Material m when isMushroom(m) -> FragileType.MUSHROOM;
+                case Material m when isPressurePlate(m) -> FragileType.PRESSURE_PLATE;
+                case Material m when isSapling(m) -> FragileType.SAPLING;
+                case Material m when isSign(m) -> FragileType.SIGN; // Normal + Wall
+                case Material m when isTorch(m) -> FragileType.TORCH; // Normal + Redstone + Soul
 
                 case CACTUS -> FragileType.CACTUS;
-                case MOSS_CARPET -> FragileType.CARPET;
                 case CHORUS_FLOWER, CHORUS_PLANT -> FragileType.CHORUS_PLANT;
-                case ATTACHED_MELON_STEM, ATTACHED_PUMPKIN_STEM -> FragileType.CROP;
                 case DEAD_BUSH -> FragileType.DEAD_BUSH;
                 case BIG_DRIPLEAF_STEM -> FragileType.DRIPLEAF;
                 case FERN, LARGE_FERN -> FragileType.FERN;

@@ -1,9 +1,7 @@
 package io.github.atrimilan.keepillegalblocks.configuration.classifiers;
 
-import com.destroystokyo.paper.MaterialTags;
 import io.github.atrimilan.keepillegalblocks.configuration.types.InteractableType;
 import org.bukkit.Material;
-import org.bukkit.Tag;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.*;
 
@@ -16,7 +14,7 @@ import org.bukkit.block.data.type.*;
  *
  * @see FragileClassifier
  */
-public class InteractableClassifier {
+public class InteractableClassifier extends AbstractClassifier {
 
     public InteractableType classify(Material mat) {
         BlockData data = mat.createBlockData();
@@ -35,9 +33,8 @@ public class InteractableClassifier {
             case TrapDoor ignored -> InteractableType.TRAP_DOOR;
 
             default -> switch (data.getMaterial()) {
-                case Material m when Tag.CAULDRONS.isTagged(m) -> InteractableType.CAULDRON;
-                case Material m when MaterialTags.CUT_COPPER_STAIRS.isTagged(m) -> InteractableType.COPPER_BLOCK;
-                case Material m when MaterialTags.CUT_COPPER_SLABS.isTagged(m) -> InteractableType.COPPER_BLOCK;
+                case Material m when isCauldron(m) -> InteractableType.CAULDRON;
+                case Material m when isNonPlainCopperBlock(m) -> InteractableType.COPPER_BLOCK;
                 case COMPOSTER -> InteractableType.COMPOSTER;
 
                 default -> InteractableType.NONE;

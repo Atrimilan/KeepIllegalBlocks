@@ -7,7 +7,6 @@ import io.github.atrimilan.keepillegalblocks.configuration.types.FragileType;
 import io.github.atrimilan.keepillegalblocks.configuration.types.InteractableType;
 import io.github.atrimilan.keepillegalblocks.models.LoadResult;
 import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -16,7 +15,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.*;
 import java.util.function.Function;
 
-import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType.*;
+import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType.ERROR;
+import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType.OK;
 
 public class KibConfig {
 
@@ -102,9 +102,8 @@ public class KibConfig {
      * @param <T>              An implementation of {@link BlockType}
      * @return The count of blacklisted blocks
      */
-    protected <T extends BlockType> int loadRegistry(FileConfiguration config, String sectionKey,
-                                                     Map<Material, T> blockMap,
-                                                     Function<Material, T> classifierMethod) {
+    <T extends BlockType> int loadRegistry(FileConfiguration config, String sectionKey, Map<Material, T> blockMap,
+                                           Function<Material, T> classifierMethod) {
         Set<String> blacklist = getBlacklist(config, sectionKey);
         Map<String, Boolean> enabledCategories = getEnabledCategories(config, sectionKey);
 

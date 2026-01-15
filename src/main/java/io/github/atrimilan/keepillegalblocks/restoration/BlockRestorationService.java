@@ -3,6 +3,7 @@ package io.github.atrimilan.keepillegalblocks.restoration;
 import io.github.atrimilan.keepillegalblocks.configuration.KibConfig;
 import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -87,7 +88,7 @@ public class BlockRestorationService {
             // Restore any fragile block that have been replaced by air
             for (BlockState oldState : fragileBlockStates) {
                 Block currentBlock = oldState.getBlock();
-                if (currentBlock.getType().isAir() && !oldState.getType().isAir())
+                if (currentBlock.getType() == Material.AIR && oldState.getType() != Material.AIR)
                     oldState.update(true, false); // Force restore without physic
             }
 
@@ -106,7 +107,7 @@ public class BlockRestorationService {
      * @param state The block state to check
      * @return True if the block will trigger an additional update, false otherwise
      */
-    private boolean willTriggerAdditionalUpdate(BlockState state) {
+    boolean willTriggerAdditionalUpdate(BlockState state) {
         return Tag.BUTTONS.isTagged(state.getType());
     }
 }
