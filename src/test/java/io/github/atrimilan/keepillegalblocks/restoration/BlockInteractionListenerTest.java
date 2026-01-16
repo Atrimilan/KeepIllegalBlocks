@@ -55,10 +55,11 @@ class BlockInteractionListenerTest {
         when(playerInteractEvent.getClickedBlock()).thenReturn(clickedBlock);
         when(clickedBlock.getType()).thenReturn(Material.STONE_BUTTON);
         when(config.isInteractable(Material.STONE_BUTTON)).thenReturn(true);
+        when(config.getMaxBlocks()).thenReturn(50);
 
         listener.onPlayerInteract(playerInteractEvent);
 
-        verify(service).recordFragileBlockStates(clickedBlock);
+        verify(service).recordFragileBlockStates(clickedBlock, 50);
         verify(service).scheduleRestoration(anyList());
     }
 

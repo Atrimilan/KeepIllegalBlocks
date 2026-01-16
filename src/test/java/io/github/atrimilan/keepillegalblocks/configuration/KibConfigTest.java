@@ -13,10 +13,8 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
@@ -100,6 +98,7 @@ class KibConfigTest {
         assertEquals(results, actualResults);
 
         verify(plugin).getConfig();
+        verify(fileConfig).getInt("max-blocks");
         verify(kibConfig).loadRegistry(eq(fileConfig), eq("fragile-blocks."), anyMap(), any());
         verify(kibConfig).loadRegistry(eq(fileConfig), eq("interactable-blocks."), anyMap(), any());
     }

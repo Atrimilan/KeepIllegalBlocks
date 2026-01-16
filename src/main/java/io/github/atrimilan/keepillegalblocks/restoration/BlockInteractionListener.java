@@ -46,7 +46,7 @@ public class BlockInteractionListener implements Listener {
         if (!config.isInteractable(sourceBlock.getType())) return;
 
         // Perform a BFS to scan and save all fragile blocks that will break as a result of the player interaction
-        List<BlockState> snapshot = service.recordFragileBlockStates(sourceBlock);
+        List<BlockState> snapshot = service.recordFragileBlockStates(sourceBlock, config.getMaxBlocks());
 
         // Schedule fragile block restoration
         service.scheduleRestoration(snapshot);

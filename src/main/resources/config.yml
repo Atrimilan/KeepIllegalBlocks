@@ -4,9 +4,14 @@
 #  |_|\_\___|___/   See all block names here: https://jd.papermc.io/paper/1.20.6/org/bukkit/Material.html
 #
 
-#########################################################
-#---------- Interactable blocks configuration ----------#
-#########################################################
+# Maximum number of fragile blocks to record.
+# I do not recommend setting this value too high, as it could be exploited by a lag machine on your server.
+# 500 is sufficient, as you will rarely reach that many blocks.
+max-blocks: 500
+
+# ####################################################### #
+# ---------- Interactable blocks configuration ---------- #
+# ####################################################### #
 
 interactable-blocks:
   # You can blacklist specific blocks below
@@ -30,9 +35,9 @@ interactable-blocks:
     switches: true # Levers + Buttons
     trap-doors: true
 
-####################################################
-#---------- Fragile blocks configuration ----------#
-####################################################
+# ################################################## #
+# ---------- Fragile blocks configuration ---------- #
+# ################################################## #
 
 fragile-blocks:
   # You can blacklist specific blocks below

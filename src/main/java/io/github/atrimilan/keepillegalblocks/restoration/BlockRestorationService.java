@@ -19,8 +19,6 @@ public class BlockRestorationService {
     private final JavaPlugin plugin;
     private final KibConfig config;
 
-    private static final int MAX_BLOCKS = 1024;
-
     private static final BlockFace[] FACES = {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH,
                                               BlockFace.EAST, BlockFace.WEST};
 
@@ -33,9 +31,10 @@ public class BlockRestorationService {
      * Perform a Breadth-First Search (BFS) to record all fragile blocks states.
      *
      * @param sourceBlock The interactable block that the player interacted with
+     * @param maxBlocks   The maximum number of blocks to record
      * @return List of states of all fragile blocks connected to the source block
      */
-    public List<BlockState> recordFragileBlockStates(Block sourceBlock) {
+    public List<BlockState> recordFragileBlockStates(Block sourceBlock, int maxBlocks) {
         if (sourceBlock == null) return Collections.emptyList();
 
         Queue<Block> queue = new ArrayDeque<>();
@@ -45,8 +44,8 @@ public class BlockRestorationService {
         visited.add(sourceBlock.getLocation());
         queue.add(sourceBlock);
 
-        // BFS (stop when queue is empty, or MAX_BLOCKS is reached)
-        while (!queue.isEmpty() && statesToSave.size() < MAX_BLOCKS) {
+        // BFS (stop when queue is empty, or maxBlocks is reached)
+        while (!queue.isEmpty() && statesToSave.size() <= maxBlocks) {
             Block currentBlock = queue.poll();
             statesToSave.add(currentBlock.getState()); // Save block state
 
@@ -55,7 +54,7 @@ public class BlockRestorationService {
                 Block relative = currentBlock.getRelative(face);
                 Location relativeLoc = relative.getLocation();
 
-                if (!visited.contains(relativeLoc) && visited.size() < MAX_BLOCKS &&
+                if (!visited.contains(relativeLoc) && visited.size() <= maxBlocks &&
                     config.isFragile(relative.getType())) {
                     visited.add(relativeLoc); // Mark as visited
                     queue.add(relative); // Add to queue for next BFS iteration
@@ -63,7 +62,7 @@ public class BlockRestorationService {
             }
         }
 
-        DebugUtils.sendChat(() -> "Fragile blocks count: <white>" + statesToSave.size() + "<gray>/" + MAX_BLOCKS, INFO);
+        DebugUtils.sendChat(() -> "Fragile blocks count: <white>" + statesToSave.size() + "<gray>/" + maxBlocks, INFO);
         return statesToSave;
     }
 

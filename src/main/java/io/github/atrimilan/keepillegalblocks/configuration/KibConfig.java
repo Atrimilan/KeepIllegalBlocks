@@ -27,6 +27,8 @@ public class KibConfig {
     private final Map<Material, FragileType> fragileBlocks = new EnumMap<>(Material.class);
     private final Map<Material, InteractableType> interactableBlocks = new EnumMap<>(Material.class);
 
+    private int maxBlocks;
+
     public KibConfig(JavaPlugin plugin) {
         this.plugin = plugin;
     }
@@ -58,10 +60,19 @@ public class KibConfig {
     }
 
     /**
+     * Get the maximum number of blocks to record.
+     */
+    public int getMaxBlocks() {
+        return maxBlocks;
+    }
+
+    /**
      * Load fragile and interactable registries.
      */
-    public List<LoadResult> loadRegistries() {
+    List<LoadResult> loadRegistries() {
         FileConfiguration configFile = plugin.getConfig();
+
+        maxBlocks = configFile.getInt("max-blocks");
 
         int blacklistedFragile = loadRegistry(configFile, "fragile-blocks.", //
                                               fragileBlocks, fragileClassifier::classify);

@@ -54,7 +54,7 @@ class BlockRestorationServiceTest {
             lenient().when(source.getRelative(BlockFace.NORTH)).thenReturn(north);
             lenient().when(source.getRelative(BlockFace.EAST)).thenReturn(east);
             lenient().when(source.getRelative(BlockFace.UP)).thenReturn(up);
-            when(config.isFragile(Material.STONE_BUTTON)).thenReturn(true);
+            lenient().when(config.isFragile(Material.STONE_BUTTON)).thenReturn(true);
         }
         return source;
     }
@@ -64,7 +64,7 @@ class BlockRestorationServiceTest {
         Block air = mockBlock(Material.AIR);
 
         lenient().when(block.getRelative(any(BlockFace.class))).thenReturn(air);
-        when(config.isFragile(Material.AIR)).thenReturn(false);
+        lenient().when(config.isFragile(Material.AIR)).thenReturn(false);
 
         return block;
     }
@@ -93,7 +93,7 @@ class BlockRestorationServiceTest {
     void shouldRecordFragileBlockStates() {
         Block source = mockSourceBlock(true);
 
-        List<BlockState> states = service.recordFragileBlockStates(source);
+        List<BlockState> states = service.recordFragileBlockStates(source, 50);
 
         assertEquals(4, states.size());
         verify(config, times(3)).isFragile(Material.STONE_BUTTON);
@@ -101,10 +101,31 @@ class BlockRestorationServiceTest {
     }
 
     @Test
+    void shouldRecordFragileBlockStatesWhenMaxBlocksIsLow() {
+        Block source = mockSourceBlock(true);
+
+        List<BlockState> states = service.recordFragileBlockStates(source, 2); // Max blocks is 2
+
+        assertEquals(3, states.size()); // +1 because the source block was also added
+        verify(config, times(2)).isFragile(Material.STONE_BUTTON);
+        verify(config, never()).isFragile(Material.OAK_DOOR); // Source should not be checked
+    }
+
+    @Test
+    void shouldRecordFragileBlockStatesWhenMaxBlocksIsZero() {
+        Block source = mockSourceBlock(true);
+
+        List<BlockState> states = service.recordFragileBlockStates(source, 0);
+
+        assertEquals(1, states.size());  // 1 because the source block was added
+        verifyNoInteractions(config); // No fragile blocks were recorded
+    }
+
+    @Test
     void shouldRecordFragileBlockStatesWithNoRelatives() {
         Block source = mockSourceBlock(false);
 
-        List<BlockState> states = service.recordFragileBlockStates(source);
+        List<BlockState> states = service.recordFragileBlockStates(source, 50);
 
         assertEquals(1, states.size());
         verify(config, times(6)).isFragile(Material.AIR);
@@ -117,7 +138,7 @@ class BlockRestorationServiceTest {
 
         when(config.isFragile(Material.STONE_BUTTON)).thenReturn(false); // Stub as not fragile
 
-        List<BlockState> states = service.recordFragileBlockStates(source);
+        List<BlockState> states = service.recordFragileBlockStates(source, 50);
 
         assertEquals(1, states.size());
         verify(config, times(3)).isFragile(Material.STONE_BUTTON);
@@ -125,7 +146,7 @@ class BlockRestorationServiceTest {
 
     @Test
     void shouldNotRecordFragileBlockStatesWhenSourceIsNull() {
-        List<BlockState> states = service.recordFragileBlockStates(null);
+        List<BlockState> states = service.recordFragileBlockStates(null, 50);
 
         assertEquals(0, states.size());
         verifyNoInteractions(config);
