@@ -51,7 +51,6 @@ tasks {
         println("Starting with JVM args: $jvmArgs")
 
         doFirst {
-            // Note: if you have already run the server once, the following files will not be overwritten; you must first delete them manually
             val serverProperties = file("$localServerDir/server.properties")
             val bukkitYml = file("$localServerDir/bukkit.yml")
 
