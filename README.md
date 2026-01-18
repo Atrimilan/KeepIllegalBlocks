@@ -13,6 +13,33 @@ Paper plugin that prevents illegal blocks from breaking when a player interacts 
   </tr>
 </table>
 
+
+<details>
+<summary><b>🖼️ Click to see more examples</b></summary>
+<br/>
+
+There you go 😎:
+
+<table>
+  <tr>
+    <td><img alt="chairs_ezgif" src="assets/chairs_ezgif.gif" style="width: 100%; height: auto;" /></td>
+    <td><img alt="rail_ezgif" src="assets/rail_ezgif.gif" style="width: 100%; height: auto;" /></td>
+    <td><img alt="copper_slabs_ezgif" src="assets/copper_slabs_ezgif.gif" style="width: 100%; height: auto;" /></td>
+  </tr>
+  <tr>
+    <td><img alt="drawbridge_ezgif" src="assets/drawbridge_ezgif.gif" style="width: 100%; height: auto;" /></td>
+    <td><img alt="lantern_ezgif" src="assets/lantern_ezgif.gif" style="width: 100%; height: auto;" /></td>
+    <td><img alt="end_portal_frame_ezgif" src="assets/end_portal_frame_ezgif.gif" style="width: 100%; height: auto;" /></td>
+  </tr>
+  <tr>
+    <td><img alt="grave_ezgif" src="assets/grave_ezgif.gif" style="width: 100%; height: auto;" /></td>
+    <td><img alt="cauldron_ezgif" src="assets/cauldron_ezgif.gif" style="width: 100%; height: auto;" /></td>
+    <td><img alt="gate_ezgif" src="assets/gate_ezgif.gif" style="width: 100%; height: auto;" /></td>
+  </tr>
+</table>
+
+</details>
+
 ## Overview
 
 ### 1. So what's the point?
