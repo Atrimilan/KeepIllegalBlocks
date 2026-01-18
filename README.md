@@ -6,6 +6,13 @@
 
 Paper plugin that prevents illegal blocks from breaking when a player interacts with an adjacent block.
 
+<table>
+  <tr>
+    <td><img alt="with_kib" src="assets/with_kib_ezgif.gif" style="width: 100%; height: auto;" /></td>
+    <td><img alt="without_kib" src="assets/without_kib_ezgif.gif" style="width: 100%; height: auto;" /></td>
+  </tr>
+</table>
+
 ## Overview
 
 ### 1. So what's the point?
@@ -21,6 +28,7 @@ Interacting with an **interactable block** triggers a physical update that propa
 
 <details>
 <summary><b>🔵 Expand list of fragile block categories</b></summary>
+<br/>
 
 List of fragile block categories that are automatically restored by the plugin when broken:
 
@@ -80,6 +88,7 @@ List of fragile block categories that are automatically restored by the plugin w
 
 <details>
 <summary><b>🔴 Expand list of interactable block categories</b></summary>
+<br/>
 
 List of interactable blocks categories recorded by the plugin:
 
@@ -134,7 +143,7 @@ Place the JAR file in the `./plugins` directory of your server
 
 ### 2. Configuration
 
-You can edit `./plugins/KeepIllegalBlocks/config.yml`, if you want to blacklist some fragile or interactable blocks.
+You can edit `./plugins/KeepIllegalBlocks/config.yml` if you want to blacklist some fragile or interactable blocks.
 
 To reload your configuration, use the `/kib reload` command (it requires the `kib.reload` permission for a non-op
 player).
