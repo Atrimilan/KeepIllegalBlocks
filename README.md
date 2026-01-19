@@ -13,7 +13,6 @@ Paper plugin that prevents illegal blocks from breaking when a player interacts 
   </tr>
 </table>
 
-
 <details>
 <summary><b>🖼️ Click to see more examples</b></summary>
 <br/>
@@ -166,7 +165,7 @@ For performance reasons, a block limit is set, which is **500 by default**.
 
 Download the plugin from Modrinth: https://modrinth.com/project/i4WvDCnD
 
-Place the JAR file in the `./plugins` directory of your server
+Place the JAR file in the `./plugins` directory of your server.
 
 ### 2. Configuration
 
