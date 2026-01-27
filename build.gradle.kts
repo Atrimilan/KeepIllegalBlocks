@@ -1,9 +1,11 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.papermc.paperweight.userdev.ReobfArtifactConfiguration
 
 plugins {
     id("java")
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.19"
     id("xyz.jpenilla.run-paper") version "3.0.2"
+    id("com.gradleup.shadow") version "9.3.1"
 }
 
 repositories {
@@ -24,6 +26,8 @@ version = projectVersion
 dependencies {
     // PaperMC (using paperweight-userdev)
     paperweight.paperDevBundle(paperApiVersion)
+    // bStats
+    implementation("org.bstats:bstats-bukkit:3.1.0")
     // JUnit & Mockito
     testImplementation(platform("org.junit:junit-bom:6.0.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -75,8 +79,21 @@ tasks {
         }
     }
 
-    named("runDevBundleServer") {
-        group = null
+    named<ShadowJar>("shadowJar") {
+        configurations = listOf(project.configurations.runtimeClasspath.get())
+        archiveClassifier.set("") // Remove the "-all" classifier
+
+        // bStats configuration
+        dependencies { exclude { it.moduleGroup != "org.bstats" } }
+        relocate("org.bstats", project.group.toString())
+    }
+
+    jar {
+        enabled = false // Disable JAR in favor of ShadowJAR
+    }
+
+    assemble {
+        dependsOn("shadowJar")
     }
 
     test {

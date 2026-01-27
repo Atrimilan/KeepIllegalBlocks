@@ -7,6 +7,7 @@ import io.github.atrimilan.keepillegalblocks.restoration.BlockRestorationService
 import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class KeepIllegalBlocks extends JavaPlugin {
@@ -21,6 +22,8 @@ public class KeepIllegalBlocks extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        new Metrics(this, 28933); // bStats
+
         registerPluginEvents();
         registerPluginCommands();
     }
