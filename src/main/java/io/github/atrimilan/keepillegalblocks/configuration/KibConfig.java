@@ -27,7 +27,11 @@ public class KibConfig {
     private final Map<Material, FragileType> fragileBlocks = new EnumMap<>(Material.class);
     private final Map<Material, InteractableType> interactableBlocks = new EnumMap<>(Material.class);
 
+    private boolean isPacketEventsPresent;
+
     private int maxBlocks;
+    private boolean isOnlyEnabledInCreativeMode;
+    private boolean isPacketEventsEnabled;
 
     public KibConfig(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -41,7 +45,9 @@ public class KibConfig {
         plugin.getConfig().options().copyDefaults(true); // For any missing value, copy them from the default config.yml
         plugin.saveConfig();
 
-        List<LoadResult> results = loadRegistries();
+        this.isPacketEventsPresent = plugin.getServer().getPluginManager().isPluginEnabled("packetevents");
+
+        List<LoadResult> results = loadConfig();
 
         for (LoadResult result : results)
             plugin.getLogger().info(result::consoleFormat);
@@ -56,7 +62,7 @@ public class KibConfig {
         fragileBlocks.clear();
         interactableBlocks.clear();
 
-        return loadRegistries();
+        return loadConfig();
     }
 
     /**
@@ -66,13 +72,23 @@ public class KibConfig {
         return maxBlocks;
     }
 
+    public boolean isOnlyEnabledInCreativeMode() {
+        return isOnlyEnabledInCreativeMode;
+    }
+
+    public boolean isPacketEventsPresent() {
+        return isPacketEventsPresent && isPacketEventsEnabled;
+    }
+
     /**
-     * Load fragile and interactable registries.
+     * Load config, including plugin's behavior, and fragile and interactable registries.
      */
-    List<LoadResult> loadRegistries() {
+    List<LoadResult> loadConfig() {
         FileConfiguration configFile = plugin.getConfig();
 
         maxBlocks = configFile.getInt("max-blocks");
+        isOnlyEnabledInCreativeMode = configFile.getBoolean("only-use-kib-in-creative-mode");
+        isPacketEventsEnabled = configFile.getBoolean("use-packet-events-if-detected");
 
         int blacklistedFragile = loadRegistry(configFile, "fragile-blocks.", //
                                               fragileBlocks, fragileClassifier::classify);

@@ -10,3 +10,12 @@ permissions:
   kib.reload:
     description: Reload KeepIllegalBlocks
     default: op
+
+softdepend:
+  - ProtocolLib
+  - ProtocolSupport
+  - ViaVersion
+  - ViaBackwards
+  - ViaRewind
+  - Geyser-Spigot
+  - packetevents # PacketEvents plugin is optional (and all of the above are required as soft dependencies by PacketEvents)

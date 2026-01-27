@@ -49,7 +49,7 @@ class KibConfigTest {
 
         List<LoadResult> results = List.of(new LoadResult("Fragile", 10, 2), //
                                            new LoadResult("Interactable", 5, 1));
-        doReturn(results).when(kibConfig).loadRegistries();
+        doReturn(results).when(kibConfig).loadConfig();
 
         kibConfig.init();
 
@@ -57,7 +57,7 @@ class KibConfigTest {
         verify(fileConfigOptions).copyDefaults(true);
         verify(plugin).saveConfig();
         verify(plugin, never()).reloadConfig(); // Never
-        verify(kibConfig).loadRegistries();
+        verify(kibConfig).loadConfig();
         verify(logger, times(2)).info(logCaptor.capture());
 
         List<String> logMsg = logCaptor.getAllValues().stream().map(Supplier::get).toList();
@@ -70,7 +70,7 @@ class KibConfigTest {
     void shouldReload() {
         List<LoadResult> results = List.of(new LoadResult("Fragile", 10, 2), //
                                            new LoadResult("Interactable", 5, 1));
-        doReturn(results).when(kibConfig).loadRegistries();
+        doReturn(results).when(kibConfig).loadConfig();
         when(fileConfig.options()).thenReturn(fileConfigOptions);
 
         List<LoadResult> actualResults = kibConfig.reload();
@@ -81,11 +81,11 @@ class KibConfigTest {
         verify(fileConfig.options(), never()).copyDefaults(true); // Never
         verify(plugin, never()).saveConfig(); // Never
         verify(plugin).reloadConfig();
-        verify(kibConfig).loadRegistries();
+        verify(kibConfig).loadConfig();
     }
 
     @Test
-    void shouldLoadRegistries() {
+    void shouldLoadConfig() {
         List<LoadResult> results = List.of(new LoadResult("Fragile", 0, 2), //
                                            new LoadResult("Interactable", 0, 1));
         doReturn(2).when(kibConfig).loadRegistry(eq(fileConfig), eq("fragile-blocks."), anyMap(), any());
@@ -93,7 +93,7 @@ class KibConfigTest {
 
         when(plugin.getConfig()).thenReturn(fileConfig);
 
-        List<LoadResult> actualResults = kibConfig.loadRegistries();
+        List<LoadResult> actualResults = kibConfig.loadConfig();
 
         assertEquals(results, actualResults);
 

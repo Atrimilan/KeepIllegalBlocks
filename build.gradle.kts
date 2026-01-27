@@ -14,6 +14,8 @@ repositories {
         name = "papermc"
         url = uri("https://repo.papermc.io/repository/maven-public/")
     }
+    maven { url = uri("https://repo.codemc.io/repository/maven-releases/") }
+    maven { url = uri("https://repo.codemc.io/repository/maven-snapshots/") }
 }
 
 val groupId: String by project
@@ -26,8 +28,10 @@ version = projectVersion
 dependencies {
     // PaperMC (using paperweight-userdev)
     paperweight.paperDevBundle(paperApiVersion)
-    // bStats
+    // bStats (shaded jar)
     implementation("org.bstats:bstats-bukkit:3.1.0")
+    // PacketEvents (optional plugin)
+    compileOnly("com.github.retrooper:packetevents-spigot:2.11.2")
     // JUnit & Mockito
     testImplementation(platform("org.junit:junit-bom:6.0.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")

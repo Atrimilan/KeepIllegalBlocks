@@ -1,6 +1,7 @@
 package io.github.atrimilan.keepillegalblocks.restoration;
 
 import io.github.atrimilan.keepillegalblocks.configuration.KibConfig;
+import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.event.EventHandler;
@@ -9,7 +10,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
-import java.util.List;
+import java.util.Set;
 
 public class BlockInteractionListener implements Listener {
 
@@ -26,6 +27,7 @@ public class BlockInteractionListener implements Listener {
      * result of the interaction.
      * <p>
      * The event will be ignored if:
+     * <li>KIB is only enabled in Creative mode and player is not in Creative mode</li>
      * <li>The action is not a right click</li>
      * <li>The hand is not the right hand</li>
      * <li>The player is sneaking and holding an item</li>
@@ -35,6 +37,7 @@ public class BlockInteractionListener implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
+        if (config.isOnlyEnabledInCreativeMode() && !GameMode.CREATIVE.equals(event.getPlayer().getGameMode())) return;
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (event.getHand() != EquipmentSlot.HAND) return;
         if (event.getPlayer().isSneaking() && event.getItem() != null) return;
@@ -46,7 +49,7 @@ public class BlockInteractionListener implements Listener {
         if (!config.isInteractable(sourceBlock.getType())) return;
 
         // Perform a BFS to scan and save all fragile blocks that will break as a result of the player interaction
-        List<BlockState> snapshot = service.recordFragileBlockStates(sourceBlock, config.getMaxBlocks());
+        Set<BlockState> snapshot = service.recordFragileBlockStates(sourceBlock, config.getMaxBlocks());
 
         // Schedule fragile block restoration
         service.scheduleRestoration(snapshot);

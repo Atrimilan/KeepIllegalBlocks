@@ -1,24 +1,27 @@
-#   _  _____ ___
-#  | |/ /_ _| _ )   This configuration file can be used to exclude some interactable and fragile blocks,
-#  | ' < | || _ \   either by blacklisting them or by disabling preconfigured categories.
-#  |_|\_\___|___/   See all block names here: https://jd.papermc.io/paper/1.20.6/org/bukkit/Material.html
-#
+# ######################################################################################################################## #
+#   _  _____ ___                                                                                                           #
+#  | |/ /_ _| _ )   This file can be used to customize the plugin's behavior. It also allows you to exclude some           #
+#  | ' < | || _ \   interactable and fragile blocks, either by blacklisting them or by disabling preconfigured categories. #
+#  |_|\_\___|___/   See all block names here: https://jd.papermc.io/paper/1.20.6/org/bukkit/Material.html                  #
+#                                                                                                                          #
+# ######################################################################################################################## #
 
 # Maximum number of fragile blocks to record.
 # I do not recommend setting this value too high, as it could be exploited by a lag machine on your server.
-# 500 is sufficient, as you will rarely reach that many blocks.
+# 500 is sufficient as you will rarely reach that many blocks.
 max-blocks: 500
 
-# ####################################################### #
-# ---------- Interactable blocks configuration ---------- #
-# ####################################################### #
+# By default, KIB is only enabled in Creative mode, as it does not prevent fragile blocks from dropping items when broken.
+# Only enable this option if you do not care about item duplication or if the “doTileDrops” gamerule is enabled.
+only-use-kib-in-creative-mode: true
 
+# Toggle the use of the "PacketEvents" plugin if it is detected.
+# KIB will use it to improve client-side visuals by canceling the sending of network packets related to the update of fragile blocks.
+use-packet-events-if-detected: true
+
+# Blacklist interactable blocks by their name, or disable categories below
 interactable-blocks:
-  # You can blacklist specific blocks below
-  # See all block names here: https://jd.papermc.io/paper/1.20.6/org/bukkit/Material.html
-  blacklist: []
-
-  # You can disable preconfigured categories below
+  blacklist: [ ]
   categories:
     campfires: true
     candles: true
@@ -35,16 +38,9 @@ interactable-blocks:
     switches: true # Levers + Buttons
     trap-doors: true
 
-# ################################################## #
-# ---------- Fragile blocks configuration ---------- #
-# ################################################## #
-
+# Blacklist fragile blocks by their name, or disable categories below
 fragile-blocks:
-  # You can blacklist specific blocks below
-  # See all block names here: https://jd.papermc.io/paper/1.20.6/org/bukkit/Material.html
-  blacklist: []
-
-  # You can disable preconfigured categories below
+  blacklist: [ ]
   categories:
     amethyst-clusters: true
     banners: true

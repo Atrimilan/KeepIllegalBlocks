@@ -15,13 +15,10 @@ public class KeepIllegalBlocks extends JavaPlugin {
     private final KibConfig kibConfig = new KibConfig(this);
 
     @Override
-    public void onLoad() {
+    public void onEnable() {
         kibConfig.init();
         DebugUtils.setServer(getServer());
-    }
 
-    @Override
-    public void onEnable() {
         new Metrics(this, 28933); // bStats
 
         registerPluginEvents();

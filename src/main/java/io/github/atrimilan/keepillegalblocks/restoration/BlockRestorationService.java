@@ -1,6 +1,7 @@
 package io.github.atrimilan.keepillegalblocks.restoration;
 
 import io.github.atrimilan.keepillegalblocks.configuration.KibConfig;
+import io.github.atrimilan.keepillegalblocks.packets.PacketEventsAdapter;
 import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -32,14 +33,14 @@ public class BlockRestorationService {
      *
      * @param sourceBlock The interactable block that the player interacted with
      * @param maxBlocks   The maximum number of blocks to record
-     * @return List of states of all fragile blocks connected to the source block
+     * @return Set of states of all fragile blocks connected to the source block
      */
-    public List<BlockState> recordFragileBlockStates(Block sourceBlock, int maxBlocks) {
-        if (sourceBlock == null) return Collections.emptyList();
+    public Set<BlockState> recordFragileBlockStates(Block sourceBlock, int maxBlocks) {
+        if (sourceBlock == null) return Collections.emptySet();
 
         Queue<Block> queue = new ArrayDeque<>();
         Set<Location> visited = new HashSet<>();
-        List<BlockState> statesToSave = new ArrayList<>();
+        Set<BlockState> statesToSave = new LinkedHashSet<>();
 
         visited.add(sourceBlock.getLocation());
         queue.add(sourceBlock);
@@ -79,10 +80,15 @@ public class BlockRestorationService {
      *
      * @param fragileBlockStates List of fragile blocks to restore (if they have been broken)
      */
-    public void scheduleRestoration(List<BlockState> fragileBlockStates) {
+    public void scheduleRestoration(Set<BlockState> fragileBlockStates) {
         if (fragileBlockStates.isEmpty()) return; // Return if there's nothing to restore
 
+        Object packetEventListener = this.registerFragileBlockBreakListener(fragileBlockStates);
+
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            if (config.isPacketEventsPresent()) {
+                PacketEventsAdapter.unregisterListener(packetEventListener);
+            }
 
             // Restore any fragile block that have been replaced by air
             for (BlockState oldState : fragileBlockStates) {
@@ -92,11 +98,16 @@ public class BlockRestorationService {
             }
 
             // Restore the first block if it causes an additional update (e.g. a button) and if there are adjacent fragile blocks
-            BlockState firstState = fragileBlockStates.getFirst();
+            BlockState firstState = fragileBlockStates.iterator().next();
             if (willTriggerAdditionalUpdate(firstState) && fragileBlockStates.size() > 1)
                 firstState.update(true, false); // Force restore without physic
 
         }, 2L); // Schedule restoration in 2 ticks
+    }
+
+    Object registerFragileBlockBreakListener(Set<BlockState> fragileBlockStates) {
+        return config.isPacketEventsPresent() ? //
+               PacketEventsAdapter.registerFragileBlockBreakListener(fragileBlockStates) : null;
     }
 
     /**
