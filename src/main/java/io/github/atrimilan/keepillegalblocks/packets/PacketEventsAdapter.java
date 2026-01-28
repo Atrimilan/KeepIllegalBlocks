@@ -12,8 +12,8 @@ public class PacketEventsAdapter {
     private PacketEventsAdapter() {
     }
 
-    public static Object registerFragileBlockBreakListener(Set<BlockState> states) {
-        FragileBlockBreakListener listener = new FragileBlockBreakListener(states);
+    public static Object registerFragileBlockBreakListener(Set<BlockState> fragileBlockStates) {
+        FragileBlockBreakListener listener = new FragileBlockBreakListener(fragileBlockStates);
         return PacketEvents.getAPI().getEventManager().registerListener(listener, PacketListenerPriority.NORMAL);
     }
 

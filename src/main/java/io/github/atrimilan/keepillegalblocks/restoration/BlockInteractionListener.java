@@ -1,16 +1,14 @@
 package io.github.atrimilan.keepillegalblocks.restoration;
 
 import io.github.atrimilan.keepillegalblocks.configuration.KibConfig;
+import io.github.atrimilan.keepillegalblocks.models.BfsResult;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-
-import java.util.Set;
 
 public class BlockInteractionListener implements Listener {
 
@@ -49,7 +47,7 @@ public class BlockInteractionListener implements Listener {
         if (!config.isInteractable(sourceBlock.getType())) return;
 
         // Perform a BFS to scan and save all fragile blocks that will break as a result of the player interaction
-        Set<BlockState> snapshot = service.recordFragileBlockStates(sourceBlock, config.getMaxBlocks());
+        BfsResult snapshot = service.recordFragileBlockStates(sourceBlock, config.getMaxBlocks());
 
         // Schedule fragile block restoration
         service.scheduleRestoration(snapshot);

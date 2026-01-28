@@ -1,6 +1,7 @@
 package io.github.atrimilan.keepillegalblocks.restoration;
 
 import io.github.atrimilan.keepillegalblocks.configuration.KibConfig;
+import io.github.atrimilan.keepillegalblocks.models.BfsResult;
 import io.github.atrimilan.keepillegalblocks.packets.PacketEventsAdapter;
 import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import org.bukkit.Location;
@@ -33,22 +34,26 @@ public class BlockRestorationService {
      *
      * @param sourceBlock The interactable block that the player interacted with
      * @param maxBlocks   The maximum number of blocks to record
-     * @return Set of states of all fragile blocks connected to the source block
+     * @return The interactable source block and a set of fragile blocks that may need to be restored
      */
-    public Set<BlockState> recordFragileBlockStates(Block sourceBlock, int maxBlocks) {
-        if (sourceBlock == null) return Collections.emptySet();
+    public BfsResult recordFragileBlockStates(Block sourceBlock, int maxBlocks) {
+        if (sourceBlock == null) return null;
 
         Queue<Block> queue = new ArrayDeque<>();
         Set<Location> visited = new HashSet<>();
-        Set<BlockState> statesToSave = new LinkedHashSet<>();
+        Set<BlockState> fragileBlocks = new HashSet<>();
 
-        visited.add(sourceBlock.getLocation());
+        Location sourceBlockLoc = sourceBlock.getLocation();
+        visited.add(sourceBlockLoc);
         queue.add(sourceBlock);
 
         // BFS (stop when queue is empty, or maxBlocks is reached)
-        while (!queue.isEmpty() && statesToSave.size() <= maxBlocks) {
+        while (!queue.isEmpty() && fragileBlocks.size() <= maxBlocks) {
             Block currentBlock = queue.poll();
-            statesToSave.add(currentBlock.getState()); // Save block state
+
+            if (!currentBlock.getLocation().equals(sourceBlockLoc)) { // Don't save the interactable source block
+                fragileBlocks.add(currentBlock.getState()); // Save fragile block state
+            }
 
             // Scan all 6 faces
             for (BlockFace face : FACES) {
@@ -63,8 +68,8 @@ public class BlockRestorationService {
             }
         }
 
-        DebugUtils.sendChat(() -> "Fragile blocks count: <white>" + statesToSave.size() + "<gray>/" + maxBlocks, INFO);
-        return statesToSave;
+        DebugUtils.sendChat(() -> "Fragile blocks count: <white>" + fragileBlocks.size() + "<gray>/" + maxBlocks, INFO);
+        return new BfsResult(sourceBlock.getState(), fragileBlocks);
     }
 
     // TODO - Schedule restoration in 1 tick for non-cascade-destructible fragile blocks
@@ -78,36 +83,45 @@ public class BlockRestorationService {
      * {@code SCAFFOLDING}, {@code SUGAR_CANE}, {@code TWISTING_VINES}, {@code TWISTING_VINES_PLANT},
      * {@code WEEPING_VINES}, {@code WEEPING_VINES_PLANT}.
      *
-     * @param fragileBlockStates List of fragile blocks to restore (if they have been broken)
+     * @param bfsResult The interactable source block and a set of fragile blocks that may need to be restored
      */
-    public void scheduleRestoration(Set<BlockState> fragileBlockStates) {
-        if (fragileBlockStates.isEmpty()) return; // Return if there's nothing to restore
+    public void scheduleRestoration(BfsResult bfsResult) {
+        if (bfsResult == null) return; // Return if there's nothing to restore
 
-        Object packetEventListener = this.registerFragileBlockBreakListener(fragileBlockStates);
+        Object packetEventsListener = config.isPacketEventsPresent() ?
+                                      PacketEventsAdapter.registerFragileBlockBreakListener(bfsResult.fragileBlocks()) :
+                                      null;
 
-        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-            if (config.isPacketEventsPresent()) {
-                PacketEventsAdapter.unregisterListener(packetEventListener);
-            }
-
-            // Restore any fragile block that have been replaced by air
-            for (BlockState oldState : fragileBlockStates) {
-                Block currentBlock = oldState.getBlock();
-                if (currentBlock.getType() == Material.AIR && oldState.getType() != Material.AIR)
-                    oldState.update(true, false); // Force restore without physic
-            }
-
-            // Restore the first block if it causes an additional update (e.g. a button) and if there are adjacent fragile blocks
-            BlockState firstState = fragileBlockStates.iterator().next();
-            if (willTriggerAdditionalUpdate(firstState) && fragileBlockStates.size() > 1)
-                firstState.update(true, false); // Force restore without physic
-
-        }, 2L); // Schedule restoration in 2 ticks
+        plugin.getServer().getScheduler() // Schedule restoration in 2 ticks
+                .runTaskLater(plugin, () -> applyRestoration(bfsResult, packetEventsListener), 2L);
     }
 
-    Object registerFragileBlockBreakListener(Set<BlockState> fragileBlockStates) {
-        return config.isPacketEventsPresent() ? //
-               PacketEventsAdapter.registerFragileBlockBreakListener(fragileBlockStates) : null;
+    private void applyRestoration(BfsResult bfsResult, Object packetEventsListener) {
+        // Unregister fragile block break PacketEvents listener (if plugin is present)
+        if (packetEventsListener != null) {
+            PacketEventsAdapter.unregisterListener(packetEventsListener);
+        }
+
+        Set<BlockState> fragileBlockStates = bfsResult.fragileBlocks();
+        BlockState interactableBlock = bfsResult.interactableBlock();
+
+        // Restore any fragile block that have been replaced by air
+        for (BlockState fragileBlockState : fragileBlockStates) {
+            if (wasReplacedByAir(fragileBlockState))
+                fragileBlockState.update(true, false); // Force restore without physic
+        }
+
+        // Restore the interactable block if it has been replaced by air
+        // Or if it will cause an additional update (e.g. a button) and there are adjacent fragile blocks
+        if (wasReplacedByAir(interactableBlock) ||
+            (willTriggerAdditionalUpdate(interactableBlock) && fragileBlockStates.size() > 1)) {
+            interactableBlock.update(true, false); // Force restore without physic
+        }
+    }
+
+    boolean wasReplacedByAir(BlockState blockState) {
+        Block currentBlock = blockState.getBlock();
+        return currentBlock.getType() == Material.AIR && blockState.getType() != Material.AIR;
     }
 
     /**
