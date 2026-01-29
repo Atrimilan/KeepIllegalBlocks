@@ -50,7 +50,9 @@ physics. These **fragile blocks** can be placed using a Debug Stick or plugins s
 **fragile blocks** to break.
 
 Interacting with an **interactable block** triggers a physical update that propagates through all chained
-**fragile blocks**, causing them to break. **--> This plugin prevents this behavior.**
+**fragile blocks**, causing them to break.
+
+**→ This plugin fixes this behavior by restoring broken blocks.**
 
 <details>
 <summary><b>🔵 Expand list of fragile block categories</b></summary>
@@ -59,6 +61,7 @@ Interacting with an **interactable block** triggers a physical update that propa
 List of fragile block categories that are automatically restored by the plugin when broken:
 
 * `amethyst-clusters`
+* `bamboos`
 * `banners`
 * `beds`
 * `bells`
@@ -135,13 +138,9 @@ List of interactable blocks categories recorded by the plugin:
 
 </details>
 
-> [!WARNING]
-> At the moment, the plugin does **not** support naturally-updating fragile blocks that are directly adjacent to
-> other naturally-updating fragile blocks.
-> If these conditions are met, blocks such as a growing cactus or a non-waterlogged dying coral will still cause
-> other fragile blocks to update and break.
->
-> The plugin also does **not** support waterlogged blocks, this includes `seagrass` and `kelp`.
+> [!NOTE]
+> KIB does not support underwater restorations. This is why `seagrass` and `kelp` are not included in the fragile block
+> list.
 
 ### 2. Why would I need it?
 
@@ -159,6 +158,12 @@ and it restores any that have been broken.
 
 For performance reasons, a block limit is set, which is **500 by default**.
 
+> [!WARNING]
+> Even after being restored by KIB, some fragile block will still update naturally, such as cactus breaking as they
+> grow, or coral dying when not waterlogged. **This is the default behavior of the game, KIB will NOT prevent this**,
+> even if they were initially placed using plugins like WorldEdit or Axiom (which rely on advanced chunk management
+> systems).
+
 ## Admin guide
 
 ### 1. Installation
@@ -167,9 +172,18 @@ Download the plugin from Modrinth: https://modrinth.com/project/i4WvDCnD
 
 Place the JAR file in the `./plugins` directory of your server.
 
+> [!TIP]
+> The [PacketEvents](https://modrinth.com/plugin/packetevents) plugin is highly recommended to improve client-side
+> rendering and performance, by disabling break particles and block flickering.
+
 ### 2. Configuration
 
-You can edit `./plugins/KeepIllegalBlocks/config.yml` if you want to blacklist some fragile or interactable blocks.
+In your server directory, you can edit `./plugins/KeepIllegalBlocks/config.yml` to:
+
+* Blacklist some fragile or interactable blocks _(everything is enabled by default)_
+* Change the maximum number of fragile blocks to restore _(default: 500)_
+* Only allow KIB in creative mode _(default: true)_
+* Use [PacketEvents](https://modrinth.com/plugin/packetevents) if it is detected _(default: true)_
 
 To reload your configuration, use the `/kib reload` command (it requires the `kib.reload` permission for a non-op
 player).

@@ -49,7 +49,7 @@ public class KibConfig {
 
         plugin.getLogger().info(isPacketEventsPresent ?
                                 "PacketEvents is present, it will be used if \"use-packet-events-if-detected\" is enabled in the config" :
-                                "PacketEvents is not present, it is recommended to improve rendering and performance on the client-side");
+                                "PacketEvents is not present, it is recommended in order to improve client-side rendering and performance");
 
         List<LoadResult> results = loadConfig();
 

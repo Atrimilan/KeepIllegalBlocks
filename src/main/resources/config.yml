@@ -16,7 +16,7 @@ max-blocks: 500
 only-use-kib-in-creative-mode: true
 
 # Toggle the use of the "PacketEvents" plugin if it is detected.
-# KIB will use it to improve client-side visuals by canceling the sending of network packets related to the update of fragile blocks.
+# KIB will use it to improve client-side rendering and performance, by canceling network packets related to the break of fragile blocks.
 use-packet-events-if-detected: true
 
 # Blacklist interactable blocks by their name, or disable categories below
