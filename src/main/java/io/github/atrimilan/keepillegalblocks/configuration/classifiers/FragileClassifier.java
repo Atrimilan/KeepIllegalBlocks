@@ -20,6 +20,7 @@ public class FragileClassifier extends AbstractClassifier {
 
         return switch (data) {
             case AmethystCluster ignored -> FragileType.AMETHYST_CLUSTER;
+            case Bamboo ignored -> FragileType.BAMBOO;
             case Bed ignored -> FragileType.BED;
             case Bell ignored -> FragileType.BELL;
             case Cake ignored -> FragileType.CAKE;
@@ -27,6 +28,7 @@ public class FragileClassifier extends AbstractClassifier {
             case CaveVinesPlant ignored -> FragileType.CAVE_VINES;
             case Cocoa ignored -> FragileType.COCOA;
             case Comparator ignored -> FragileType.COMPARATOR;
+            case CoralWallFan ignored -> FragileType.CORAL;
             case Door ignored -> FragileType.DOOR;
             case BigDripleaf ignored -> FragileType.DRIPLEAF;
             case SmallDripleaf ignored -> FragileType.DRIPLEAF;
@@ -57,6 +59,7 @@ public class FragileClassifier extends AbstractClassifier {
                 case Material m when isSign(m) -> FragileType.SIGN; // Normal + Wall
                 case Material m when isTorch(m) -> FragileType.TORCH; // Normal + Redstone + Soul
 
+                case BAMBOO_SAPLING -> FragileType.BAMBOO;
                 case CACTUS -> FragileType.CACTUS;
                 case CHORUS_FLOWER, CHORUS_PLANT -> FragileType.CHORUS_PLANT;
                 case DEAD_BUSH -> FragileType.DEAD_BUSH;

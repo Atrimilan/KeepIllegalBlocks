@@ -12,7 +12,10 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.HashSet;
+import java.util.Queue;
+import java.util.Set;
 
 import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType.INFO;
 
@@ -72,16 +75,14 @@ public class BlockRestorationService {
         return new BfsResult(sourceBlock.getState(), fragileBlocks);
     }
 
-    // TODO - Schedule restoration in 1 tick for non-cascade-destructible fragile blocks
-
     /**
      * Schedule restoration of fragile blocks that might have been broken after the update of an interactable block.
      * <p>
      * Note: Restoration is scheduled in 2 ticks, because some fragile blocks are not broken within the first tick.
-     * Known blocks doing so are blocks breaking in cascade (tick by tick): {@code CACTUS}, {@code CAVE_VINES},
-     * {@code CAVE_VINES_PLANT}, {@code CHORUS_FLOWER}, {@code CHORUS_PLANT}, {@code POINTED_DRIPSTONE},
-     * {@code SCAFFOLDING}, {@code SUGAR_CANE}, {@code TWISTING_VINES}, {@code TWISTING_VINES_PLANT},
-     * {@code WEEPING_VINES}, {@code WEEPING_VINES_PLANT}.
+     * Known blocks doing so are blocks breaking in cascade (tick by tick): {@code BAMBOO}, {@code CACTUS},
+     * {@code CAVE_VINES}, {@code CAVE_VINES_PLANT}, {@code CHORUS_FLOWER}, {@code CHORUS_PLANT},
+     * {@code POINTED_DRIPSTONE}, {@code SCAFFOLDING}, {@code SUGAR_CANE}, {@code TWISTING_VINES},
+     * {@code TWISTING_VINES_PLANT}, {@code WEEPING_VINES}, {@code WEEPING_VINES_PLANT}.
      *
      * @param bfsResult The interactable source block and a set of fragile blocks that may need to be restored
      */
@@ -102,34 +103,35 @@ public class BlockRestorationService {
             PacketEventsAdapter.unregisterListener(packetEventsListener);
         }
 
+        // Restore the fragile blocks if needed
         Set<BlockState> fragileBlockStates = bfsResult.fragileBlocks();
-        BlockState interactableBlock = bfsResult.interactableBlock();
-
-        // Restore any fragile block that have been replaced by air
-        for (BlockState fragileBlockState : fragileBlockStates) {
-            if (wasReplacedByAir(fragileBlockState))
-                fragileBlockState.update(true, false); // Force restore without physic
+        for (BlockState state : fragileBlockStates) {
+            if (wasReplacedByAir(state)) {
+                state.update(true, false); // Force restore without physic
+            }
         }
 
-        // Restore the interactable block if it has been replaced by air
-        // Or if it will cause an additional update (e.g. a button) and there are adjacent fragile blocks
+        // Restore the interactable block if needed
+        BlockState interactableBlock = bfsResult.interactableBlock();
         if (wasReplacedByAir(interactableBlock) ||
             (willTriggerAdditionalUpdate(interactableBlock) && fragileBlockStates.size() > 1)) {
             interactableBlock.update(true, false); // Force restore without physic
         }
     }
 
-    boolean wasReplacedByAir(BlockState blockState) {
-        Block currentBlock = blockState.getBlock();
-        return currentBlock.getType() == Material.AIR && blockState.getType() != Material.AIR;
+    /**
+     * @param state The block state to check
+     * @return Whether the block has been replaced by air.
+     */
+    boolean wasReplacedByAir(BlockState state) {
+        Block currentBlock = state.getBlock();
+        return currentBlock.getType() == Material.AIR && state.getType() != Material.AIR;
     }
 
     /**
-     * Check if the interactable block will trigger an additional update. For example, a button will reset to its
-     * initial state 1 second after being pressed.
-     *
      * @param state The block state to check
-     * @return True if the block will trigger an additional update, false otherwise
+     * @return Whether the block will trigger an additional update.<br/> For example, a button will reset to its initial
+     * state 1 second after being pressed.
      */
     boolean willTriggerAdditionalUpdate(BlockState state) {
         return Tag.BUTTONS.isTagged(state.getType());

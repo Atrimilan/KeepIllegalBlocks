@@ -43,6 +43,7 @@ fragile-blocks:
   blacklist: [ ]
   categories:
     amethyst-clusters: true
+    bamboos: true
     banners: true
     beds: true
     bells: true

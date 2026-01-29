@@ -2,6 +2,7 @@ package io.github.atrimilan.keepillegalblocks.configuration.types;
 
 public enum FragileType implements BlockType {
     AMETHYST_CLUSTER("amethyst-clusters"),
+    BAMBOO("bamboos"),
     BANNER("banners"),
     BED("beds"),
     BELL("bells"),
