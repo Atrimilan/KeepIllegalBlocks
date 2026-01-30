@@ -2,21 +2,25 @@ package io.github.atrimilan.keepillegalblocks.packets;
 
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
+import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEffect;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerMultiBlockChange;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
+import io.github.atrimilan.keepillegalblocks.models.BfsResult;
 import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.type.Door;
 import org.bukkit.entity.Player;
+import org.bukkit.util.BoundingBox;
 
 import java.util.Arrays;
 import java.util.Set;
 
-import static com.github.retrooper.packetevents.protocol.packettype.PacketType.Play.Server.EFFECT;
-import static com.github.retrooper.packetevents.protocol.packettype.PacketType.Play.Server.MULTI_BLOCK_CHANGE;
+import static com.github.retrooper.packetevents.protocol.packettype.PacketType.Play.Server.*;
 import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType.WARN;
 
 /**
@@ -24,6 +28,7 @@ import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType
  * client-side rendering and performances:
  * <li>Cancel break particles.</li>
  * <li>Cancel break sounds.</li>
+ * <li>Cancel item drop from broken blocks.</li>
  * <li>Fake fragile blocks presence until they are restored.</li>
  */
 public class FragileBlockBreakListener implements PacketListener {
@@ -31,12 +36,16 @@ public class FragileBlockBreakListener implements PacketListener {
     private final LongOpenHashSet fragileBlockVectors;
     private final LongOpenHashSet fragileBlockVectorsWithoutDoors;
     private final World world;
+    private final BoundingBox boundingBox;
 
-    public FragileBlockBreakListener(Set<BlockState> fragileBlockStates) {
+    public FragileBlockBreakListener(BfsResult bfsResult) {
+        Set<BlockState> fragileBlockStates = bfsResult.fragileBlocks();
         int size = fragileBlockStates.size();
+
         this.fragileBlockVectors = new LongOpenHashSet(size);
         this.fragileBlockVectorsWithoutDoors = new LongOpenHashSet(size);
-        this.world = fragileBlockStates.isEmpty() ? null : fragileBlockStates.iterator().next().getWorld();
+        this.world = bfsResult.interactableBlock().getWorld();
+        this.boundingBox = bfsResult.boundingBox();
 
         for (BlockState s : fragileBlockStates) {
             long vector = packVector(s.getX(), s.getY(), s.getZ());
@@ -52,10 +61,13 @@ public class FragileBlockBreakListener implements PacketListener {
     public void onPacketSend(PacketSendEvent event) {
         if (((Player) event.getPlayer()).getWorld() != world) return;
 
-        if (event.getPacketType().equals(EFFECT)) {
+        if (event.getPacketType() == EFFECT) {
             this.cancelEffectPacketEvent(event, new WrapperPlayServerEffect(event));
 
-        } else if (event.getPacketType().equals(MULTI_BLOCK_CHANGE)) {
+        } else if (event.getPacketType() == SPAWN_ENTITY) {
+            this.cancelSpawnItemPacketEvent(event, new WrapperPlayServerSpawnEntity(event));
+
+        } else if (event.getPacketType() == MULTI_BLOCK_CHANGE) {
             this.tweakMultiBlockChangePacketEvent(event, new WrapperPlayServerMultiBlockChange(event));
         }
     }
@@ -66,13 +78,29 @@ public class FragileBlockBreakListener implements PacketListener {
      * quite slow on some clients.
      *
      * @param event  The packet event
-     * @param packet The wrapped packet to tweak
+     * @param packet The wrapped packet to cancel
      */
     void cancelEffectPacketEvent(PacketSendEvent event, WrapperPlayServerEffect packet) {
         Vector3i pos = packet.getPosition();
         long vector = packVector(pos.getX(), pos.getY(), pos.getZ());
 
         if (fragileBlockVectors.contains(vector)) {
+            event.setCancelled(true);
+        }
+    }
+
+    /**
+     * Cancel the {@code SPAWN_ENTITY} packet when the entity is of type {@link EntityTypes#ITEM} and is inside the
+     * fragile blocks bounding box, in order to hide item drops from these fragile blocks.
+     *
+     * @param event  The packet event
+     * @param packet The wrapped packet to cancel
+     */
+    void cancelSpawnItemPacketEvent(PacketSendEvent event, WrapperPlayServerSpawnEntity packet) {
+        boolean isItem = packet.getEntityType().isInstanceOf(EntityTypes.ITEM);
+        Vector3d pos = packet.getPosition();
+
+        if (isItem && boundingBox.contains(pos.getX(), pos.getY(), pos.getZ())) {
             event.setCancelled(true);
         }
     }

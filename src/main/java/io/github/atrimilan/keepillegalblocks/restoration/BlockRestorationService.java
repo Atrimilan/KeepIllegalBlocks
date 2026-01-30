@@ -7,12 +7,15 @@ import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Tag;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.util.BoundingBox;
 
 import java.util.ArrayDeque;
 import java.util.HashSet;
@@ -35,15 +38,21 @@ public class BlockRestorationService {
     }
 
     /**
-     * Perform a Breadth-First Search (BFS) to record all fragile blocks states.
+     * Perform a Breadth-First Search (BFS) to record all fragile blocks states, and calculate their bounding box.
      *
      * @param sourceBlock The interactable block that the player interacted with
      * @param maxBlocks   The maximum number of blocks to record
-     * @return The interactable source block and a set of fragile blocks that may need to be restored
+     * @return All block states (interactable and fragile) and their bounding box.
      */
     public BfsResult recordFragileBlockStates(Block sourceBlock, int maxBlocks) {
         if (sourceBlock == null) return null;
 
+        // Initialize bounding box boundaries
+        int minX = sourceBlock.getX(), maxX = sourceBlock.getX();
+        int minY = sourceBlock.getY(), maxY = sourceBlock.getY();
+        int minZ = sourceBlock.getZ(), maxZ = sourceBlock.getZ();
+
+        // Initialize BFS variables
         Queue<Block> queue = new ArrayDeque<>();
         Set<Location> visited = new HashSet<>();
         Set<BlockState> fragileBlocks = new HashSet<>();
@@ -58,6 +67,14 @@ public class BlockRestorationService {
 
             if (!currentBlock.getLocation().equals(sourceBlockLoc)) { // Don't save the interactable source block
                 fragileBlocks.add(currentBlock.getState()); // Save fragile block state
+
+                // Update bounding box
+                minX = Math.min(minX, currentBlock.getX());
+                maxX = Math.max(maxX, currentBlock.getX());
+                minY = Math.min(minY, currentBlock.getY());
+                maxY = Math.max(maxY, currentBlock.getY());
+                minZ = Math.min(minZ, currentBlock.getZ());
+                maxZ = Math.max(maxZ, currentBlock.getZ());
             }
 
             // Scan all 6 faces
@@ -73,8 +90,11 @@ public class BlockRestorationService {
             }
         }
 
+        BoundingBox box = new BoundingBox(minX - 0.5, minY - 0.5, minZ - 0.5, maxX + 1.5, maxY + 1.5, maxZ + 1.5);
+
         DebugUtils.sendChat(() -> "Fragile blocks count: <white>" + fragileBlocks.size() + "<gray>/" + maxBlocks, INFO);
-        return new BfsResult(sourceBlock.getState(), fragileBlocks);
+
+        return new BfsResult(sourceBlock.getState(), fragileBlocks, box);
     }
 
     /**
@@ -86,17 +106,32 @@ public class BlockRestorationService {
      * {@code POINTED_DRIPSTONE}, {@code SCAFFOLDING}, {@code SUGAR_CANE}, {@code TWISTING_VINES},
      * {@code TWISTING_VINES_PLANT}, {@code WEEPING_VINES}, {@code WEEPING_VINES_PLANT}.
      *
-     * @param bfsResult The interactable source block and a set of fragile blocks that may need to be restored
+     * @param bfsResult All block states (interactable and fragile) and their bounding box.
      */
     public void scheduleRestoration(BfsResult bfsResult) {
         if (bfsResult == null) return; // Return if there's nothing to restore
 
-        Object packetEventsListener = config.isPacketEventsPresent() ?
-                                      PacketEventsAdapter.registerFragileBlockBreakListener(bfsResult.fragileBlocks()) :
-                                      null;
+        Object packetEventsListener = config.isPacketEventsPresent() ? //
+                                      PacketEventsAdapter.registerFragileBlockBreakListener(bfsResult) : null;
 
-        plugin.getServer().getScheduler() // Schedule restoration in 2 ticks
-                .runTaskLater(plugin, () -> applyRestoration(bfsResult, packetEventsListener), 2L);
+        BukkitScheduler scheduler = plugin.getServer().getScheduler();
+        scheduler.runTask(plugin, () -> preventBlocksToDropItem(bfsResult)); // In 1 tick
+        scheduler.runTaskLater(plugin, () -> applyRestoration(bfsResult, packetEventsListener), 2L); // In 2 ticks
+    }
+
+    /**
+     * Delete items dropped by fragile blocks, by checking if they are within the fragile blocks bounding box and if
+     * they have been dropped in the last tick.
+     *
+     * @param bfsResult All block states (interactable and fragile) and their bounding box.
+     */
+    private void preventBlocksToDropItem(BfsResult bfsResult) {
+        if (bfsResult.fragileBlocks().isEmpty()) return;
+
+        World world = bfsResult.interactableBlock().getWorld();
+
+        world.getNearbyEntities(bfsResult.boundingBox(), e -> e instanceof Item i && i.getTicksLived() <= 1)
+                .forEach(Entity::remove);
     }
 
     private void applyRestoration(BfsResult bfsResult, Object packetEventsListener) {

@@ -3,17 +3,15 @@ package io.github.atrimilan.keepillegalblocks.packets;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerCommon;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
-import org.bukkit.block.BlockState;
-
-import java.util.Set;
+import io.github.atrimilan.keepillegalblocks.models.BfsResult;
 
 public class PacketEventsAdapter {
 
     private PacketEventsAdapter() {
     }
 
-    public static Object registerFragileBlockBreakListener(Set<BlockState> fragileBlockStates) {
-        FragileBlockBreakListener listener = new FragileBlockBreakListener(fragileBlockStates);
+    public static Object registerFragileBlockBreakListener(BfsResult bfsResult) {
+        FragileBlockBreakListener listener = new FragileBlockBreakListener(bfsResult);
         return PacketEvents.getAPI().getEventManager().registerListener(listener, PacketListenerPriority.NORMAL);
     }
 
