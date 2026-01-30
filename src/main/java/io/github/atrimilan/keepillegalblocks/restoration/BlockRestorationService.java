@@ -10,6 +10,8 @@ import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayDeque;
@@ -27,9 +29,9 @@ public class BlockRestorationService {
     private static final BlockFace[] FACES = {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH,
                                               BlockFace.EAST, BlockFace.WEST};
 
-    public BlockRestorationService(JavaPlugin plugin, KibConfig config) {
-        this.plugin = plugin;
+    public BlockRestorationService(KibConfig config) {
         this.config = config;
+        this.plugin = config.getPlugin();
     }
 
     /**

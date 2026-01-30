@@ -1,7 +1,7 @@
 # Keep Illegal Blocks
 
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Atrimilan/KeepIllegalBlocks/release.yml?branch=master&event=workflow_dispatch&style=for-the-badge&logo=github)](https://github.com/Atrimilan/KeepIllegalBlocks/actions/workflows/release.yml)
-&nbsp;[![Modrinth version](https://img.shields.io/modrinth/v/i4WvDCnD?style=for-the-badge&logo=modrinth)](https://modrinth.com/project/i4WvDCnD)
+&nbsp;[![Modrinth version](https://img.shields.io/modrinth/v/i4WvDCnD?style=for-the-badge&logo=modrinth)](https://modrinth.com/plugin/keep-illegal-blocks)
 &nbsp;[![GitHub License](https://img.shields.io/github/license/Atrimilan/KeepIllegalBlocks?style=for-the-badge)](https://github.com/Atrimilan/KeepIllegalBlocks/blob/master/LICENSE)
 
 Paper plugin that prevents illegal blocks from breaking when a player interacts with an adjacent block.
@@ -168,7 +168,7 @@ For performance reasons, a block limit is set, which is **500 by default**.
 
 ### 1. Installation
 
-Download the plugin from Modrinth: https://modrinth.com/project/i4WvDCnD
+Download the plugin from Modrinth: https://modrinth.com/plugin/keep-illegal-blocks
 
 Place the JAR file in the `./plugins` directory of your server.
 

@@ -69,6 +69,10 @@ public class KibConfig {
         return loadConfig();
     }
 
+    public JavaPlugin getPlugin() {
+        return plugin;
+    }
+
     /**
      * Get the maximum number of blocks to record.
      */

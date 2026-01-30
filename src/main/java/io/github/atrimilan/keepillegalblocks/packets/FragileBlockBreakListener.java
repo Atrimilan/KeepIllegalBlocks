@@ -52,10 +52,10 @@ public class FragileBlockBreakListener implements PacketListener {
     public void onPacketSend(PacketSendEvent event) {
         if (((Player) event.getPlayer()).getWorld() != world) return;
 
-        if (event.getPacketType() == EFFECT) {
+        if (event.getPacketType().equals(EFFECT)) {
             this.cancelEffectPacketEvent(event, new WrapperPlayServerEffect(event));
 
-        } else if (event.getPacketType() == MULTI_BLOCK_CHANGE) {
+        } else if (event.getPacketType().equals(MULTI_BLOCK_CHANGE)) {
             this.tweakMultiBlockChangePacketEvent(event, new WrapperPlayServerMultiBlockChange(event));
         }
     }
@@ -83,7 +83,7 @@ public class FragileBlockBreakListener implements PacketListener {
      * <p>
      * This does not include:
      * <li>Doors - As they would appear half-open.</li>
-     * <li>The source interactable block - As it would not always be updated correctly for all players.</li>
+     * <li>The interactable source block - As it would not always be updated correctly for all players.</li>
      *
      * @param event  The packet event
      * @param packet The wrapped packet to tweak

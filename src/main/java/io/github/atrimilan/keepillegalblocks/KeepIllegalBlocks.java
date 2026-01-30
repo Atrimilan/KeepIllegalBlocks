@@ -27,13 +27,13 @@ public class KeepIllegalBlocks extends JavaPlugin {
 
     private void registerPluginEvents() {
         getServer().getPluginManager().registerEvents( //
-                new BlockInteractionListener(new BlockRestorationService(this, kibConfig), kibConfig), this);
+                new BlockInteractionListener(new BlockRestorationService(kibConfig), kibConfig), this);
     }
 
     private void registerPluginCommands() {
-        KibCommand kibCommand = new KibCommand(this.getLogger(), kibConfig);
+        KibCommand kibCommand = new KibCommand(kibConfig, this.getLogger());
 
-        this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
+        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             final Commands commands = event.registrar();
             commands.register(kibCommand.create(), KibCommand.DESCRIPTION, KibCommand.ALIASES);
         });

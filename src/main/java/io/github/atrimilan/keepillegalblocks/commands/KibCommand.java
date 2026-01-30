@@ -23,9 +23,9 @@ public class KibCommand {
     private final Logger logger;
     private final KibConfig kibConfig;
 
-    public KibCommand(Logger logger, KibConfig kibConfig) {
-        this.logger = logger;
+    public KibCommand(KibConfig kibConfig, Logger logger) {
         this.kibConfig = kibConfig;
+        this.logger = logger;
     }
 
     /**
