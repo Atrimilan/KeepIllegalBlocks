@@ -6,15 +6,10 @@ import io.github.atrimilan.keepillegalblocks.configuration.KibConfig;
 import io.github.atrimilan.keepillegalblocks.models.LoadResult;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -39,16 +34,16 @@ class KibCommandTest {
     private KibConfig kibConfig;
 
     @Mock
-    CommandSourceStack commandSourceStack;
+    private CommandSourceStack commandSourceStack;
 
     @Mock
-    CommandContext<CommandSourceStack> ctx;
+    private CommandContext<CommandSourceStack> ctx;
 
     @Mock
-    CommandSender sender;
+    private CommandSender sender;
 
     @Mock
-    Logger logger;
+    private Logger logger;
 
     @Captor
     private ArgumentCaptor<Supplier<String>> captor;

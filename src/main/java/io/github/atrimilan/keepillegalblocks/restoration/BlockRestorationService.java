@@ -45,7 +45,7 @@ public class BlockRestorationService {
      * @return All block states (interactable and fragile) and their bounding box.
      */
     public BfsResult recordFragileBlockStates(Block sourceBlock, int maxBlocks) {
-        if (sourceBlock == null) return null;
+        if (sourceBlock == null || maxBlocks <= 0) return null;
 
         // Initialize bounding box boundaries
         int minX = sourceBlock.getX(), maxX = sourceBlock.getX();
@@ -109,7 +109,7 @@ public class BlockRestorationService {
      * @param bfsResult All block states (interactable and fragile) and their bounding box.
      */
     public void scheduleRestoration(BfsResult bfsResult) {
-        if (bfsResult == null) return; // Return if there's nothing to restore
+        if (bfsResult == null || bfsResult.fragileBlocks().isEmpty()) return; // Return if there's nothing to restore
 
         Object packetEventsListener = config.isPacketEventsPresent() ? //
                                       PacketEventsAdapter.registerFragileBlockBreakListener(bfsResult) : null;
@@ -126,8 +126,6 @@ public class BlockRestorationService {
      * @param bfsResult All block states (interactable and fragile) and their bounding box.
      */
     private void preventBlocksToDropItem(BfsResult bfsResult) {
-        if (bfsResult.fragileBlocks().isEmpty()) return;
-
         World world = bfsResult.interactableBlock().getWorld();
 
         world.getNearbyEntities(bfsResult.boundingBox(), e -> e instanceof Item i && i.getTicksLived() <= 1)
@@ -150,8 +148,7 @@ public class BlockRestorationService {
 
         // Restore the interactable block if needed
         BlockState interactableBlock = bfsResult.interactableBlock();
-        if (wasReplacedByAir(interactableBlock) ||
-            (willTriggerAdditionalUpdate(interactableBlock) && fragileBlockStates.size() > 1)) {
+        if (wasReplacedByAir(interactableBlock) || willTriggerAdditionalUpdate(interactableBlock)) {
             interactableBlock.update(true, false); // Force restore without physic
         }
     }

@@ -4,8 +4,10 @@ import io.github.atrimilan.keepillegalblocks.configuration.types.FragileType;
 import io.github.atrimilan.keepillegalblocks.configuration.types.InteractableType;
 import io.github.atrimilan.keepillegalblocks.models.LoadResult;
 import org.bukkit.Material;
+import org.bukkit.Server;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.FileConfigurationOptions;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,6 +48,10 @@ class KibConfigTest {
         when(plugin.getLogger()).thenReturn(logger);
         when(plugin.getConfig()).thenReturn(fileConfig);
         when(fileConfig.options()).thenReturn(fileConfigOptions);
+        Server server = mock(Server.class);
+        when(plugin.getServer()).thenReturn(server);
+        PluginManager pluginManager = mock(PluginManager.class);
+        when(server.getPluginManager()).thenReturn(pluginManager);
 
         List<LoadResult> results = List.of(new LoadResult("Fragile", 10, 2), //
                                            new LoadResult("Interactable", 5, 1));
@@ -58,8 +64,8 @@ class KibConfigTest {
         verify(plugin).saveConfig();
         verify(plugin, never()).reloadConfig(); // Never
         verify(kibConfig).loadConfig();
+        verify(logger).info(anyString()); // PacketEvents detected/not detected info message
         verify(logger, times(2)).info(logCaptor.capture());
-
         List<String> logMsg = logCaptor.getAllValues().stream().map(Supplier::get).toList();
         assertEquals(2, logMsg.size());
         assertTrue(logMsg.contains("Fragile blocks loaded: 10 (2 blacklisted)"));
@@ -99,6 +105,8 @@ class KibConfigTest {
 
         verify(plugin).getConfig();
         verify(fileConfig).getInt("max-blocks");
+        verify(fileConfig).getBoolean("only-use-kib-in-creative-mode");
+        verify(fileConfig).getBoolean("use-packet-events-if-detected");
         verify(kibConfig).loadRegistry(eq(fileConfig), eq("fragile-blocks."), anyMap(), any());
         verify(kibConfig).loadRegistry(eq(fileConfig), eq("interactable-blocks."), anyMap(), any());
     }

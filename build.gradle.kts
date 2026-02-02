@@ -32,6 +32,7 @@ dependencies {
     implementation("org.bstats:bstats-bukkit:3.1.0")
     // PacketEvents (optional plugin)
     compileOnly("com.github.retrooper:packetevents-spigot:2.11.2")
+    testImplementation("com.github.retrooper:packetevents-spigot:2.11.2")
     // JUnit & Mockito
     testImplementation(platform("org.junit:junit-bom:6.0.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")

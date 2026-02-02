@@ -80,7 +80,7 @@ public class FragileBlockBreakListener implements PacketListener {
      * @param event  The packet event
      * @param packet The wrapped packet to cancel
      */
-    void cancelEffectPacketEvent(PacketSendEvent event, WrapperPlayServerEffect packet) {
+    private void cancelEffectPacketEvent(PacketSendEvent event, WrapperPlayServerEffect packet) {
         Vector3i pos = packet.getPosition();
         long vector = packVector(pos.getX(), pos.getY(), pos.getZ());
 
@@ -96,13 +96,17 @@ public class FragileBlockBreakListener implements PacketListener {
      * @param event  The packet event
      * @param packet The wrapped packet to cancel
      */
-    void cancelSpawnItemPacketEvent(PacketSendEvent event, WrapperPlayServerSpawnEntity packet) {
-        boolean isItem = packet.getEntityType().isInstanceOf(EntityTypes.ITEM);
-        Vector3d pos = packet.getPosition();
-
-        if (isItem && boundingBox.contains(pos.getX(), pos.getY(), pos.getZ())) {
-            event.setCancelled(true);
+    private void cancelSpawnItemPacketEvent(PacketSendEvent event, WrapperPlayServerSpawnEntity packet) {
+        if (isItemEntity(packet)) {
+            Vector3d pos = packet.getPosition();
+            if (boundingBox.contains(pos.getX(), pos.getY(), pos.getZ())) {
+                event.setCancelled(true);
+            }
         }
+    }
+
+    boolean isItemEntity(WrapperPlayServerSpawnEntity packet) {
+        return packet.getEntityType().isInstanceOf(EntityTypes.ITEM);
     }
 
     /**
@@ -116,7 +120,7 @@ public class FragileBlockBreakListener implements PacketListener {
      * @param event  The packet event
      * @param packet The wrapped packet to tweak
      */
-    void tweakMultiBlockChangePacketEvent(PacketSendEvent event, WrapperPlayServerMultiBlockChange packet) {
+    private void tweakMultiBlockChangePacketEvent(PacketSendEvent event, WrapperPlayServerMultiBlockChange packet) {
         var packetBlocks = packet.getBlocks();
 
         int keptCount = 0; // Number of blocks that must remain in the packet (the source interactable and doors)

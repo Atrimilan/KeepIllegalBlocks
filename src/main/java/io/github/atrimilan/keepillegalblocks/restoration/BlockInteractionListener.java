@@ -41,15 +41,10 @@ public class BlockInteractionListener implements Listener {
         if (event.getPlayer().isSneaking() && event.getItem() != null) return;
 
         Block sourceBlock = event.getClickedBlock();
-        if (sourceBlock == null) return;
-
-        // Check if the block is interactable
-        if (!config.isInteractable(sourceBlock.getType())) return;
+        if (sourceBlock == null || !config.isInteractable(sourceBlock.getType())) return;
 
         // Perform a BFS to scan and save all fragile blocks that will break as a result of the player interaction
         BfsResult result = service.recordFragileBlockStates(sourceBlock, config.getMaxBlocks());
-
-        if (result.fragileBlocks().isEmpty()) return;
 
         // Schedule fragile block restoration
         service.scheduleRestoration(result);
