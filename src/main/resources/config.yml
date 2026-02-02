@@ -11,8 +11,7 @@
 # 500 is sufficient as you will rarely reach that many blocks.
 max-blocks: 500
 
-# By default, KIB is only enabled in Creative mode, as it does not prevent fragile blocks from dropping items when broken.
-# Only enable this option if you do not care about item duplication or if the “doTileDrops” gamerule is enabled.
+# By default, KIB is only be enabled in Creative mode.
 only-use-kib-in-creative-mode: true
 
 # Toggle the use of the "PacketEvents" plugin if it is detected.

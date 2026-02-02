@@ -21,14 +21,17 @@ jobs:
           VERSION=$(grep '^projectVersion=' gradle.properties | cut -d '=' -f2)
           GAME_VERSIONS=$(grep '^supportedGameVersions=' gradle.properties | cut -d '=' -f2)
           TYPE=$(grep '^versionType=' gradle.properties | cut -d '=' -f2)
+          LOADERS=$(grep '^compatibleLoaders=' gradle.properties | cut -d '=' -f2)
           
           echo "projectVersion=$VERSION" >> $GITHUB_ENV
           echo "supportedGameVersions=$GAME_VERSIONS" >> $GITHUB_ENV
           echo "versionType=$TYPE" >> $GITHUB_ENV
+          echo "compatibleLoaders=$LOADERS" >> $GITHUB_ENV
           
           echo "✅ Project version: $VERSION"
           echo "✅ Supported Minecraft version(s): $GAME_VERSIONS"
           echo "✅ Version type: $TYPE"
+          echo "✅ Compatible loaders: $LOADERS"
 
       # Run unit tests and build JAR file
       - name: Build plugin with Gradle
@@ -45,7 +48,7 @@ jobs:
           version: ${{ env.projectVersion }}              # Version of the plugin itself
           game-versions: ${{ env.supportedGameVersions }} # Supported Minecraft version(s)
           version-type: ${{ env.versionType }}            # Either 'alpha', 'beta' or 'release'
-          loaders: paper
+          loaders: ${{ env.compatibleLoaders }}           # Compatible loaders (bukkit, paper, etc.)
           changelog-file: changelogs/${{ env.projectVersion }}.md
 
           modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
