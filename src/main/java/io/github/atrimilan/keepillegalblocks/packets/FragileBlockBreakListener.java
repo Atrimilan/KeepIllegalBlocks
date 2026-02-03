@@ -59,7 +59,7 @@ public class FragileBlockBreakListener implements PacketListener {
 
     @Override
     public void onPacketSend(PacketSendEvent event) {
-        if (((Player) event.getPlayer()).getWorld() != world) return;
+        if (event.getPlayer() == null || ((Player) event.getPlayer()).getWorld() != world) return;
 
         if (event.getPacketType() == EFFECT) {
             this.cancelEffectPacketEvent(event, new WrapperPlayServerEffect(event));

@@ -51,7 +51,7 @@ public abstract class AbstractClassifier {
     }
 
     protected boolean isSign(Material m) {
-        return MaterialTags.SIGNS.isTagged(m);
+        return Tag.ALL_SIGNS.isTagged(m);
     }
 
     protected boolean isTorch(Material m) {

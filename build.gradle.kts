@@ -20,19 +20,22 @@ repositories {
 
 val groupId: String by project
 val projectVersion: String by project
-val paperApiVersion: String by project
 
 group = groupId
 version = projectVersion
+
+val paperApiVersion: String by project
+val packetEventsVersion: String by project
+val bStatsVersion: String by project
 
 dependencies {
     // PaperMC (using paperweight-userdev)
     paperweight.paperDevBundle(paperApiVersion)
     // bStats (shaded jar)
-    implementation("org.bstats:bstats-bukkit:3.1.0")
+    implementation("org.bstats:bstats-bukkit:$bStatsVersion")
     // PacketEvents (optional plugin)
-    compileOnly("com.github.retrooper:packetevents-spigot:2.11.2")
-    testImplementation("com.github.retrooper:packetevents-spigot:2.11.2")
+    compileOnly("com.github.retrooper:packetevents-spigot:$packetEventsVersion")
+    testImplementation("com.github.retrooper:packetevents-spigot:$packetEventsVersion")
     // JUnit & Mockito
     testImplementation(platform("org.junit:junit-bom:6.0.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")

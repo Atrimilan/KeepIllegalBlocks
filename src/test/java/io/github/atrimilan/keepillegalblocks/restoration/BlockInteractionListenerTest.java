@@ -110,7 +110,7 @@ class BlockInteractionListenerTest {
         when(playerInteractEvent.getHand()).thenReturn(EquipmentSlot.HAND);
         when(playerInteractEvent.getPlayer()).thenReturn(player);
         when(player.isSneaking()).thenReturn(true);
-        when(playerInteractEvent.getItem()).thenReturn(new ItemStack(Material.NETHERITE_HOE));
+        when(playerInteractEvent.getItem()).thenReturn(mock(ItemStack.class));
 
         listener.onPlayerInteract(playerInteractEvent);
 

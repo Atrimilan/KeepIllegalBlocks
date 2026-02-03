@@ -78,6 +78,15 @@ class FragileBlockBreakListenerTest {
     }
 
     @Test
+    void shouldIgnorePacketFromNullPlayer() {
+        when(event.getPlayer()).thenReturn(null);
+
+        listener.onPacketSend(event);
+
+        verify(event, never()).setCancelled(anyBoolean());
+    }
+
+    @Test
     void shouldIgnorePacketFromDifferentWorld() {
         when(player.getWorld()).thenReturn(mock(World.class));
 

@@ -1,5 +1,5 @@
 name: KeepIllegalBlocks
-version: 1.0.0
+version: 1.1.1
 main: io.github.atrimilan.keepillegalblocks.KeepIllegalBlocks
 description: Prevent illegal blocks from breaking due to physics when a player interacts with an adjacent block
 author: Atrimilan
