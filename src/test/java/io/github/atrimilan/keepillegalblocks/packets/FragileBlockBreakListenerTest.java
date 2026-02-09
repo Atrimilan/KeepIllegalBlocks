@@ -12,7 +12,6 @@ import io.github.atrimilan.keepillegalblocks.models.BfsResult;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.data.type.Door;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 import org.junit.jupiter.api.AfterEach;
@@ -104,7 +103,7 @@ class FragileBlockBreakListenerTest {
         verify(event, never()).setCancelled(anyBoolean());
     }
 
-    /********** EFFECT Packet **********/
+    // ********** EFFECT Packet **********
 
     @Test
     void shouldCancelEffectPacket() {
@@ -130,7 +129,7 @@ class FragileBlockBreakListenerTest {
         verify(event, never()).setCancelled(anyBoolean());
     }
 
-    /********** SPAWN_ENTITY Packet **********/
+    // ********** SPAWN_ENTITY Packet **********
 
     @Test
     void shouldCancelItemSpawnInsideBoundingBox() {
@@ -169,13 +168,11 @@ class FragileBlockBreakListenerTest {
         verify(event, never()).setCancelled(anyBoolean());
     }
 
-    /********** MULTI_BLOCK_CHANGE Packet **********/
+    // ********** MULTI_BLOCK_CHANGE Packet **********
 
-    private WrapperPlayServerMultiBlockChange.EncodedBlock mockEncodedBlock(int x, int y, int z) {
+    private WrapperPlayServerMultiBlockChange.EncodedBlock mockEncodedBlock(boolean isAir) {
         var block = mock(WrapperPlayServerMultiBlockChange.EncodedBlock.class);
-        when(block.getX()).thenReturn(x);
-        when(block.getY()).thenReturn(y);
-        when(block.getZ()).thenReturn(z);
+        when(block.getBlockId()).thenReturn(isAir ? 0 : 1);
         return block;
     }
 
@@ -183,8 +180,8 @@ class FragileBlockBreakListenerTest {
     void shouldTweakMultiBlockChangePacket() {
         when(event.getPacketType()).thenReturn(PacketType.Play.Server.MULTI_BLOCK_CHANGE);
 
-        var fragileBlock = mockEncodedBlock(X_INT, Y_INT, Z_INT);
-        var safeBlock = mockEncodedBlock(X_INT + 1, Y_INT, Z_INT);
+        var fragileBlock = mockEncodedBlock(true);
+        var safeBlock = mockEncodedBlock(false);
 
         WrapperPlayServerMultiBlockChange.EncodedBlock[] blocks = {fragileBlock, safeBlock};
 
@@ -206,35 +203,21 @@ class FragileBlockBreakListenerTest {
     }
 
     @Test
-    void shouldNotRemoveFragileDoorFromMultiBlockChangePacket() {
+    void shouldNotTweakMultiBlockChangeWhenPacketContainsNoAirBlock() {
         when(event.getPacketType()).thenReturn(PacketType.Play.Server.MULTI_BLOCK_CHANGE);
 
-        BlockState interactable = BukkitMockFactory.mockBlockState(Material.OAK_DOOR);
-        when(interactable.getWorld()).thenReturn(world);
+        var fragileBlock = mockEncodedBlock(false); // Was not replaced by AIR
+        var safeBlock = mockEncodedBlock(false);
 
-        BlockState fragileDoor = BukkitMockFactory.mockBlockState(Material.OAK_DOOR);
-        BukkitMockFactory.setCoordinates(fragileDoor, X_INT, Y_INT, Z_INT);
-        when(fragileDoor.getBlockData()).thenReturn(mock(Door.class));
-
-        BfsResult bfsResult = new BfsResult(interactable, Set.of(fragileDoor), mock(BoundingBox.class));
-
-        // Create a new listener that uses a different BfsResult from the one prepared in the @BeforeEach
-        FragileBlockBreakListener doorListener = new FragileBlockBreakListener(bfsResult);
-
-        var block = mockEncodedBlock(X_INT, Y_INT, Z_INT);
+        WrapperPlayServerMultiBlockChange.EncodedBlock[] blocks = {fragileBlock, safeBlock};
 
         mockedMultiBlock = mockConstruction(WrapperPlayServerMultiBlockChange.class, (mock, context) -> {
-            when(mock.getBlocks()).thenReturn(new WrapperPlayServerMultiBlockChange.EncodedBlock[]{block});
+            when(mock.getBlocks()).thenReturn(blocks);
         });
 
-        when(event.getPlayer()).thenReturn(player);
-        when(player.getWorld()).thenReturn(world);
+        listener.onPacketSend(event);
 
-        doorListener.onPacketSend(event);
-
-        WrapperPlayServerMultiBlockChange packet = mockedMultiBlock.constructed().getFirst();
-
-        verify(packet, never()).setBlocks(any());
+        verify(mockedMultiBlock.constructed().getFirst(), never()).setBlocks(any());
         verify(event, never()).markForReEncode(anyBoolean());
         verify(event, never()).setCancelled(anyBoolean());
     }

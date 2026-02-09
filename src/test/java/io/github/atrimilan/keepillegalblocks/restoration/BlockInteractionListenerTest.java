@@ -44,7 +44,7 @@ class BlockInteractionListenerTest {
     @Mock
     private BfsResult bfsResult;
 
-    /********** Should restore **********/
+    // ********** Should restore **********
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
@@ -69,7 +69,7 @@ class BlockInteractionListenerTest {
         verify(service).scheduleRestoration(any());
     }
 
-    /********** Should not restore **********/
+    // ********** Should not restore **********
 
     @Test
     void onPlayerInteract_shouldNotRestoreWhenGamemodeIsNotValid() {

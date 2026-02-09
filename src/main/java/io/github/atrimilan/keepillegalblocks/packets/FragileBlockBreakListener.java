@@ -13,7 +13,6 @@ import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.data.type.Door;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 
@@ -34,7 +33,6 @@ import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType
 public class FragileBlockBreakListener implements PacketListener {
 
     private final LongOpenHashSet fragileBlockVectors;
-    private final LongOpenHashSet fragileBlockVectorsWithoutDoors;
     private final World world;
     private final BoundingBox boundingBox;
 
@@ -43,17 +41,12 @@ public class FragileBlockBreakListener implements PacketListener {
         int size = fragileBlockStates.size();
 
         this.fragileBlockVectors = new LongOpenHashSet(size);
-        this.fragileBlockVectorsWithoutDoors = new LongOpenHashSet(size);
         this.world = bfsResult.interactableBlock().getWorld();
         this.boundingBox = bfsResult.boundingBox();
 
         for (BlockState s : fragileBlockStates) {
             long vector = packVector(s.getX(), s.getY(), s.getZ());
             this.fragileBlockVectors.add(vector);
-
-            if (!(s.getBlockData() instanceof Door)) {
-                this.fragileBlockVectorsWithoutDoors.add(vector);
-            }
         }
     }
 
@@ -112,10 +105,6 @@ public class FragileBlockBreakListener implements PacketListener {
     /**
      * Tweak the {@code MULTI_BLOCK_CHANGE} packet to fake fragile blocks presence when they are broken and restored.
      * This hides block flickering, making client-side rendering smoother.
-     * <p>
-     * This does not include:
-     * <li>Doors - As they would appear half-open.</li>
-     * <li>The interactable source block - As it would not always be updated correctly for all players.</li>
      *
      * @param event  The packet event
      * @param packet The wrapped packet to tweak
@@ -123,23 +112,21 @@ public class FragileBlockBreakListener implements PacketListener {
     private void tweakMultiBlockChangePacketEvent(PacketSendEvent event, WrapperPlayServerMultiBlockChange packet) {
         var packetBlocks = packet.getBlocks();
 
-        int keptCount = 0; // Number of blocks that must remain in the packet (the source interactable and doors)
-        var keptBlocks = new WrapperPlayServerMultiBlockChange.EncodedBlock[packetBlocks.length];
+        int notAirCount = 0; // Number of blocks that must remain in the packet
+        var notAirBlocks = new WrapperPlayServerMultiBlockChange.EncodedBlock[packetBlocks.length];
 
-        for (var pb : packetBlocks) {
-            if (!fragileBlockVectorsWithoutDoors.contains(packVector(pb.getX(), pb.getY(), pb.getZ()))) {
-                keptBlocks[keptCount++] = pb; // Packet should not be canceled for blocks that are not in the list
+        for (var packetBlock : packetBlocks) {
+            if (packetBlock.getBlockId() != 0) { // "0" is the AIR blockId
+                notAirBlocks[notAirCount++] = packetBlock; // Add packet block as not air
             }
         }
 
-        // If all blocks must be sent, send the packet as is
-        if (keptCount == packetBlocks.length) return;
+        // If there are no AIR blocks to hide, send the packet as is
+        if (notAirCount == packetBlocks.length) return;
 
-        // Otherwise, remove all fragile blocks from the packet
-        packet.setBlocks(Arrays.copyOf(keptBlocks, keptCount));
+        // Otherwise, only send the non-air fragile blocks
+        packet.setBlocks(Arrays.copyOf(notAirBlocks, notAirCount));
         event.markForReEncode(true);
-        // Not using `event.setCancelled(true)` because the first blocks is always an interactable, and therefore not
-        // in the list of fragile blocks, so there is always at least one block in the packet that needs to be sent.
 
         DebugUtils.sendChat(() -> "Sending modified packet: <white>" + MULTI_BLOCK_CHANGE.name(), WARN);
     }

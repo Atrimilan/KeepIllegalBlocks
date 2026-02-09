@@ -87,7 +87,7 @@ class BlockRestorationServiceTest {
         return source;
     }
 
-    /********** Tests - Should record fragile block states **********/
+    // ********** Tests - Should record fragile block states **********
 
     @Test
     void shouldRecordFragileBlockStates() {
@@ -175,7 +175,7 @@ class BlockRestorationServiceTest {
         verifyNoInteractions(config); // No fragile blocks were recorded
     }
 
-    /********** Tests - Should schedule restoration **********/
+    // ********** Tests - Should schedule restoration **********
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
