@@ -15,44 +15,37 @@ jobs:
           distribution: 'corretto'
           java-version: '21'
 
-      # Extract properties required for publishing the JAR file
-      - name: Extract properties
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      # Run unit tests + Build (shadow) JAR file + Publish on Modrinth
+      - name: Build and publish on Modrinth
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
+        run: ./gradlew build modrinth
+
+      - name: List output files
+        if: always()
+        run: |
+          echo "📂 Contents of the ./build/libs folder:"
+          ls -R ./build/libs/
+
+      - name: Summary of published version
+        if: success()
         run: |
           VERSION=$(grep '^projectVersion=' gradle.properties | cut -d '=' -f2)
           GAME_VERSIONS=$(grep '^supportedGameVersions=' gradle.properties | cut -d '=' -f2)
           TYPE=$(grep '^versionType=' gradle.properties | cut -d '=' -f2)
           LOADERS=$(grep '^compatibleLoaders=' gradle.properties | cut -d '=' -f2)
           
-          echo "projectVersion=$VERSION" >> $GITHUB_ENV
-          echo "supportedGameVersions=$GAME_VERSIONS" >> $GITHUB_ENV
-          echo "versionType=$TYPE" >> $GITHUB_ENV
-          echo "compatibleLoaders=$LOADERS" >> $GITHUB_ENV
-          
+          echo "🚀 Plugin successfully published on Modrinth !"
           echo "✅ Project version: $VERSION"
           echo "✅ Supported Minecraft version(s): $GAME_VERSIONS"
           echo "✅ Version type: $TYPE"
           echo "✅ Compatible loaders: $LOADERS"
-
-      # Run unit tests and build JAR file
-      - name: Build plugin with Gradle
-        run: ./gradlew build
-
-      - name: List output files
-        run: ls -R ./build/libs/
-
-      # Publish JAR file - Documentation of mc-publish: https://github.com/Kira-NT/mc-publish/blob/master/README.md
-      - name: Publishing plugin on Modrinth
-        uses: Kir-Antipov/mc-publish@v3.3
-        with:
-          files: build/libs/*.jar
-          version: ${{ env.projectVersion }}              # Version of the plugin itself
-          game-versions: ${{ env.supportedGameVersions }} # Supported Minecraft version(s)
-          version-type: ${{ env.versionType }}            # Either 'alpha', 'beta' or 'release'
-          loaders: ${{ env.compatibleLoaders }}           # Compatible loaders (bukkit, paper, etc.)
-          changelog-file: changelogs/${{ env.projectVersion }}.md
-
-          modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
-          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          
+          echo "projectVersion=$VERSION" >> $GITHUB_ENV
 
       # Create GIT tag if the release was successful
       - name: Create GIT tag

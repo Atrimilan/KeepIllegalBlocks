@@ -6,10 +6,12 @@ plugins {
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.19"
     id("xyz.jpenilla.run-paper") version "3.0.2"
     id("com.gradleup.shadow") version "9.3.1"
+    id("com.modrinth.minotaur") version "2.+"
 }
 
 repositories {
     mavenCentral()
+    gradlePluginPortal()
     maven {
         name = "papermc"
         url = uri("https://repo.papermc.io/repository/maven-public/")
@@ -51,7 +53,7 @@ val serverPort = 25565  // Change the server port here
 
 tasks {
     runServer {
-        runDirectory.set(file(localServerDir))
+        runDirectory.set(file("$localServerDir/$paperApiVersion"))
 
         val customJvmArgs = mutableListOf( // Add custom JVM arguments here
             "-Dcom.mojang.eula.agree=true", "-Dserver.port=$serverPort"
@@ -63,8 +65,8 @@ tasks {
         println("Starting with JVM args: $jvmArgs")
 
         doFirst {
-            val serverProperties = file("$localServerDir/server.properties")
-            val bukkitYml = file("$localServerDir/bukkit.yml")
+            val serverProperties = file("$localServerDir/$paperApiVersion/server.properties")
+            val bukkitYml = file("$localServerDir/$paperApiVersion/bukkit.yml")
 
             listOf(serverProperties, bukkitYml).forEach { file ->
                 file.parentFile.mkdirs()
@@ -104,8 +106,37 @@ tasks {
         dependsOn("shadowJar")
     }
 
+    named("modrinth") {
+        dependsOn("modrinthSyncBody") // Sync body on every Modrinth publishing
+    }
+
     test {
         useJUnitPlatform()
+    }
+}
+
+val projectVersionType: String by project
+val compatibleLoaders: String by project
+val supportedGameVersions: String by project
+
+modrinth {
+
+    token.set(providers.environmentVariable("MODRINTH_TOKEN"))
+    projectId.set(providers.environmentVariable("MODRINTH_PROJECT_ID"))
+
+    versionNumber.set(projectVersion)
+    versionType.set(projectVersionType)
+    gameVersions.addAll(supportedGameVersions.split(","))
+    loaders.addAll(compatibleLoaders.split(","))
+
+    changelog.set(file("changelogs/$projectVersion.md").readText())
+    syncBodyFrom.set(file("MODRINTH_README.md").readText())
+
+    uploadFile.set(tasks.shadowJar)
+
+    dependencies {
+        // https://modrinth.com/plugin/packetevents/version/2.11.2+spigot
+        optional.version("packetevents", "2.11.2+spigot")
     }
 }
 
