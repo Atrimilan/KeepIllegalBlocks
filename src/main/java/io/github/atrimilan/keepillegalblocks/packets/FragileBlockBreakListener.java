@@ -41,7 +41,7 @@ public class FragileBlockBreakListener implements PacketListener {
         int size = fragileBlockStates.size();
 
         this.fragileBlockVectors = new LongOpenHashSet(size);
-        this.world = bfsResult.interactableBlock().getWorld();
+        this.world = bfsResult.getWorld();
         this.boundingBox = bfsResult.boundingBox();
 
         for (BlockState s : fragileBlockStates) {

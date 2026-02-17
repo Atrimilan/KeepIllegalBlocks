@@ -1,9 +1,18 @@
 package io.github.atrimilan.keepillegalblocks.models;
 
+import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.util.BoundingBox;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-public record BfsResult(BlockState interactableBlock, Set<BlockState> fragileBlocks, BoundingBox boundingBox) {
+public record BfsResult(
+        @NotNull InteractableWrapper interactableBlock,
+        @NotNull Set<BlockState> fragileBlocks,
+        @NotNull BoundingBox boundingBox) {
+
+    public World getWorld() {
+        return interactableBlock.blockState().getWorld();
+    }
 }

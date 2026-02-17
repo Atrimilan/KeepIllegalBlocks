@@ -2,6 +2,7 @@ package io.github.atrimilan.keepillegalblocks.restoration;
 
 import io.github.atrimilan.keepillegalblocks.configuration.KibConfig;
 import io.github.atrimilan.keepillegalblocks.models.BfsResult;
+import io.github.atrimilan.keepillegalblocks.models.InteractableWrapper;
 import io.github.atrimilan.keepillegalblocks.packets.PacketEventsAdapter;
 import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import org.bukkit.Location;
@@ -65,7 +66,7 @@ public class BlockRestorationService {
         while (!queue.isEmpty() && fragileBlocks.size() <= maxBlocks) {
             Block currentBlock = queue.poll();
 
-            if (!currentBlock.getLocation().equals(sourceBlockLoc)) { // Don't save the interactable source block
+            if (currentBlock != sourceBlock) { // Skip interactable source block
                 fragileBlocks.add(currentBlock.getState()); // Save fragile block state
 
                 // Update bounding box
@@ -90,11 +91,12 @@ public class BlockRestorationService {
             }
         }
 
-        BoundingBox box = new BoundingBox(minX - 0.5, minY - 0.5, minZ - 0.5, maxX + 1.5, maxY + 1.5, maxZ + 1.5);
-
         DebugUtils.sendChat(() -> "Fragile blocks count: <white>" + fragileBlocks.size() + "<gray>/" + maxBlocks, INFO);
 
-        return new BfsResult(sourceBlock.getState(), fragileBlocks, box);
+        var interactable = new InteractableWrapper(sourceBlock.getState(), config.isFragile(sourceBlock.getType()));
+        var boundingBox = new BoundingBox(minX - 0.5, minY - 0.5, minZ - 0.5, maxX + 1.5, maxY + 1.5, maxZ + 1.5);
+
+        return new BfsResult(interactable, fragileBlocks, boundingBox);
     }
 
     /**
@@ -109,7 +111,10 @@ public class BlockRestorationService {
      * @param bfsResult All block states (interactable and fragile) and their bounding box.
      */
     public void scheduleRestoration(BfsResult bfsResult) {
-        if (bfsResult == null || bfsResult.fragileBlocks().isEmpty()) return; // Return if there's nothing to restore
+        if (bfsResult == null ||
+            (bfsResult.fragileBlocks().isEmpty() && !bfsResult.interactableBlock().isAlsoFragile())) {
+            return; // Return if there's nothing to restore
+        }
 
         Object packetEventsListener = config.isPacketEventsPresent() ? //
                                       PacketEventsAdapter.registerFragileBlockBreakListener(bfsResult) : null;
@@ -126,7 +131,7 @@ public class BlockRestorationService {
      * @param bfsResult All block states (interactable and fragile) and their bounding box.
      */
     private void preventBlocksToDropItem(BfsResult bfsResult) {
-        World world = bfsResult.interactableBlock().getWorld();
+        World world = bfsResult.getWorld();
 
         world.getNearbyEntities(bfsResult.boundingBox(), e -> e instanceof Item i && i.getTicksLived() <= 1)
                 .forEach(Entity::remove);
@@ -139,17 +144,19 @@ public class BlockRestorationService {
         }
 
         // Restore the fragile blocks if needed
-        Set<BlockState> fragileBlockStates = bfsResult.fragileBlocks();
-        for (BlockState state : fragileBlockStates) {
+        for (BlockState state : bfsResult.fragileBlocks()) {
             if (wasReplacedByAir(state)) {
                 state.update(true, false); // Force restore without physic
             }
         }
 
+        BlockState interactableBlockState = bfsResult.interactableBlock().blockState();
+        boolean isInteractableAlsoFragile = bfsResult.interactableBlock().isAlsoFragile();
+
         // Restore the interactable block if needed
-        BlockState interactableBlock = bfsResult.interactableBlock();
-        if (wasReplacedByAir(interactableBlock) || willTriggerAdditionalUpdate(interactableBlock)) {
-            interactableBlock.update(true, false); // Force restore without physic
+        if ((isInteractableAlsoFragile && wasReplacedByAir(interactableBlockState)) ||
+            willTriggerAdditionalUpdate(interactableBlockState)) {
+            interactableBlockState.update(true, false); // Force restore without physic
         }
     }
 
