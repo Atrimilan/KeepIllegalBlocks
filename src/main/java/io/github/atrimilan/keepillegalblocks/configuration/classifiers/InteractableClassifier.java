@@ -22,6 +22,8 @@ public class InteractableClassifier extends AbstractClassifier {
         return switch (data) {
             case Campfire ignored -> InteractableType.CAMPFIRE;
             case Candle ignored -> InteractableType.CANDLE;
+            case CaveVines ignored -> InteractableType.CAVE_VINES;
+            case CaveVinesPlant ignored -> InteractableType.CAVE_VINES;
             case Comparator ignored -> InteractableType.COMPARATOR;
             case DaylightDetector ignored -> InteractableType.DAYLIGHT_DETECTOR;
             case Door ignored -> InteractableType.DOOR;
@@ -36,6 +38,7 @@ public class InteractableClassifier extends AbstractClassifier {
                 case Material m when isCauldron(m) -> InteractableType.CAULDRON;
                 case Material m when isNonPlainCopperBlock(m) -> InteractableType.COPPER_BLOCK;
                 case COMPOSTER -> InteractableType.COMPOSTER;
+                case SWEET_BERRY_BUSH -> InteractableType.SWEET_BERRY_BUSH;
 
                 default -> InteractableType.NONE;
             };

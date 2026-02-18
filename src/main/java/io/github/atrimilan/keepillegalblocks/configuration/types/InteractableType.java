@@ -4,6 +4,7 @@ public enum InteractableType implements BlockType {
     CAMPFIRE("campfires"),
     CANDLE("candles"),
     CAULDRON("cauldrons"),
+    CAVE_VINES("cave-vines"),
     COMPARATOR("comparators"),
     COMPOSTER("composters"),
     COPPER_BLOCK("copper-blocks"),
@@ -14,6 +15,7 @@ public enum InteractableType implements BlockType {
     LECTERN("lecterns"),
     NONE(null),
     REPEATER("repeaters"),
+    SWEET_BERRY_BUSH("sweet-berry-bushes"),
     SWITCH("switches"),
     TRAP_DOOR("trap-doors");
 

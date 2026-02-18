@@ -25,6 +25,7 @@ interactable-blocks:
     campfires: true
     candles: true
     cauldrons: true
+    cave-vines: true # Taking their berries (Cave vines + Cave vine plants)
     comparators: true
     composters: true
     copper-blocks: true # Non-plain copper blocks that can be waxed or scraped
@@ -34,6 +35,7 @@ interactable-blocks:
     gates: true
     lecterns: true # Putting a book on them
     repeaters: true
+    sweet-berry-bushes: true # Taking their berries
     switches: true # Levers + Buttons
     trap-doors: true
 
