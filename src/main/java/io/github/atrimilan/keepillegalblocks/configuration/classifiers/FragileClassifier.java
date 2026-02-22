@@ -7,9 +7,7 @@ import org.bukkit.block.data.Rail;
 import org.bukkit.block.data.type.*;
 
 /**
- * A "fragile" block is an illegally placed block, such as a door on another door, a torch attached to a sign, or
- * anything that the game physic would generally not allow. Fragile blocks can commonly be placed with a Debug Stick, or
- * plugins like WorldEdit.
+ * See more details about "fragile" blocks here: {@link FragileType}.
  *
  * @see InteractableClassifier
  */

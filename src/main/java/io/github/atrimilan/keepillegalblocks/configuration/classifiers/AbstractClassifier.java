@@ -21,6 +21,14 @@ public abstract class AbstractClassifier {
         return Tag.BANNERS.isTagged(m);
     }
 
+    protected boolean isWoodenButton(Material m) {
+        return Tag.WOODEN_BUTTONS.isTagged(m);
+    }
+
+    protected boolean isStoneButton(Material m) {
+        return Tag.STONE_BUTTONS.isTagged(m);
+    }
+
     protected boolean isCarpet(Material m) {
         return Tag.WOOL_CARPETS.isTagged(m) || Material.MOSS_CARPET.equals(m);
     }

@@ -98,10 +98,10 @@ public class KibConfig {
         isOnlyEnabledInCreativeMode = configFile.getBoolean("only-use-kib-in-creative-mode");
         isPacketEventsEnabled = configFile.getBoolean("use-packet-events-if-detected");
 
-        int blacklistedFragile = loadRegistry(configFile, "fragile-blocks.", //
-                                              fragileBlocks, fragileClassifier::classify);
-        int blacklistedInteractable = loadRegistry(configFile, "interactable-blocks.", //
-                                                   interactableBlocks, interactableClassifier::classify);
+        int blacklistedFragile = loadRegistry(configFile, "fragile-blocks.", fragileBlocks,
+                                              fragileClassifier::classify);
+        int blacklistedInteractable = loadRegistry(configFile, "interactable-blocks.", interactableBlocks,
+                                                   interactableClassifier::classify);
 
         return List.of(new LoadResult("Fragile", fragileBlocks.size(), blacklistedFragile),
                        new LoadResult("Interactable", interactableBlocks.size(), blacklistedInteractable));
@@ -114,16 +114,15 @@ public class KibConfig {
         return type != FragileType.NONE;
     }
 
-    public boolean isInteractable(Material mat) {
-        if (mat == null || interactableBlocks.isEmpty()) return false;
+    public InteractableType getInteractableType(Material mat) {
+        if (mat == null || interactableBlocks.isEmpty()) return InteractableType.NONE;
 
-        InteractableType type = interactableBlocks.getOrDefault(mat, InteractableType.NONE);
-        boolean isInteractable = type != InteractableType.NONE;
+        InteractableType interactableType = interactableBlocks.getOrDefault(mat, InteractableType.NONE);
 
-        DebugUtils.sendChat(() -> "Block <white>" + mat + "</white> " + //
-                                  (isInteractable ? ("is interactable: <white>" + mat) : //
-                                   "is not interactable"), isInteractable ? OK : ERROR);
-        return isInteractable;
+        DebugUtils.sendChat(() -> "Block <white>" + mat + "</white> " +
+                                  (interactableType != InteractableType.NONE ? ("is interactable: <white>" + mat) :
+                                   "is not interactable"), interactableType != InteractableType.NONE ? OK : ERROR);
+        return interactableType;
     }
 
     /**

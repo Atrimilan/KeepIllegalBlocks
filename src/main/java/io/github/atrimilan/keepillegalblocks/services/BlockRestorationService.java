@@ -1,19 +1,18 @@
-package io.github.atrimilan.keepillegalblocks.restoration;
+package io.github.atrimilan.keepillegalblocks.services;
 
 import io.github.atrimilan.keepillegalblocks.configuration.KibConfig;
+import io.github.atrimilan.keepillegalblocks.configuration.types.FragileType;
+import io.github.atrimilan.keepillegalblocks.configuration.types.InteractableType;
+import io.github.atrimilan.keepillegalblocks.listeners.ItemSpawnListener;
 import io.github.atrimilan.keepillegalblocks.models.BfsResult;
 import io.github.atrimilan.keepillegalblocks.models.InteractableWrapper;
 import io.github.atrimilan.keepillegalblocks.packets.PacketEventsAdapter;
 import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Tag;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.BoundingBox;
@@ -83,81 +82,82 @@ public class BlockRestorationService {
                 Block relative = currentBlock.getRelative(face);
                 Location relativeLoc = relative.getLocation();
 
-                if (!visited.contains(relativeLoc) && visited.size() <= maxBlocks &&
-                    config.isFragile(relative.getType())) {
-                    visited.add(relativeLoc); // Mark as visited
+                if (!visited.contains(relativeLoc) && config.isFragile(relative.getType())) {
+                    visited.add(relativeLoc); // Mark location as visited
                     queue.add(relative); // Add to queue for next BFS iteration
                 }
             }
         }
 
-        DebugUtils.sendChat(() -> "Fragile blocks count: <white>" + fragileBlocks.size() + "<gray>/" + maxBlocks, INFO);
+        DebugUtils.sendChat(() -> "Fragile blocks count: <white>" + (fragileBlocks.size()) + "<gray>/" + maxBlocks,
+                            INFO);
 
-        var interactable = new InteractableWrapper(sourceBlock.getState(), config.isFragile(sourceBlock.getType()));
-        var boundingBox = new BoundingBox(minX - 0.5, minY - 0.5, minZ - 0.5, maxX + 1.5, maxY + 1.5, maxZ + 1.5);
+        boolean isInteractableAlsoFragile = config.isFragile(sourceBlock.getType());
+        var interactable = new InteractableWrapper(sourceBlock.getState(), isInteractableAlsoFragile);
+        var boundingBox = new BoundingBox(minX, minY, minZ, maxX + 1, maxY + 1, maxZ + 1);
 
         return new BfsResult(interactable, fragileBlocks, boundingBox);
     }
 
     /**
      * Schedule restoration of fragile blocks that might have been broken after the update of an interactable block.
-     * <p>
-     * Note: Restoration is scheduled in 2 ticks, because some fragile blocks are not broken within the first tick.
-     * Known blocks doing so are blocks breaking in cascade (tick by tick): {@code BAMBOO}, {@code CACTUS},
-     * {@code CAVE_VINES}, {@code CAVE_VINES_PLANT}, {@code CHORUS_FLOWER}, {@code CHORUS_PLANT},
-     * {@code POINTED_DRIPSTONE}, {@code SCAFFOLDING}, {@code SUGAR_CANE}, {@code TWISTING_VINES},
-     * {@code TWISTING_VINES_PLANT}, {@code WEEPING_VINES}, {@code WEEPING_VINES_PLANT}.
+     * <li>The initial restoration is scheduled in 2 ticks, because some fragile blocks are not broken within the first
+     * tick. See which blocks are involved in {@link FragileType}.</li>
+     * <li>If the interactable block will trigger a second update (such as a button), an additional restoration is
+     * scheduled after a delay (which depends on the {@link InteractableType}).</li>
      *
      * @param bfsResult All block states (interactable and fragile) and their bounding box.
      */
-    public void scheduleRestoration(BfsResult bfsResult) {
-        if (bfsResult == null ||
-            (bfsResult.fragileBlocks().isEmpty() && !bfsResult.interactableBlock().isAlsoFragile())) {
-            return; // Return if there's nothing to restore
-        }
+    public void scheduleRestoration(BfsResult bfsResult, InteractableType interactableType) {
+        if (bfsResult == null || !bfsResult.hasFragileBlocks()) return; // Return if there's nothing to restore
 
-        Object packetEventsListener = config.isPacketEventsPresent() ? //
-                                      PacketEventsAdapter.registerFragileBlockBreakListener(bfsResult) : null;
+        ItemSpawnListener itemSpawnListener = new ItemSpawnListener(bfsResult, plugin);
+        Object packetListener = config.isPacketEventsPresent() ? //
+                                PacketEventsAdapter.registerFragileBlockBreakListener(bfsResult) : null;
 
         BukkitScheduler scheduler = plugin.getServer().getScheduler();
-        scheduler.runTask(plugin, () -> preventBlocksToDropItem(bfsResult)); // In 1 tick
-        scheduler.runTaskLater(plugin, () -> applyRestoration(bfsResult, packetEventsListener), 2L); // In 2 ticks
+
+        // Schedule initial restoration in 2 ticks
+        scheduler.runTaskLater(plugin, () -> {
+            applyRestoration(bfsResult.getAllFragileBlocks()); // Apply restoration
+
+            long delayBeforeSecondUpdate = interactableType.getDelayBeforeSecondUpdate();
+            boolean hasSecondUpdate = delayBeforeSecondUpdate > 0;
+
+            if (!hasSecondUpdate) {
+                unregisterListeners(packetListener, itemSpawnListener);
+
+            } else {
+                // If interactable type has a second update, schedule another restoration
+                scheduler.runTaskLater(plugin, () -> {
+                    applyRestoration(bfsResult.getAllFragileBlocks());
+                    unregisterListeners(packetListener, itemSpawnListener);
+                }, delayBeforeSecondUpdate); // Delay depends on the interactable type
+            }
+        }, 2L);
     }
 
     /**
-     * Delete items dropped by fragile blocks, by checking if they are within the fragile blocks bounding box and if
-     * they have been dropped in the last tick.
+     * Restore the fragile blocks that have been broken (including the interactable block if it is also fragile).
      *
-     * @param bfsResult All block states (interactable and fragile) and their bounding box.
+     * @param fragileBlocks All fragile block states
      */
-    private void preventBlocksToDropItem(BfsResult bfsResult) {
-        World world = bfsResult.getWorld();
-
-        world.getNearbyEntities(bfsResult.boundingBox(), e -> e instanceof Item i && i.getTicksLived() <= 1)
-                .forEach(Entity::remove);
-    }
-
-    private void applyRestoration(BfsResult bfsResult, Object packetEventsListener) {
-        // Unregister fragile block break PacketEvents listener (if plugin is present)
-        if (packetEventsListener != null) {
-            PacketEventsAdapter.unregisterListener(packetEventsListener);
-        }
-
-        // Restore the fragile blocks if needed
-        for (BlockState state : bfsResult.fragileBlocks()) {
+    private void applyRestoration(Set<BlockState> fragileBlocks) {
+        for (BlockState state : fragileBlocks) {
             if (wasReplacedByAir(state)) {
                 state.update(true, false); // Force restore without physic
             }
         }
+    }
 
-        BlockState interactableBlockState = bfsResult.interactableBlock().blockState();
-        boolean isInteractableAlsoFragile = bfsResult.interactableBlock().isAlsoFragile();
-
-        // Restore the interactable block if needed
-        if ((isInteractableAlsoFragile && wasReplacedByAir(interactableBlockState)) ||
-            willTriggerAdditionalUpdate(interactableBlockState)) {
-            interactableBlockState.update(true, false); // Force restore without physic
-        }
+    /**
+     * Unregister fragile block break PacketEvents listener (if plugin is present)
+     *
+     * @param packetListener The PacketEvents listener to unregister
+     */
+    private void unregisterListeners(Object packetListener, ItemSpawnListener itemSpawnListener) {
+        if (packetListener != null) PacketEventsAdapter.unregisterListener(packetListener);
+        if (itemSpawnListener != null) itemSpawnListener.unregister();
     }
 
     /**
@@ -167,14 +167,5 @@ public class BlockRestorationService {
     boolean wasReplacedByAir(BlockState state) {
         Block currentBlock = state.getBlock();
         return currentBlock.getType() == Material.AIR && state.getType() != Material.AIR;
-    }
-
-    /**
-     * @param state The block state to check
-     * @return Whether the block will trigger an additional update.<br/> For example, a button will reset to its initial
-     * state 1 second after being pressed.
-     */
-    boolean willTriggerAdditionalUpdate(BlockState state) {
-        return Tag.BUTTONS.isTagged(state.getType());
     }
 }

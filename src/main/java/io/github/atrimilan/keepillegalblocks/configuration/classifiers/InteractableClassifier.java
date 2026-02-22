@@ -6,11 +6,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.*;
 
 /**
- * An “interactable” is a block that a player can interact with directly (with right-clicking), and which physically
- * changes. In addition, only blocks that can trigger an update of “fragile” blocks are considered “interactable”.
- * <p>
- * For example, blocks such as doors, levers, candles, etc. are considered interactable, whereas blocks such as chests,
- * grindstones, enchanting tables, etc. are not.
+ * See more details about "interactable" blocks here: {@link InteractableType}.
  *
  * @see FragileClassifier
  */
@@ -31,13 +27,15 @@ public class InteractableClassifier extends AbstractClassifier {
             case Gate ignored -> InteractableType.GATE;
             case Lectern ignored -> InteractableType.LECTERN;
             case Repeater ignored -> InteractableType.REPEATER;
-            case Switch ignored -> InteractableType.SWITCH; // Lever + Button
             case TrapDoor ignored -> InteractableType.TRAP_DOOR;
 
             default -> switch (data.getMaterial()) {
                 case Material m when isCauldron(m) -> InteractableType.CAULDRON;
                 case Material m when isNonPlainCopperBlock(m) -> InteractableType.COPPER_BLOCK;
+                case Material m when isStoneButton(m) -> InteractableType.STONE_BUTTON;
+                case Material m when isWoodenButton(m) -> InteractableType.WOODEN_BUTTON;
                 case COMPOSTER -> InteractableType.COMPOSTER;
+                case LEVER -> InteractableType.LEVER;
                 case SWEET_BERRY_BUSH -> InteractableType.SWEET_BERRY_BUSH;
 
                 default -> InteractableType.NONE;

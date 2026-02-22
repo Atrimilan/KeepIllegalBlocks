@@ -7,7 +7,7 @@
 # ######################################################################################################################## #
 
 # Maximum number of fragile blocks to record.
-# I do not recommend setting this value too high, as it could be exploited by a lag machine on your server.
+# Setting this value too high is not recommended, as it could be exploited by a lag machine on your server.
 # 500 is sufficient as you will rarely reach that many blocks.
 max-blocks: 500
 
@@ -15,7 +15,7 @@ max-blocks: 500
 only-use-kib-in-creative-mode: true
 
 # Toggle the use of the "PacketEvents" plugin if it is detected.
-# KIB will use it to improve client-side rendering and performance, by canceling network packets related to the break of fragile blocks.
+# KIB will use it to improve client-side rendering and performance, for example by canceling break sounds and particles.
 use-packet-events-if-detected: true
 
 # Blacklist interactable blocks by their name, or disable categories below
@@ -34,10 +34,12 @@ interactable-blocks:
     end-portal-frames: true
     gates: true
     lecterns: true # Putting a book on them
+    levers: true
     repeaters: true
+    stone-buttons: true
     sweet-berry-bushes: true # Taking their berries
-    switches: true # Levers + Buttons
     trap-doors: true
+    wooden-buttons: true
 
 # Blacklist fragile blocks by their name, or disable categories below
 fragile-blocks:

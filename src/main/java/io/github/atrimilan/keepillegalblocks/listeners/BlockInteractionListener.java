@@ -1,10 +1,13 @@
-package io.github.atrimilan.keepillegalblocks.restoration;
+package io.github.atrimilan.keepillegalblocks.listeners;
 
 import io.github.atrimilan.keepillegalblocks.configuration.KibConfig;
+import io.github.atrimilan.keepillegalblocks.configuration.types.InteractableType;
 import io.github.atrimilan.keepillegalblocks.models.BfsResult;
+import io.github.atrimilan.keepillegalblocks.services.BlockRestorationService;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -33,7 +36,7 @@ public class BlockInteractionListener implements Listener {
      *
      * @param event The player's interaction event
      */
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (config.isOnlyEnabledInCreativeMode() && !GameMode.CREATIVE.equals(event.getPlayer().getGameMode())) return;
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
@@ -41,12 +44,15 @@ public class BlockInteractionListener implements Listener {
         if (event.getPlayer().isSneaking() && event.getItem() != null) return;
 
         Block sourceBlock = event.getClickedBlock();
-        if (sourceBlock == null || !config.isInteractable(sourceBlock.getType())) return;
+        if (sourceBlock == null) return;
+
+        InteractableType interactableType = config.getInteractableType(sourceBlock.getType());
+        if (InteractableType.NONE.equals(interactableType)) return;
 
         // Perform a BFS to scan and save all fragile blocks that will break as a result of the player interaction
         BfsResult result = service.recordFragileBlockStates(sourceBlock, config.getMaxBlocks());
 
         // Schedule fragile block restoration
-        service.scheduleRestoration(result);
+        service.scheduleRestoration(result, interactableType);
     }
 }

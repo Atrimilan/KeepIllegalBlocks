@@ -2,8 +2,8 @@ package io.github.atrimilan.keepillegalblocks;
 
 import io.github.atrimilan.keepillegalblocks.commands.KibCommand;
 import io.github.atrimilan.keepillegalblocks.configuration.KibConfig;
-import io.github.atrimilan.keepillegalblocks.restoration.BlockInteractionListener;
-import io.github.atrimilan.keepillegalblocks.restoration.BlockRestorationService;
+import io.github.atrimilan.keepillegalblocks.listeners.BlockInteractionListener;
+import io.github.atrimilan.keepillegalblocks.services.BlockRestorationService;
 import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
