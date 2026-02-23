@@ -62,7 +62,7 @@ public class BlockRestorationService {
         queue.add(sourceBlock);
 
         // BFS (stop when queue is empty, or maxBlocks is reached)
-        while (!queue.isEmpty() && fragileBlocks.size() <= maxBlocks) {
+        while (!queue.isEmpty() && fragileBlocks.size() < maxBlocks) {
             Block currentBlock = queue.poll();
 
             if (currentBlock != sourceBlock) { // Skip interactable source block
