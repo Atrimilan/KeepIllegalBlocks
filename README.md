@@ -58,7 +58,7 @@ Interacting with an **interactable block** triggers a physical update that propa
 <summary><b>🔵 Expand list of fragile block categories</b></summary>
 <br/>
 
-List of fragile block categories that are automatically restored by the plugin when broken:
+List of fragile block categories that are automatically restored by KIB when broken:
 
 * `amethyst-clusters`
 * `bamboos`
@@ -119,7 +119,7 @@ List of fragile block categories that are automatically restored by the plugin w
 <summary><b>🔴 Expand list of interactable block categories</b></summary>
 <br/>
 
-List of interactable blocks categories recorded by the plugin:
+List of interactable blocks categories recorded by KIB:
 
 * `campfires`
 * `candles`

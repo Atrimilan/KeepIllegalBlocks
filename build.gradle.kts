@@ -120,7 +120,6 @@ val compatibleLoaders: String by project
 val supportedGameVersions: String by project
 
 modrinth {
-
     token.set(providers.environmentVariable("MODRINTH_TOKEN"))
     projectId.set(providers.environmentVariable("MODRINTH_PROJECT_ID"))
 

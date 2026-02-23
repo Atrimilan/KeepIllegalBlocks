@@ -91,7 +91,7 @@ fragile-blocks:
     snow: true
     sugar-canes: true
     sweet-berry-bushes: true
-    switches: true # Levers + Buttons
+    switches: true # Levers + Stone buttons + Wooden buttons
     torches: true
     tripwire-hooks: true
     twisting-vines: true # Twisting vines + Twisting vine plants

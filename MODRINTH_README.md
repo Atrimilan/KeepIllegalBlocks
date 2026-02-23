@@ -59,7 +59,7 @@ blocks**, causing them to break.
 <details>
 <summary>🔵 List of fragile block categories</summary>
 
-List of fragile block categories that are automatically restored by the plugin when broken:
+List of fragile block categories that are automatically restored by KIB when broken:
 
 * `amethyst-clusters`
 * `bamboos`
@@ -119,7 +119,7 @@ List of fragile block categories that are automatically restored by the plugin w
 <details>
 <summary>🔴 List of interactable block categories</summary>
 
-List of interactable blocks categories recorded by the plugin:
+List of interactable blocks categories recorded by KIB:
 
 * `campfires`
 * `candles`

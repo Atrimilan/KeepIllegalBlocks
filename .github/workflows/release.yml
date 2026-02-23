@@ -36,7 +36,7 @@ jobs:
         run: |
           VERSION=$(grep '^projectVersion=' gradle.properties | cut -d '=' -f2)
           GAME_VERSIONS=$(grep '^supportedGameVersions=' gradle.properties | cut -d '=' -f2)
-          TYPE=$(grep '^versionType=' gradle.properties | cut -d '=' -f2)
+          TYPE=$(grep '^projectVersionType=' gradle.properties | cut -d '=' -f2)
           LOADERS=$(grep '^compatibleLoaders=' gradle.properties | cut -d '=' -f2)
           
           echo "🚀 Plugin successfully published on Modrinth !"
