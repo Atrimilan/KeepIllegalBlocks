@@ -1,16 +1,10 @@
 package io.github.atrimilan.keepillegalblocks;
 
-import io.github.atrimilan.keepillegalblocks.models.BfsResult;
-import io.github.atrimilan.keepillegalblocks.models.InteractableWrapper;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
-import org.bukkit.util.BoundingBox;
-
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;

@@ -31,7 +31,6 @@ import static org.mockito.Mockito.*;
 class FragileBlockBreakListenerTest {
 
     private static final int X_INT = 10, Y_INT = 64, Z_INT = 10;
-    private static final double X_DOUBLE = 10.5, Y_DOUBLE = 64.0, Z_DOUBLE = 10.5;
 
     private FragileBlockBreakListener listener;
 
@@ -44,22 +43,23 @@ class FragileBlockBreakListenerTest {
     @Mock
     private World world;
 
+    @Mock
+    private BoundingBox boundingBox;
+
     private MockedConstruction<WrapperPlayServerEffect> mockedEffect;
     private MockedConstruction<WrapperPlayServerMultiBlockChange> mockedMultiBlock;
 
     @BeforeEach
     void setUp() {
         // Prepare BFS result
-        InteractableWrapper interactableWrapper = new InteractableWrapper(BukkitMockFactory.mockBlockState(Material.OAK_DOOR), false);
+        InteractableWrapper interactableWrapper = new InteractableWrapper(
+                BukkitMockFactory.mockBlockState(Material.OAK_DOOR), false);
         when(interactableWrapper.blockState().getWorld()).thenReturn(world);
 
         BlockState fragile = BukkitMockFactory.mockBlockState(Material.AIR);
         BukkitMockFactory.setCoordinates(fragile, X_INT, Y_INT, Z_INT);
 
-        BoundingBox box = new BoundingBox(X_DOUBLE - 0.5, Y_DOUBLE - 0.5, Z_DOUBLE - 0.5, //
-                                          X_DOUBLE + 1.5, Y_DOUBLE + 1.5, Z_DOUBLE + 1.5);
-
-        BfsResult bfsResult = new BfsResult(interactableWrapper, Set.of(fragile), box);
+        BfsResult bfsResult = new BfsResult(interactableWrapper, Set.of(fragile), boundingBox);
 
         listener = spy(new FragileBlockBreakListener(bfsResult));
 

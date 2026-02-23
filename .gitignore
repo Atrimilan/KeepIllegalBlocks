@@ -1,6 +1,8 @@
-### Project ###
+### Project & custom files ###
 local-server/
 logs/
+.idea/discordrp.xml
+changelogs/TODO.md
 
 ### Gradle ###
 .gradle

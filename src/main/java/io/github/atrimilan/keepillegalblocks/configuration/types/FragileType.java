@@ -23,7 +23,7 @@ public enum FragileType implements BlockType {
     CAKE("cakes"),
     CARPET("carpets"),
     CAVE_VINES("cave-vines"),
-    CHORUS_PLANT("chorus-plants"), // FIXME: CHORUS_FLOWER behavior seems different, restoration only works with button
+    CHORUS_PLANT("chorus-plants"), // FIXME: CHORUS_FLOWER behavior seems different, restoration only works with second update of buttons
     COCOA("cocoa"),
     COMPARATOR("comparators"),
     CORAL("corals"),

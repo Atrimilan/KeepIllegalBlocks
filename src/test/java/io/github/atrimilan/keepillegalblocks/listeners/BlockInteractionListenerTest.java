@@ -23,9 +23,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.mockito.Mockito.*;
 
@@ -56,6 +54,7 @@ class BlockInteractionListenerTest {
     @ValueSource(booleans = {true, false})
     void onPlayerInteract_ShouldRestore(boolean isSneaking) {
         Material interactableMat = Material.STONE_BUTTON;
+        InteractableType interactableType = InteractableType.STONE_BUTTON;
         BfsResult bfsResult = new BfsResult(
                 new InteractableWrapper(BukkitMockFactory.mockBlockState(interactableMat), false), Set.of(),
                 mock(BoundingBox.class));
@@ -70,14 +69,14 @@ class BlockInteractionListenerTest {
             when(playerInteractEvent.getItem()).thenReturn(null);
         when(playerInteractEvent.getClickedBlock()).thenReturn(clickedBlock);
         when(clickedBlock.getType()).thenReturn(interactableMat);
-        when(config.getInteractableType(interactableMat)).thenReturn(InteractableType.STONE_BUTTON);
+        when(config.getInteractableType(interactableMat)).thenReturn(interactableType);
         when(config.getMaxBlocks()).thenReturn(50);
         when(service.recordFragileBlockStates(clickedBlock, 50)).thenReturn(bfsResult);
 
         listener.onPlayerInteract(playerInteractEvent);
 
         verify(service).recordFragileBlockStates(clickedBlock, 50);
-        verify(service).scheduleRestoration(any(), any());
+        verify(service).scheduleRestoration(any(), eq(interactableType));
     }
 
     // ********** Should not restore **********

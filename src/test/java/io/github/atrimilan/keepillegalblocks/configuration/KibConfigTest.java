@@ -125,7 +125,7 @@ class KibConfigTest {
     }
 
     @Test
-    void shouldBeInteractable() throws Exception {
+    void shouldGetInteractableType() throws Exception {
         Field field = KibConfig.class.getDeclaredField("interactableBlocks"); // Reflection
         field.setAccessible(true);
         Map<Material, InteractableType> map = (Map<Material, InteractableType>) field.get(kibConfig);
