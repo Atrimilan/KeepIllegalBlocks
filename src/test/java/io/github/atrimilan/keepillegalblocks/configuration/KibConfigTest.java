@@ -130,10 +130,10 @@ class KibConfigTest {
         field.setAccessible(true);
         Map<Material, InteractableType> map = (Map<Material, InteractableType>) field.get(kibConfig);
 
-        map.put(Material.STONE_BUTTON, InteractableType.SWITCH);
+        map.put(Material.STONE_BUTTON, InteractableType.STONE_BUTTON);
 
-        assertTrue(kibConfig.isInteractable(Material.STONE_BUTTON));
-        assertFalse(kibConfig.isInteractable(Material.DIRT));
-        assertFalse(kibConfig.isInteractable(null));
+        assertEquals(InteractableType.STONE_BUTTON, kibConfig.getInteractableType(Material.STONE_BUTTON));
+        assertNotEquals(InteractableType.STONE_BUTTON, kibConfig.getInteractableType(Material.DIRT));
+        assertNotEquals(InteractableType.STONE_BUTTON, kibConfig.getInteractableType(null));
     }
 }

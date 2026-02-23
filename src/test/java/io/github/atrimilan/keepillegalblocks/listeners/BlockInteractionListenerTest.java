@@ -1,7 +1,11 @@
-package io.github.atrimilan.keepillegalblocks.restoration;
+package io.github.atrimilan.keepillegalblocks.listeners;
 
+import io.github.atrimilan.keepillegalblocks.BukkitMockFactory;
 import io.github.atrimilan.keepillegalblocks.configuration.KibConfig;
+import io.github.atrimilan.keepillegalblocks.configuration.types.InteractableType;
 import io.github.atrimilan.keepillegalblocks.models.BfsResult;
+import io.github.atrimilan.keepillegalblocks.models.InteractableWrapper;
+import io.github.atrimilan.keepillegalblocks.services.BlockRestorationService;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -10,6 +14,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.BoundingBox;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,6 +22,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.mockito.Mockito.*;
 
@@ -41,14 +50,16 @@ class BlockInteractionListenerTest {
     @Mock
     private Block clickedBlock;
 
-    @Mock
-    private BfsResult bfsResult;
-
     // ********** Should restore **********
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void onPlayerInteract_ShouldRestore(boolean isSneaking) {
+        Material interactableMat = Material.STONE_BUTTON;
+        BfsResult bfsResult = new BfsResult(
+                new InteractableWrapper(BukkitMockFactory.mockBlockState(interactableMat), false), Set.of(),
+                mock(BoundingBox.class));
+
         when(config.isOnlyEnabledInCreativeMode()).thenReturn(true);
         when(playerInteractEvent.getPlayer()).thenReturn(player);
         when(player.getGameMode()).thenReturn(GameMode.CREATIVE);
@@ -58,15 +69,15 @@ class BlockInteractionListenerTest {
         if (isSneaking) // When player is sneaking, he must not be holding an item
             when(playerInteractEvent.getItem()).thenReturn(null);
         when(playerInteractEvent.getClickedBlock()).thenReturn(clickedBlock);
-        when(clickedBlock.getType()).thenReturn(Material.STONE_BUTTON);
-        when(config.isInteractable(Material.STONE_BUTTON)).thenReturn(true);
+        when(clickedBlock.getType()).thenReturn(interactableMat);
+        when(config.getInteractableType(interactableMat)).thenReturn(InteractableType.STONE_BUTTON);
         when(config.getMaxBlocks()).thenReturn(50);
         when(service.recordFragileBlockStates(clickedBlock, 50)).thenReturn(bfsResult);
 
         listener.onPlayerInteract(playerInteractEvent);
 
         verify(service).recordFragileBlockStates(clickedBlock, 50);
-        verify(service).scheduleRestoration(any());
+        verify(service).scheduleRestoration(any(), any());
     }
 
     // ********** Should not restore **********
@@ -140,7 +151,7 @@ class BlockInteractionListenerTest {
         when(player.isSneaking()).thenReturn(false);
         when(playerInteractEvent.getClickedBlock()).thenReturn(clickedBlock);
         when(clickedBlock.getType()).thenReturn(Material.COBBLESTONE);
-        when(config.isInteractable(Material.COBBLESTONE)).thenReturn(false);
+        when(config.getInteractableType(Material.COBBLESTONE)).thenReturn(InteractableType.NONE);
 
         listener.onPlayerInteract(playerInteractEvent);
 

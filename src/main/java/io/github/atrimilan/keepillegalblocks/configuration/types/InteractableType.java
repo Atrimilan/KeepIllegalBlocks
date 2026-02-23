@@ -8,7 +8,7 @@ package io.github.atrimilan.keepillegalblocks.configuration.types;
  * For example, blocks such as doors, levers, candles, etc. are considered interactable, whereas blocks such as chests,
  * grindstones, enchanting tables, etc. are not.
  * <p>
- * Some interactable blocks will automatically trigger asecond update after a few ticks: currently, only
+ * Some interactable blocks will automatically trigger a second update after a few ticks: currently, only
  * {@link InteractableType#STONE_BUTTON} and {@link InteractableType#WOODEN_BUTTON} can do this.
  *
  * @see FragileType

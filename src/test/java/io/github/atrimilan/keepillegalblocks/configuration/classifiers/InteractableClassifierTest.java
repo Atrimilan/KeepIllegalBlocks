@@ -31,7 +31,7 @@ class InteractableClassifierTest {
         return Stream.of( // Non-exhaustive list of materials to test
                 Arguments.of(Material.CAMPFIRE, Campfire.class, InteractableType.CAMPFIRE),
                 Arguments.of(Material.OAK_DOOR, Door.class, InteractableType.DOOR),
-                Arguments.of(Material.LEVER, Switch.class, InteractableType.SWITCH),
+                Arguments.of(Material.STONE_BUTTON, Switch.class, InteractableType.STONE_BUTTON),
                 Arguments.of(Material.OAK_FENCE_GATE, Gate.class, InteractableType.GATE),
                 Arguments.of(Material.COMPOSTER, BlockData.class, InteractableType.COMPOSTER),
                 Arguments.of(Material.WATER_CAULDRON, BlockData.class, InteractableType.CAULDRON),
@@ -42,6 +42,8 @@ class InteractableClassifierTest {
     void prepareClassifierStubs(Material mat, InteractableType expected) {
         lenient().doReturn(expected == InteractableType.CAULDRON).when(classifier).isCauldron(mat);
         lenient().doReturn(expected == InteractableType.COPPER_BLOCK).when(classifier).isNonPlainCopperBlock(mat);
+        lenient().doReturn(expected == InteractableType.STONE_BUTTON).when(classifier).isStoneButton(mat);
+        lenient().doReturn(expected == InteractableType.WOODEN_BUTTON).when(classifier).isWoodenButton(mat);
     }
 
     @ParameterizedTest

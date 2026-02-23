@@ -2,13 +2,12 @@ package io.github.atrimilan.keepillegalblocks.packets;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEffect;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerMultiBlockChange;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
 import io.github.atrimilan.keepillegalblocks.BukkitMockFactory;
 import io.github.atrimilan.keepillegalblocks.models.BfsResult;
+import io.github.atrimilan.keepillegalblocks.models.InteractableWrapper;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
@@ -46,14 +45,13 @@ class FragileBlockBreakListenerTest {
     private World world;
 
     private MockedConstruction<WrapperPlayServerEffect> mockedEffect;
-    private MockedConstruction<WrapperPlayServerSpawnEntity> mockedSpawn;
     private MockedConstruction<WrapperPlayServerMultiBlockChange> mockedMultiBlock;
 
     @BeforeEach
     void setUp() {
         // Prepare BFS result
-        BlockState interactable = BukkitMockFactory.mockBlockState(Material.OAK_DOOR);
-        when(interactable.getWorld()).thenReturn(world);
+        InteractableWrapper interactableWrapper = new InteractableWrapper(BukkitMockFactory.mockBlockState(Material.OAK_DOOR), false);
+        when(interactableWrapper.blockState().getWorld()).thenReturn(world);
 
         BlockState fragile = BukkitMockFactory.mockBlockState(Material.AIR);
         BukkitMockFactory.setCoordinates(fragile, X_INT, Y_INT, Z_INT);
@@ -61,7 +59,7 @@ class FragileBlockBreakListenerTest {
         BoundingBox box = new BoundingBox(X_DOUBLE - 0.5, Y_DOUBLE - 0.5, Z_DOUBLE - 0.5, //
                                           X_DOUBLE + 1.5, Y_DOUBLE + 1.5, Z_DOUBLE + 1.5);
 
-        BfsResult bfsResult = new BfsResult(interactable, Set.of(fragile), box);
+        BfsResult bfsResult = new BfsResult(interactableWrapper, Set.of(fragile), box);
 
         listener = spy(new FragileBlockBreakListener(bfsResult));
 
@@ -72,7 +70,6 @@ class FragileBlockBreakListenerTest {
     @AfterEach
     void tearDown() {
         if (mockedEffect != null) mockedEffect.close();
-        if (mockedSpawn != null) mockedSpawn.close();
         if (mockedMultiBlock != null) mockedMultiBlock.close();
     }
 
@@ -123,45 +120,6 @@ class FragileBlockBreakListenerTest {
         mockedEffect = mockConstruction(WrapperPlayServerEffect.class, (mock, context) -> {
             when(mock.getPosition()).thenReturn(new Vector3i(1, 2, 3));
         });
-
-        listener.onPacketSend(event);
-
-        verify(event, never()).setCancelled(anyBoolean());
-    }
-
-    // ********** SPAWN_ENTITY Packet **********
-
-    @Test
-    void shouldCancelItemSpawnInsideBoundingBox() {
-        when(event.getPacketType()).thenReturn(PacketType.Play.Server.SPAWN_ENTITY);
-        doReturn(true).when(listener).isItemEntity(any());
-        mockedSpawn = mockConstruction(WrapperPlayServerSpawnEntity.class, (mock, context) -> {
-            when(mock.getPosition()).thenReturn(new Vector3d(X_DOUBLE, Y_DOUBLE, Z_DOUBLE));
-        });
-
-        listener.onPacketSend(event);
-
-        verify(event).setCancelled(true);
-    }
-
-    @Test
-    void shouldNotCancelItemSpawnOutsideBoundingBox() {
-        when(event.getPacketType()).thenReturn(PacketType.Play.Server.SPAWN_ENTITY);
-        doReturn(true).when(listener).isItemEntity(any());
-        mockedSpawn = mockConstruction(WrapperPlayServerSpawnEntity.class, (mock, context) -> {
-            when(mock.getPosition()).thenReturn(new Vector3d(1d, 2d, 3d));
-        });
-
-        listener.onPacketSend(event);
-
-        verify(event, never()).setCancelled(anyBoolean());
-    }
-
-    @Test
-    void shouldNotCancelSpawnWhenEntityIsNotItem() {
-        when(event.getPacketType()).thenReturn(PacketType.Play.Server.SPAWN_ENTITY);
-        doReturn(false).when(listener).isItemEntity(any());
-        mockedSpawn = mockConstruction(WrapperPlayServerSpawnEntity.class);
 
         listener.onPacketSend(event);
 

@@ -94,7 +94,7 @@ public class BlockRestorationService {
 
         boolean isInteractableAlsoFragile = config.isFragile(sourceBlock.getType());
         var interactable = new InteractableWrapper(sourceBlock.getState(), isInteractableAlsoFragile);
-        var boundingBox = new BoundingBox(minX, minY, minZ, maxX + 1, maxY + 1, maxZ + 1);
+        var boundingBox = new BoundingBox(minX, minY, minZ, maxX + 1D, maxY + 1D, maxZ + 1D);
 
         return new BfsResult(interactable, fragileBlocks, boundingBox);
     }
