@@ -2,18 +2,17 @@ package io.github.atrimilan.keepillegalblocks.configuration.types;
 
 
 /**
- * An “interactable” is a block that a player can interact with directly (with right-clicking), and which physically
- * changes. In addition, only blocks that can trigger an update of “fragile” blocks are considered “interactable”.
+ * An “interactable” is a block that a player can interact with directly (by right-clicking on it), and which triggers
+ * an update to the physics of its adjacent blocks. For example, blocks such as doors, levers, candles, etc. are
+ * considered interactable, while blocks such as chests, grindstones, enchanting tables, etc. are not.
  * <p>
- * For example, blocks such as doors, levers, candles, etc. are considered interactable, whereas blocks such as chests,
- * grindstones, enchanting tables, etc. are not.
- * <p>
- * Some interactable blocks will automatically trigger a second update after a few ticks: currently, only
+ * Some interactable blocks automatically trigger a second update after a few ticks. Currently, only
  * {@link InteractableType#STONE_BUTTON} and {@link InteractableType#WOODEN_BUTTON} can do this.
  *
+ * @see ConnectableType
  * @see FragileType
  */
-public enum InteractableType implements BlockType {
+public enum InteractableType implements KibBlockType {
     CAMPFIRE("campfires"),
     CANDLE("candles"),
     CAULDRON("cauldrons"),

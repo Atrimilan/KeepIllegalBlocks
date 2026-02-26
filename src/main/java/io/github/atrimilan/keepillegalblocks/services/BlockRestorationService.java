@@ -38,13 +38,14 @@ public class BlockRestorationService {
     }
 
     /**
-     * Perform a Breadth-First Search (BFS) to record all fragile blocks states, and calculate their bounding box.
+     * Perform a Breadth-First Search (BFS) to record all fragile and connectable blocks states, and calculate their
+     * bounding box.
      *
      * @param sourceBlock The interactable block that the player interacted with
      * @param maxBlocks   The maximum number of blocks to record
-     * @return All block states (interactable and fragile) and their bounding box.
+     * @return All block states and their bounding box.
      */
-    public BfsResult recordFragileBlockStates(Block sourceBlock, int maxBlocks) {
+    public BfsResult recordBlockStates(Block sourceBlock, int maxBlocks) {
         if (sourceBlock == null || maxBlocks <= 0) return null;
 
         // Initialize bounding box boundaries
@@ -56,17 +57,26 @@ public class BlockRestorationService {
         Queue<Block> queue = new ArrayDeque<>();
         Set<Location> visited = new HashSet<>();
         Set<BlockState> fragileBlocks = new HashSet<>();
+        Set<BlockState> connectableBlocks = new HashSet<>();
 
         Location sourceBlockLoc = sourceBlock.getLocation();
         visited.add(sourceBlockLoc);
         queue.add(sourceBlock);
 
+        int nbBlocks = 0;
+
         // BFS (stop when queue is empty, or maxBlocks is reached)
-        while (!queue.isEmpty() && fragileBlocks.size() < maxBlocks) {
+        while (!queue.isEmpty() && nbBlocks < maxBlocks) {
             Block currentBlock = queue.poll();
 
             if (currentBlock != sourceBlock) { // Skip interactable source block
-                fragileBlocks.add(currentBlock.getState()); // Save fragile block state
+                if (config.isFragile(currentBlock.getType())) {
+                    fragileBlocks.add(currentBlock.getState()); // Save fragile block state
+                    nbBlocks++;
+                } else if (config.isConnectable(currentBlock.getType())) {
+                    connectableBlocks.add(currentBlock.getState()); // Save connectable block state
+                    nbBlocks++;
+                } else continue;
 
                 // Update bounding box
                 minX = Math.min(minX, currentBlock.getX());
@@ -82,7 +92,7 @@ public class BlockRestorationService {
                 Block relative = currentBlock.getRelative(face);
                 Location relativeLoc = relative.getLocation();
 
-                if (!visited.contains(relativeLoc) && config.isFragile(relative.getType())) {
+                if (!visited.contains(relativeLoc)) {
                     visited.add(relativeLoc); // Mark location as visited
                     queue.add(relative); // Add to queue for next BFS iteration
                 }
@@ -96,7 +106,7 @@ public class BlockRestorationService {
         var interactable = new InteractableWrapper(sourceBlock.getState(), isInteractableAlsoFragile);
         var boundingBox = new BoundingBox(minX, minY, minZ, maxX + 1D, maxY + 1D, maxZ + 1D);
 
-        return new BfsResult(interactable, fragileBlocks, boundingBox);
+        return new BfsResult(interactable, fragileBlocks, connectableBlocks, boundingBox);
     }
 
     /**
@@ -106,10 +116,10 @@ public class BlockRestorationService {
      * <li>If the interactable block will trigger a second update (such as a button), an additional restoration is
      * scheduled after a delay (which depends on the {@link InteractableType}).</li>
      *
-     * @param bfsResult All block states (interactable and fragile) and their bounding box.
+     * @param bfsResult All block states and their bounding box.
      */
     public void scheduleRestoration(BfsResult bfsResult, InteractableType interactableType) {
-        if (bfsResult == null || !bfsResult.hasFragileBlocks()) return; // Return if there's nothing to restore
+        if (bfsResult == null || !bfsResult.hasBlocksToRestore()) return; // Return if there's nothing to restore
 
         ItemSpawnListener itemSpawnListener = new ItemSpawnListener(bfsResult, plugin);
         Object packetListener = config.isPacketEventsPresent() ? //
@@ -119,7 +129,7 @@ public class BlockRestorationService {
 
         // Schedule initial restoration in 2 ticks
         scheduler.runTaskLater(plugin, () -> {
-            applyRestoration(bfsResult.getAllFragileBlocks()); // Apply restoration
+            applyRestoration(bfsResult); // Apply restoration
 
             long delayBeforeSecondUpdate = interactableType.getDelayBeforeSecondUpdate();
             boolean hasSecondUpdate = delayBeforeSecondUpdate > 0;
@@ -128,9 +138,9 @@ public class BlockRestorationService {
                 unregisterListeners(packetListener, itemSpawnListener);
 
             } else {
-                // If interactable type has a second update, schedule another restoration
+                // If the interactable type has a second update, schedule another restoration
                 scheduler.runTaskLater(plugin, () -> {
-                    applyRestoration(bfsResult.getAllFragileBlocks());
+                    applyRestoration(bfsResult);
                     unregisterListeners(packetListener, itemSpawnListener);
                 }, delayBeforeSecondUpdate); // Delay depends on the interactable type
             }
@@ -140,11 +150,16 @@ public class BlockRestorationService {
     /**
      * Restore the fragile blocks that have been broken (including the interactable block if it is also fragile).
      *
-     * @param fragileBlocks All fragile block states
+     * @param bfsResult The BFS result to iterate over
      */
-    private void applyRestoration(Set<BlockState> fragileBlocks) {
-        for (BlockState state : fragileBlocks) {
+    private void applyRestoration(BfsResult bfsResult) {
+        for (BlockState state : bfsResult.getAllFragileBlocks()) {
             if (wasReplacedByAir(state)) {
+                state.update(true, false); // Force restore without physic
+            }
+        }
+        for (BlockState state : bfsResult.connectableBlocks()) {
+            if (hasBlockDataChanged(state)) {
                 state.update(true, false); // Force restore without physic
             }
         }
@@ -167,5 +182,14 @@ public class BlockRestorationService {
     boolean wasReplacedByAir(BlockState state) {
         Block currentBlock = state.getBlock();
         return currentBlock.getType() == Material.AIR && state.getType() != Material.AIR;
+    }
+
+    /**
+     * @param state The block state to check
+     * @return Whether the block's data has changed.
+     */
+    boolean hasBlockDataChanged(BlockState state) {
+        Block currentBlock = state.getBlock();
+        return !currentBlock.getBlockData().equals(state.getBlockData());
     }
 }

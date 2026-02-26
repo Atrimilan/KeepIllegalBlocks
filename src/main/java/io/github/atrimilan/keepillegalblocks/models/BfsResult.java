@@ -11,14 +11,15 @@ import java.util.Set;
 public record BfsResult(
         @NotNull InteractableWrapper interactableBlock,
         @NotNull Set<BlockState> fragileBlocks,
+        @NotNull Set<BlockState> connectableBlocks,
         @NotNull BoundingBox boundingBox) {
 
     public World getWorld() {
         return interactableBlock.blockState().getWorld();
     }
 
-    public boolean hasFragileBlocks() {
-        return interactableBlock.isAlsoFragile() || !fragileBlocks.isEmpty();
+    public boolean hasBlocksToRestore() {
+        return interactableBlock.isAlsoFragile() || !fragileBlocks.isEmpty() || !connectableBlocks.isEmpty();
     }
 
     public Set<BlockState> getAllFragileBlocks() {

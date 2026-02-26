@@ -1,10 +1,10 @@
-# ######################################################################################################################## #
-#   _  _____ ___                                                                                                           #
-#  | |/ /_ _| _ )   This file can be used to customize the plugin's behavior. It also allows you to exclude some           #
-#  | ' < | || _ \   interactable and fragile blocks, either by blacklisting them or by disabling preconfigured categories. #
-#  |_|\_\___|___/   See all block names here: https://jd.papermc.io/paper/1.20.6/org/bukkit/Material.html                  #
-#                                                                                                                          #
-# ######################################################################################################################## #
+# ########################################################################################################################### #
+#   _  _____ ___                                                                                                              #
+#  | |/ /_ _| _ )   This file can be used to customize the plugin's behavior. It also allows you to exclude some              #
+#  | ' < | || _ \   interactable and fragile materials, either by blacklisting them or by disabling preconfigured categories. #
+#  |_|\_\___|___/   See all up-to-date material names here: https://jd.papermc.io/paper/org/bukkit/Material.html              #
+#                                                                                                                             #
+# ########################################################################################################################### #
 
 # Maximum number of fragile blocks to record.
 # Setting this value too high is not recommended, as it could be exploited by a lag machine on your server.
@@ -40,6 +40,14 @@ interactable-blocks:
     sweet-berry-bushes: true # Taking their berries
     trap-doors: true
     wooden-buttons: true
+
+# Blacklist connectable blocks by their name, or disable categories below
+connectable-blocks:
+  blacklist: [ ]
+  categories:
+    fences: true # Fences + Iron bars + Copper bars
+    glass-panes: true
+    walls: true
 
 # Blacklist fragile blocks by their name, or disable categories below
 fragile-blocks:

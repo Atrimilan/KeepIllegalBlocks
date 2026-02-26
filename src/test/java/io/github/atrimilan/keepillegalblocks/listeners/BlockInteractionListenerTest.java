@@ -71,11 +71,11 @@ class BlockInteractionListenerTest {
         when(clickedBlock.getType()).thenReturn(interactableMat);
         when(config.getInteractableType(interactableMat)).thenReturn(interactableType);
         when(config.getMaxBlocks()).thenReturn(50);
-        when(service.recordFragileBlockStates(clickedBlock, 50)).thenReturn(bfsResult);
+        when(service.recordBlockStates(clickedBlock, 50)).thenReturn(bfsResult);
 
         listener.onPlayerInteract(playerInteractEvent);
 
-        verify(service).recordFragileBlockStates(clickedBlock, 50);
+        verify(service).recordBlockStates(clickedBlock, 50);
         verify(service).scheduleRestoration(any(), eq(interactableType));
     }
 

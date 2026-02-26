@@ -37,7 +37,7 @@ class BfsResultTest {
         InteractableWrapper wrapper = new InteractableWrapper(interactableBlockState, false);
         BfsResult result = new BfsResult(wrapper, Set.of(fragileBlockState), boundingBox);
 
-        assertTrue(result.hasFragileBlocks());
+        assertTrue(result.hasBlocksToRestore());
     }
 
     @Test
@@ -45,7 +45,7 @@ class BfsResultTest {
         InteractableWrapper wrapper = new InteractableWrapper(interactableBlockState, true);
         BfsResult result = new BfsResult(wrapper, Collections.emptySet(), boundingBox);
 
-        assertTrue(result.hasFragileBlocks());
+        assertTrue(result.hasBlocksToRestore());
     }
 
     @Test
@@ -53,7 +53,7 @@ class BfsResultTest {
         InteractableWrapper wrapper = new InteractableWrapper(interactableBlockState, true);
         BfsResult result = new BfsResult(wrapper, Set.of(fragileBlockState), boundingBox);
 
-        assertTrue(result.hasFragileBlocks());
+        assertTrue(result.hasBlocksToRestore());
         assertEquals(Set.of(interactableBlockState, fragileBlockState), result.getAllFragileBlocks());
     }
 
@@ -62,7 +62,7 @@ class BfsResultTest {
         InteractableWrapper wrapper = new InteractableWrapper(interactableBlockState, false);
         BfsResult result = new BfsResult(wrapper, Collections.emptySet(), boundingBox);
 
-        assertFalse(result.hasFragileBlocks());
+        assertFalse(result.hasBlocksToRestore());
         assertEquals(Collections.emptySet(), result.getAllFragileBlocks());
     }
 }

@@ -85,11 +85,11 @@ class BlockRestorationServiceTest {
     // ********** Tests - Should record fragile block states **********
 
     @Test
-    void shouldRecordFragileBlockStates() {
+    void shouldRecordBlockStates() {
         lenient().when(config.isFragile(Material.OAK_DOOR)).thenReturn(true); // Set interactable as also fragile
 
         Block source = mockSourceBlock(Material.OAK_DOOR, true);
-        BfsResult res = service.recordFragileBlockStates(source, 50);
+        BfsResult res = service.recordBlockStates(source, 50);
 
         assertTrue(res.boundingBox().getVolume() >= 1); // 1x1x1 (because fragile blocks positions are 0 in the mock)
         assertEquals(source.getState(), res.interactableBlock().blockState());
@@ -100,9 +100,9 @@ class BlockRestorationServiceTest {
     }
 
     @Test
-    void shouldRecordFragileBlockStatesWhenInteractableIsNotFragile() {
+    void shouldRecordBlockStatesWhenInteractableIsNotFragile() {
         Block source = mockSourceBlock(Material.COMPOSTER, true);
-        BfsResult res = service.recordFragileBlockStates(source, 50);
+        BfsResult res = service.recordBlockStates(source, 50);
 
         assertTrue(res.boundingBox().getVolume() >= 1); // 1x1x1 (because fragile blocks positions are 0 in the mock)
         assertEquals(source.getState(), res.interactableBlock().blockState());
@@ -113,9 +113,9 @@ class BlockRestorationServiceTest {
     }
 
     @Test
-    void shouldRecordFragileBlockStatesWhenMaxBlocksIsLow() {
+    void shouldRecordBlockStatesWhenMaxBlocksIsLow() {
         Block source = mockSourceBlock(Material.COMPOSTER, true);
-        BfsResult res = service.recordFragileBlockStates(source, 2); // Set max blocks to 2
+        BfsResult res = service.recordBlockStates(source, 2); // Set max blocks to 2
 
         assertTrue(res.boundingBox().getVolume() >= 1);
         assertEquals(source.getState(), res.interactableBlock().blockState());
@@ -126,9 +126,9 @@ class BlockRestorationServiceTest {
     }
 
     @Test
-    void shouldRecordFragileBlockStatesWithNoRelatives() {
+    void shouldRecordBlockStatesWithNoRelatives() {
         Block source = mockSourceBlock(Material.COMPOSTER, false);
-        BfsResult res = service.recordFragileBlockStates(source, 50);
+        BfsResult res = service.recordBlockStates(source, 50);
 
         assertTrue(res.boundingBox().getVolume() >= 1);
         assertEquals(source.getState(), res.interactableBlock().blockState());
@@ -139,12 +139,12 @@ class BlockRestorationServiceTest {
     }
 
     @Test
-    void shouldRecordFragileBlockStatesWithNoFragileRelatives2() {
+    void shouldRecordBlockStatesWithNoFragileRelatives2() {
         Block source = mockSourceBlock(Material.COMPOSTER, true);
 
         when(config.isFragile(Material.STONE_BUTTON)).thenReturn(false); // Stub as not fragile
 
-        BfsResult res = service.recordFragileBlockStates(source, 50);
+        BfsResult res = service.recordBlockStates(source, 50);
 
         assertTrue(res.boundingBox().getVolume() >= 1);
         assertEquals(source.getState(), res.interactableBlock().blockState());
@@ -155,21 +155,21 @@ class BlockRestorationServiceTest {
     }
 
     @Test
-    void shouldNotRecordFragileBlockStatesWhenSourceIsNull() {
+    void shouldNotRecordBlockStatesWhenSourceIsNull() {
         clearInvocations(config); // Clear invocation in service init
 
-        BfsResult res = service.recordFragileBlockStates(null, 50);
+        BfsResult res = service.recordBlockStates(null, 50);
 
         assertNull(res);
         verifyNoInteractions(config);
     }
 
     @Test
-    void shouldNotRecordFragileBlockStatesWhenMaxBlocksIsZero() {
+    void shouldNotRecordBlockStatesWhenMaxBlocksIsZero() {
         clearInvocations(config); // Clear invocation in service init
         Block source = mockSourceBlock(Material.STONE_BUTTON, true);
 
-        BfsResult res = service.recordFragileBlockStates(source, 0);
+        BfsResult res = service.recordBlockStates(source, 0);
 
         assertNull(res);
         verifyNoInteractions(config); // No fragile blocks were recorded

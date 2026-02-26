@@ -22,27 +22,29 @@ import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType
 /**
  * Listen to packets events sent to players when fragile blocks are broken, and cancel or tweak them in order to improve
  * client-side rendering and performances:
- * <li>Cancel break particles.</li>
- * <li>Cancel break sounds.</li>
- * <li>Cancel item drop from broken blocks.</li>
- * <li>Fake fragile blocks presence until they are restored.</li>
+ * <li>Cancel break effect (sounds and particles).</li>
+ * <li>Fake fragile blocks presence, and connectable blocks connection, until they are restored.</li>
  */
 public class FragileBlockBreakListener implements PacketListener {
 
-    private final LongOpenHashSet fragileBlockVectors;
     private final World world;
+    private final LongOpenHashSet fragileBlockVectors;
+    private final LongOpenHashSet connectableBlockVectors;
 
     public FragileBlockBreakListener(BfsResult bfsResult) {
-        Set<BlockState> fragileBlockStates = bfsResult.getAllFragileBlocks();
-        int size = fragileBlockStates.size();
-
-        this.fragileBlockVectors = new LongOpenHashSet(size);
         this.world = bfsResult.getWorld();
 
-        for (BlockState s : fragileBlockStates) {
-            long vector = packVector(s.getX(), s.getY(), s.getZ());
-            this.fragileBlockVectors.add(vector);
-        }
+        Set<BlockState> fragileBlockStates = bfsResult.getAllFragileBlocks();
+        Set<BlockState> connectableBlockStates = bfsResult.connectableBlocks();
+
+        this.fragileBlockVectors = new LongOpenHashSet(fragileBlockStates.size());
+        this.connectableBlockVectors = new LongOpenHashSet(connectableBlockStates.size());
+
+        for (BlockState s : fragileBlockStates)
+            this.fragileBlockVectors.add(packVector(s.getX(), s.getY(), s.getZ()));
+
+        for (BlockState s : connectableBlockStates)
+            this.connectableBlockVectors.add(packVector(s.getX(), s.getY(), s.getZ()));
     }
 
     @Override
@@ -75,8 +77,9 @@ public class FragileBlockBreakListener implements PacketListener {
     }
 
     /**
-     * Tweak the {@code MULTI_BLOCK_CHANGE} packet to fake fragile blocks presence when they are broken and restored.
-     * This hides block flickering, making client-side rendering smoother.
+     * Tweak the {@code MULTI_BLOCK_CHANGE} packet to pretend that fragile blocks have not been broken, and that
+     * connectable blocks have not been updated. This hides (or at least reduces) block flickering, making client-side
+     * rendering smoother.
      *
      * @param event  The packet event
      * @param packet The wrapped packet to tweak
@@ -84,20 +87,27 @@ public class FragileBlockBreakListener implements PacketListener {
     private void tweakMultiBlockChangePacketEvent(PacketSendEvent event, WrapperPlayServerMultiBlockChange packet) {
         var packetBlocks = packet.getBlocks();
 
-        int notAirCount = 0; // Number of blocks that must remain in the packet
-        var notAirBlocks = new WrapperPlayServerMultiBlockChange.EncodedBlock[packetBlocks.length];
+        int toBeSentCount = 0; // Number of blocks that must remain in the packet
+        var blocksToBeSent = new WrapperPlayServerMultiBlockChange.EncodedBlock[packetBlocks.length];
 
-        for (var packetBlock : packetBlocks) {
-            if (packetBlock.getBlockId() != 0) { // "0" is the AIR blockId
-                notAirBlocks[notAirCount++] = packetBlock; // Add packet block as not air
+        for (var b : packetBlocks) {
+            // Ignore block update if it's AIR (id = 0) and in the fragile list, or if it's in the connectable list
+            // --> Because in those cases, the block is restored, so it should be removed from the packet
+            boolean removeBlockFromPacket =
+                    (b.getBlockId() == 0 && fragileBlockVectors.contains(packVector(b.getX(), b.getY(), b.getZ()))) ||
+                    connectableBlockVectors.contains(packVector(b.getX(), b.getY(), b.getZ()));
+
+            // Update the list of blocks to be present in the packet
+            if (!removeBlockFromPacket) {
+                blocksToBeSent[toBeSentCount++] = b;
             }
         }
 
-        // If there are no AIR blocks to hide, send the packet as is
-        if (notAirCount == packetBlocks.length) return;
+        // If there are no blocks to remove from the packet, send the packet as is
+        if (toBeSentCount == packetBlocks.length) return;
 
-        // Otherwise, only send the non-air fragile blocks
-        packet.setBlocks(Arrays.copyOf(notAirBlocks, notAirCount));
+        // Otherwise, update the packet with the filtered list of blocks to be sent
+        packet.setBlocks(Arrays.copyOf(blocksToBeSent, toBeSentCount));
         event.markForReEncode(true);
 
         DebugUtils.sendChat(() -> "Sending modified packet: <white>" + MULTI_BLOCK_CHANGE.name(), WARN);

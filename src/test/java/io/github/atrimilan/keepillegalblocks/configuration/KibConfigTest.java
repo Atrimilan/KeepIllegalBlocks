@@ -112,6 +112,7 @@ class KibConfigTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void shouldBeFragile() throws Exception {
         Field field = KibConfig.class.getDeclaredField("fragileBlocks"); // Reflection
         field.setAccessible(true);
@@ -125,6 +126,7 @@ class KibConfigTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void shouldGetInteractableType() throws Exception {
         Field field = KibConfig.class.getDeclaredField("interactableBlocks"); // Reflection
         field.setAccessible(true);

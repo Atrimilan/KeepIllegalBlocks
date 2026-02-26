@@ -179,5 +179,5 @@ player).
 **Yes, [PacketEvents](https://modrinth.com/plugin/packetevents) is highly recommended to improve client-side rendering
 and performance.**
 
-It is supported by KIB to tweak network packets and make fragile block restoration completely transparent by hiding
-their break particles, break animation, break sound and item drops.
+It is supported by KIB to tweak network packets and make restorations completely transparent by canceling fragile
+block break sounds and particles, as well as hiding flickering during restoration.

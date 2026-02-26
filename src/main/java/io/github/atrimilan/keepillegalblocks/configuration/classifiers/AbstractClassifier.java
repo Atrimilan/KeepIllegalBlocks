@@ -1,13 +1,13 @@
 package io.github.atrimilan.keepillegalblocks.configuration.classifiers;
 
 import com.destroystokyo.paper.MaterialTags;
-import io.github.atrimilan.keepillegalblocks.configuration.types.BlockType;
+import io.github.atrimilan.keepillegalblocks.configuration.types.KibBlockType;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 
 public abstract class AbstractClassifier {
 
-    public abstract BlockType classify(Material m);
+    public abstract KibBlockType classify(Material m);
 
     protected boolean isCauldron(Material m) {
         return Tag.CAULDRONS.isTagged(m);

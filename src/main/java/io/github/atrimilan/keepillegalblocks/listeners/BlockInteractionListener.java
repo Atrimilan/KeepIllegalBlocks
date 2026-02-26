@@ -24,8 +24,8 @@ public class BlockInteractionListener implements Listener {
     }
 
     /**
-     * Listen to players' interactions with interactable blocks, and restore any adjacent fragile blocks that break as a
-     * result of the interaction.
+     * Listen to player interactions with interactable blocks, and restore any fragile blocks that break or connectable
+     * blocks that update as a result of the interaction.
      * <p>
      * The event will be ignored if:
      * <li>KIB is only enabled in Creative mode and player is not in Creative mode</li>
@@ -49,10 +49,11 @@ public class BlockInteractionListener implements Listener {
         InteractableType interactableType = config.getInteractableType(sourceBlock.getType());
         if (InteractableType.NONE.equals(interactableType)) return;
 
-        // Perform a BFS to scan and save all fragile blocks that will break as a result of the player interaction
-        BfsResult result = service.recordFragileBlockStates(sourceBlock, config.getMaxBlocks());
+        // Perform a BFS to record all fragile and connectable blocks, so that they can be restored
+        // if they are broken or updated due to the player interaction
+        BfsResult result = service.recordBlockStates(sourceBlock, config.getMaxBlocks());
 
-        // Schedule fragile block restoration
+        // Schedule block restoration
         service.scheduleRestoration(result, interactableType);
     }
 }

@@ -9,6 +9,7 @@ import org.bukkit.block.data.type.*;
 /**
  * See more details about "fragile" blocks here: {@link FragileType}.
  *
+ * @see ConnectableClassifier
  * @see InteractableClassifier
  */
 public class FragileClassifier extends AbstractClassifier {

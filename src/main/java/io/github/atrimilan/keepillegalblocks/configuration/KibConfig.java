@@ -1,8 +1,10 @@
 package io.github.atrimilan.keepillegalblocks.configuration;
 
+import io.github.atrimilan.keepillegalblocks.configuration.classifiers.ConnectableClassifier;
 import io.github.atrimilan.keepillegalblocks.configuration.classifiers.FragileClassifier;
 import io.github.atrimilan.keepillegalblocks.configuration.classifiers.InteractableClassifier;
-import io.github.atrimilan.keepillegalblocks.configuration.types.BlockType;
+import io.github.atrimilan.keepillegalblocks.configuration.types.KibBlockType;
+import io.github.atrimilan.keepillegalblocks.configuration.types.ConnectableType;
 import io.github.atrimilan.keepillegalblocks.configuration.types.FragileType;
 import io.github.atrimilan.keepillegalblocks.configuration.types.InteractableType;
 import io.github.atrimilan.keepillegalblocks.models.LoadResult;
@@ -22,9 +24,11 @@ public class KibConfig {
 
     private final JavaPlugin plugin;
     private final FragileClassifier fragileClassifier = new FragileClassifier();
+    private final ConnectableClassifier connectableClassifier = new ConnectableClassifier();
     private final InteractableClassifier interactableClassifier = new InteractableClassifier();
 
     private final Map<Material, FragileType> fragileBlocks = new EnumMap<>(Material.class);
+    private final Map<Material, ConnectableType> connectableBlocks = new EnumMap<>(Material.class);
     private final Map<Material, InteractableType> interactableBlocks = new EnumMap<>(Material.class);
 
     private boolean isPacketEventsPresent;
@@ -64,6 +68,7 @@ public class KibConfig {
         plugin.reloadConfig();
 
         fragileBlocks.clear();
+        connectableBlocks.clear();
         interactableBlocks.clear();
 
         return loadConfig();
@@ -102,8 +107,11 @@ public class KibConfig {
                                               fragileClassifier::classify);
         int blacklistedInteractable = loadRegistry(configFile, "interactable-blocks.", interactableBlocks,
                                                    interactableClassifier::classify);
+        int blacklistedConnectable = loadRegistry(configFile, "connectable-blocks.", connectableBlocks,
+                                                   connectableClassifier::classify);
 
         return List.of(new LoadResult("Fragile", fragileBlocks.size(), blacklistedFragile),
+                       new LoadResult("Connectable", connectableBlocks.size(), blacklistedConnectable),
                        new LoadResult("Interactable", interactableBlocks.size(), blacklistedInteractable));
     }
 
@@ -112,6 +120,13 @@ public class KibConfig {
 
         FragileType type = fragileBlocks.getOrDefault(mat, FragileType.NONE);
         return type != FragileType.NONE;
+    }
+
+    public boolean isConnectable(Material mat) {
+        if (mat == null || connectableBlocks.isEmpty()) return false;
+
+        ConnectableType type = connectableBlocks.getOrDefault(mat, ConnectableType.NONE);
+        return type != ConnectableType.NONE;
     }
 
     public InteractableType getInteractableType(Material mat) {
@@ -133,11 +148,11 @@ public class KibConfig {
      * @param sectionKey       The config.yml section to check
      * @param blockMap         The block map to initialize
      * @param classifierMethod The classifier method to execute
-     * @param <T>              An implementation of {@link BlockType}
+     * @param <T>              An implementation of {@link KibBlockType}
      * @return The count of blacklisted blocks
      */
-    <T extends BlockType> int loadRegistry(FileConfiguration config, String sectionKey, Map<Material, T> blockMap,
-                                           Function<Material, T> classifierMethod) {
+    <T extends KibBlockType> int loadRegistry(FileConfiguration config, String sectionKey, Map<Material, T> blockMap,
+                                              Function<Material, T> classifierMethod) {
         Set<String> blacklist = getBlacklist(config, sectionKey);
         Map<String, Boolean> enabledCategories = getEnabledCategories(config, sectionKey);
 
@@ -166,10 +181,10 @@ public class KibConfig {
         return map;
     }
 
-    private <T extends BlockType> boolean classifyMaterial(Material mat, Map<Material, T> blockMap,
-                                                           Function<Material, T> classifierMethod,
-                                                           Set<String> blacklist,
-                                                           Map<String, Boolean> enabledCategories) {
+    private <T extends KibBlockType> boolean classifyMaterial(Material mat, Map<Material, T> blockMap,
+                                                              Function<Material, T> classifierMethod,
+                                                              Set<String> blacklist,
+                                                              Map<String, Boolean> enabledCategories) {
         if (blacklist.contains(mat.name())) {
             return true; // Material is blacklisted
         }
