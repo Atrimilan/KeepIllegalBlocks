@@ -1,6 +1,6 @@
-package io.github.atrimilan.keepillegalblocks.configuration.classifiers;
+package io.github.atrimilan.keepillegalblocks.core.classifiers;
 
-import io.github.atrimilan.keepillegalblocks.configuration.types.ConnectableType;
+import io.github.atrimilan.keepillegalblocks.core.types.ConnectableType;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Fence;

@@ -1,8 +1,9 @@
 package io.github.atrimilan.keepillegalblocks.services;
 
-import io.github.atrimilan.keepillegalblocks.configuration.KibConfig;
-import io.github.atrimilan.keepillegalblocks.configuration.types.FragileType;
-import io.github.atrimilan.keepillegalblocks.configuration.types.InteractableType;
+import io.github.atrimilan.keepillegalblocks.core.types.FragileType;
+import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
+import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
+import io.github.atrimilan.keepillegalblocks.core.Settings;
 import io.github.atrimilan.keepillegalblocks.listeners.ItemSpawnListener;
 import io.github.atrimilan.keepillegalblocks.models.BfsResult;
 import io.github.atrimilan.keepillegalblocks.models.InteractableWrapper;
@@ -27,14 +28,16 @@ import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType
 public class BlockRestorationService {
 
     private final JavaPlugin plugin;
-    private final KibConfig config;
+    private final MaterialRegistry materialRegistry;
+    private final Settings settings;
 
     private static final BlockFace[] FACES = {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH,
                                               BlockFace.EAST, BlockFace.WEST};
 
-    public BlockRestorationService(KibConfig config) {
-        this.config = config;
-        this.plugin = config.getPlugin();
+    public BlockRestorationService(JavaPlugin plugin, MaterialRegistry materialRegistry, Settings settings) {
+        this.plugin = plugin;
+        this.materialRegistry = materialRegistry;
+        this.settings = settings;
     }
 
     /**
@@ -70,10 +73,10 @@ public class BlockRestorationService {
             Block currentBlock = queue.poll();
 
             if (currentBlock != sourceBlock) { // Skip interactable source block
-                if (config.isFragile(currentBlock.getType())) {
+                if (materialRegistry.isFragile(currentBlock.getType())) {
                     fragileBlocks.add(currentBlock.getState()); // Save fragile block state
                     nbBlocks++;
-                } else if (config.isConnectable(currentBlock.getType())) {
+                } else if (materialRegistry.isConnectable(currentBlock.getType())) {
                     connectableBlocks.add(currentBlock.getState()); // Save connectable block state
                     nbBlocks++;
                 } else continue;
@@ -102,7 +105,7 @@ public class BlockRestorationService {
         DebugUtils.sendChat(() -> "Fragile blocks count: <white>" + (fragileBlocks.size()) + "<gray>/" + maxBlocks,
                             INFO);
 
-        boolean isInteractableAlsoFragile = config.isFragile(sourceBlock.getType());
+        boolean isInteractableAlsoFragile = materialRegistry.isFragile(sourceBlock.getType());
         var interactable = new InteractableWrapper(sourceBlock.getState(), isInteractableAlsoFragile);
         var boundingBox = new BoundingBox(minX, minY, minZ, maxX + 1D, maxY + 1D, maxZ + 1D);
 
@@ -122,7 +125,7 @@ public class BlockRestorationService {
         if (bfsResult == null || !bfsResult.hasBlocksToRestore()) return; // Return if there's nothing to restore
 
         ItemSpawnListener itemSpawnListener = new ItemSpawnListener(bfsResult, plugin);
-        Object packetListener = config.isPacketEventsPresent() ? //
+        Object packetListener = settings.isPacketEventsEnabled() ? //
                                 PacketEventsAdapter.registerFragileBlockBreakListener(bfsResult) : null;
 
         BukkitScheduler scheduler = plugin.getServer().getScheduler();

@@ -1,5 +1,4 @@
-package io.github.atrimilan.keepillegalblocks.configuration.types;
-
+package io.github.atrimilan.keepillegalblocks.core.types;
 
 /**
  * An “interactable” is a block that a player can interact with directly (by right-clicking on it), and which triggers

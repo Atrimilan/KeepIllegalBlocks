@@ -1,4 +1,4 @@
-package io.github.atrimilan.keepillegalblocks.configuration.types;
+package io.github.atrimilan.keepillegalblocks.core.types;
 
 public interface KibBlockType {
 

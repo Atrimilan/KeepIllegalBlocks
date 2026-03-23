@@ -1,12 +1,12 @@
 package io.github.atrimilan.keepillegalblocks.configuration;
 
-import io.github.atrimilan.keepillegalblocks.configuration.classifiers.ConnectableClassifier;
-import io.github.atrimilan.keepillegalblocks.configuration.classifiers.FragileClassifier;
-import io.github.atrimilan.keepillegalblocks.configuration.classifiers.InteractableClassifier;
-import io.github.atrimilan.keepillegalblocks.configuration.types.KibBlockType;
-import io.github.atrimilan.keepillegalblocks.configuration.types.ConnectableType;
-import io.github.atrimilan.keepillegalblocks.configuration.types.FragileType;
-import io.github.atrimilan.keepillegalblocks.configuration.types.InteractableType;
+import io.github.atrimilan.keepillegalblocks.core.classifiers.ConnectableClassifier;
+import io.github.atrimilan.keepillegalblocks.core.classifiers.FragileClassifier;
+import io.github.atrimilan.keepillegalblocks.core.classifiers.InteractableClassifier;
+import io.github.atrimilan.keepillegalblocks.core.types.KibBlockType;
+import io.github.atrimilan.keepillegalblocks.core.types.ConnectableType;
+import io.github.atrimilan.keepillegalblocks.core.types.FragileType;
+import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
 import io.github.atrimilan.keepillegalblocks.models.LoadResult;
 import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import org.bukkit.Material;
@@ -20,6 +20,10 @@ import java.util.function.Function;
 import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType.ERROR;
 import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType.OK;
 
+/**
+ * @deprecated Will be removed in the next update.
+ */
+@Deprecated(forRemoval = true)
 public class KibConfig {
 
     private final JavaPlugin plugin;
@@ -108,7 +112,7 @@ public class KibConfig {
         int blacklistedInteractable = loadRegistry(configFile, "interactable-blocks.", interactableBlocks,
                                                    interactableClassifier::classify);
         int blacklistedConnectable = loadRegistry(configFile, "connectable-blocks.", connectableBlocks,
-                                                   connectableClassifier::classify);
+                                                  connectableClassifier::classify);
 
         return List.of(new LoadResult("Fragile", fragileBlocks.size(), blacklistedFragile),
                        new LoadResult("Connectable", connectableBlocks.size(), blacklistedConnectable),
@@ -149,7 +153,7 @@ public class KibConfig {
      * @param blockMap         The block map to initialize
      * @param classifierMethod The classifier method to execute
      * @param <T>              An implementation of {@link KibBlockType}
-     * @return The count of blacklisted blocks
+     * @return The count of blacklisted materials
      */
     <T extends KibBlockType> int loadRegistry(FileConfiguration config, String sectionKey, Map<Material, T> blockMap,
                                               Function<Material, T> classifierMethod) {

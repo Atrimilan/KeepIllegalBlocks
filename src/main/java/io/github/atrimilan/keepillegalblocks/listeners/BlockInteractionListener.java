@@ -1,7 +1,8 @@
 package io.github.atrimilan.keepillegalblocks.listeners;
 
-import io.github.atrimilan.keepillegalblocks.configuration.KibConfig;
-import io.github.atrimilan.keepillegalblocks.configuration.types.InteractableType;
+import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
+import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
+import io.github.atrimilan.keepillegalblocks.core.Settings;
 import io.github.atrimilan.keepillegalblocks.models.BfsResult;
 import io.github.atrimilan.keepillegalblocks.services.BlockRestorationService;
 import org.bukkit.GameMode;
@@ -16,11 +17,13 @@ import org.bukkit.inventory.EquipmentSlot;
 public class BlockInteractionListener implements Listener {
 
     private final BlockRestorationService service;
-    private final KibConfig config;
+    private final MaterialRegistry materialRegistry;
+    private final Settings settings;
 
-    public BlockInteractionListener(BlockRestorationService service, KibConfig config) {
+    public BlockInteractionListener(BlockRestorationService service, MaterialRegistry materialRegistry, Settings settings) {
         this.service = service;
-        this.config = config;
+        this.materialRegistry = materialRegistry;
+        this.settings = settings;
     }
 
     /**
@@ -38,7 +41,7 @@ public class BlockInteractionListener implements Listener {
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (config.isOnlyEnabledInCreativeMode() && !GameMode.CREATIVE.equals(event.getPlayer().getGameMode())) return;
+        if (settings.isOnlyEnabledInCreativeMode() && !GameMode.CREATIVE.equals(event.getPlayer().getGameMode())) return;
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (event.getHand() != EquipmentSlot.HAND) return;
         if (event.getPlayer().isSneaking() && event.getItem() != null) return;
@@ -46,12 +49,12 @@ public class BlockInteractionListener implements Listener {
         Block sourceBlock = event.getClickedBlock();
         if (sourceBlock == null) return;
 
-        InteractableType interactableType = config.getInteractableType(sourceBlock.getType());
+        InteractableType interactableType = materialRegistry.getInteractableType(sourceBlock.getType());
         if (InteractableType.NONE.equals(interactableType)) return;
 
         // Perform a BFS to record all fragile and connectable blocks, so that they can be restored
         // if they are broken or updated due to the player interaction
-        BfsResult result = service.recordBlockStates(sourceBlock, config.getMaxBlocks());
+        BfsResult result = service.recordBlockStates(sourceBlock, settings.getMaxBlocks());
 
         // Schedule block restoration
         service.scheduleRestoration(result, interactableType);

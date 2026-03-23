@@ -1,7 +1,7 @@
-package io.github.atrimilan.keepillegalblocks.configuration.classifiers;
+package io.github.atrimilan.keepillegalblocks.core.classifiers;
 
 import com.destroystokyo.paper.MaterialTags;
-import io.github.atrimilan.keepillegalblocks.configuration.types.KibBlockType;
+import io.github.atrimilan.keepillegalblocks.core.types.KibBlockType;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 
@@ -43,7 +43,7 @@ public abstract class AbstractClassifier {
     }
 
     protected boolean isFlower(Material m) {
-        return Tag.FLOWERS.isTagged(m);
+        return Tag.FLOWERS.isTagged(m) && !Material.CHORUS_FLOWER.equals(m); // FIXME: Add support for CHORUS_FLOWER
     }
 
     protected boolean isMushroom(Material m) {

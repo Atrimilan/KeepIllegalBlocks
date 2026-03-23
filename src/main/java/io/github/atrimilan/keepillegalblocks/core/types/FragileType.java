@@ -1,4 +1,4 @@
-package io.github.atrimilan.keepillegalblocks.configuration.types;
+package io.github.atrimilan.keepillegalblocks.core.types;
 
 /**
  * A "fragile" is a block that can be placed illegally in a way that the game's physics would not normally allow. They
@@ -8,7 +8,7 @@ package io.github.atrimilan.keepillegalblocks.configuration.types;
  * <p>
  * All chained fragile blocks break on the first tick, except for the following ones, which break in a cascade starting
  * on the second tick after interaction: {@code BAMBOO} (not {@code BAMBOO_SAPLING}), {@code CACTUS}, {@code CAVE_VINES}
- * and {@code CAVE_VINES_PLANT}, {@code CHORUS_PLANT} and {@code CHORUS_FLOWER}, {@code POINTED_DRIPSTONE},
+ * and {@code CAVE_VINES_PLANT}, {@code CHORUS_PLANT} and {@code CHORUS_FLOWER},  {@code POINTED_DRIPSTONE},
  * {@code SCAFFOLDING}, {@code SUGAR_CANE}, {@code TWISTING_VINES} and {@code TWISTING_VINES_PLANT},
  * {@code WEEPING_VINES} and {@code WEEPING_VINES_PLANT}
  *

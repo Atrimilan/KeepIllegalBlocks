@@ -1,10 +1,10 @@
-# ########################################################################################################################### #
-#   _  _____ ___                                                                                                              #
-#  | |/ /_ _| _ )   This file can be used to customize the plugin's behavior. It also allows you to exclude some              #
-#  | ' < | || _ \   interactable and fragile materials, either by blacklisting them or by disabling preconfigured categories. #
-#  |_|\_\___|___/   See all up-to-date material names here: https://jd.papermc.io/paper/org/bukkit/Material.html              #
-#                                                                                                                             #
-# ########################################################################################################################### #
+# ###################################################################################################################### #
+#   _  _____ ___                                                                                                         #
+#  | |/ /_ _| _ )   This file can be used to customize the plugin's behavior. You can exclude some fragile, connectable  #
+#  | ' < | || _ \   or interactable materials, either by blacklisting them or by disabling preconfigured categories.     #
+#  |_|\_\___|___/   See all up-to-date material names here: https://jd.papermc.io/paper/org/bukkit/Material.html         #
+#                                                                                                                        #
+# ###################################################################################################################### #
 
 # Maximum number of fragile blocks to record.
 # Setting this value too high is not recommended, as it could be exploited by a lag machine on your server.
@@ -18,7 +18,7 @@ only-use-kib-in-creative-mode: true
 # KIB will use it to improve client-side rendering and performance, for example by canceling break sounds and particles.
 use-packet-events-if-detected: true
 
-# Blacklist interactable blocks by their name, or disable categories below
+# Blacklist interactable materials by their name, or disable categories below
 interactable-blocks:
   blacklist: [ ]
   categories:
@@ -41,7 +41,7 @@ interactable-blocks:
     trap-doors: true
     wooden-buttons: true
 
-# Blacklist connectable blocks by their name, or disable categories below
+# Blacklist connectable materials by their name, or disable categories below
 connectable-blocks:
   blacklist: [ ]
   categories:
@@ -49,7 +49,7 @@ connectable-blocks:
     glass-panes: true
     walls: true
 
-# Blacklist fragile blocks by their name, or disable categories below
+# Blacklist fragile materials by their name, or disable categories below
 fragile-blocks:
   blacklist: [ ]
   categories:
@@ -62,7 +62,7 @@ fragile-blocks:
     cakes: true
     carpets: true
     cave-vines: true # Cave vines + Cave vine plants
-    chorus-plants: true # Chorus plants + Chorus flowers
+    chorus-plants: true # Chorus plants only (chorus flowers are not supported yet)
     cocoa: true
     comparators: true
     corals: true # Does not apply to waterlogged corals

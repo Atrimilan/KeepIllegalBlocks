@@ -3,12 +3,12 @@ package io.github.atrimilan.keepillegalblocks.commands;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import io.github.atrimilan.keepillegalblocks.configuration.KibConfig;
+import io.github.atrimilan.keepillegalblocks.core.RegistryLoader;
+import io.github.atrimilan.keepillegalblocks.core.Settings;
 import io.github.atrimilan.keepillegalblocks.models.LoadResult;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -20,11 +20,13 @@ public class KibCommand {
     public static final String DESCRIPTION = "Reload KeepIllegalBlocks";
     public static final Set<String> ALIASES = Set.of("keepillegalblocks");
 
+    private final Settings settings;
+    private final RegistryLoader registryLoader;
     private final Logger logger;
-    private final KibConfig kibConfig;
 
-    public KibCommand(KibConfig kibConfig, Logger logger) {
-        this.kibConfig = kibConfig;
+    public KibCommand(Settings settings, RegistryLoader registryLoader, Logger logger) {
+        this.settings = settings;
+        this.registryLoader = registryLoader;
         this.logger = logger;
     }
 
@@ -40,14 +42,14 @@ public class KibCommand {
     }
 
     private int reloadKib(CommandContext<CommandSourceStack> ctx) {
-        List<LoadResult> results = kibConfig.reload();
-        CommandSender sender = ctx.getSource().getSender();
+        settings.reloadConfig();
+        List<LoadResult> results = registryLoader.fillMaterialRegistry(settings);
 
         for (LoadResult result : results) {
             if (ctx.getSource().getExecutor() instanceof Player)
-                sender.sendMessage(MiniMessage.miniMessage().deserialize(result.chatFormat()));
+                ctx.getSource().getSender().sendMessage(MiniMessage.miniMessage().deserialize(result.chatFormat()));
 
-            else logger.info(result::consoleFormat);
+            logger.info(result::consoleFormat);
         }
         return Command.SINGLE_SUCCESS;
     }

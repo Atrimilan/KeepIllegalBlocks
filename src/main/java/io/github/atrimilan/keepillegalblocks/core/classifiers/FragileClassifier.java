@@ -1,6 +1,6 @@
-package io.github.atrimilan.keepillegalblocks.configuration.classifiers;
+package io.github.atrimilan.keepillegalblocks.core.classifiers;
 
-import io.github.atrimilan.keepillegalblocks.configuration.types.FragileType;
+import io.github.atrimilan.keepillegalblocks.core.types.FragileType;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Rail;
@@ -60,7 +60,7 @@ public class FragileClassifier extends AbstractClassifier {
 
                 case BAMBOO_SAPLING -> FragileType.BAMBOO;
                 case CACTUS -> FragileType.CACTUS;
-                case CHORUS_FLOWER, CHORUS_PLANT -> FragileType.CHORUS_PLANT;
+                case CHORUS_PLANT -> FragileType.CHORUS_PLANT; // FIXME: Add support for CHORUS_FLOWER
                 case DEAD_BUSH -> FragileType.DEAD_BUSH;
                 case BIG_DRIPLEAF_STEM -> FragileType.DRIPLEAF;
                 case FERN, LARGE_FERN -> FragileType.FERN;

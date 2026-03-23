@@ -1,4 +1,4 @@
-package io.github.atrimilan.keepillegalblocks.configuration.types;
+package io.github.atrimilan.keepillegalblocks.core.types;
 
 /**
  * A "connectable" is a block that automatically connects to its adjacent blocks, such as a fence or a wall. Their
