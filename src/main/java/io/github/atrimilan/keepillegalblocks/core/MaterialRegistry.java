@@ -17,42 +17,42 @@ import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType
  */
 public class MaterialRegistry {
 
-    private final Map<Material, FragileType> fragileBlocks = new EnumMap<>(Material.class);
-    private final Map<Material, ConnectableType> connectableBlocks = new EnumMap<>(Material.class);
-    private final Map<Material, InteractableType> interactableBlocks = new EnumMap<>(Material.class);
+    private final Map<Material, FragileType> fragileMaterials = new EnumMap<>(Material.class);
+    private final Map<Material, ConnectableType> connectableMaterials = new EnumMap<>(Material.class);
+    private final Map<Material, InteractableType> interactableMaterials = new EnumMap<>(Material.class);
 
     public void registerFragile(Material mat, FragileType type) {
-        fragileBlocks.put(mat, type);
+        fragileMaterials.put(mat, type);
     }
 
     public void registerConnectable(Material mat, ConnectableType type) {
-        connectableBlocks.put(mat, type);
+        connectableMaterials.put(mat, type);
     }
 
     public void registerInteractable(Material mat, InteractableType type) {
-        interactableBlocks.put(mat, type);
+        interactableMaterials.put(mat, type);
     }
 
     public void clearAll() {
-        fragileBlocks.clear();
-        connectableBlocks.clear();
-        interactableBlocks.clear();
+        fragileMaterials.clear();
+        connectableMaterials.clear();
+        interactableMaterials.clear();
     }
 
     public boolean isFragile(Material mat) {
-        if (mat == null || fragileBlocks.isEmpty()) return false;
-        return fragileBlocks.getOrDefault(mat, FragileType.NONE) != FragileType.NONE;
+        if (mat == null || fragileMaterials.isEmpty()) return false;
+        return fragileMaterials.getOrDefault(mat, FragileType.NONE) != FragileType.NONE;
     }
 
     public boolean isConnectable(Material mat) {
-        if (mat == null || connectableBlocks.isEmpty()) return false;
-        return connectableBlocks.getOrDefault(mat, ConnectableType.NONE) != ConnectableType.NONE;
+        if (mat == null || connectableMaterials.isEmpty()) return false;
+        return connectableMaterials.getOrDefault(mat, ConnectableType.NONE) != ConnectableType.NONE;
     }
 
     public InteractableType getInteractableType(Material mat) {
-        if (mat == null || interactableBlocks.isEmpty()) return InteractableType.NONE;
+        if (mat == null || interactableMaterials.isEmpty()) return InteractableType.NONE;
 
-        InteractableType interactableType = interactableBlocks.getOrDefault(mat, InteractableType.NONE);
+        InteractableType interactableType = interactableMaterials.getOrDefault(mat, InteractableType.NONE);
 
         DebugUtils.sendChat(() -> "Material <white>" + mat + "</white> " +
                                   (interactableType != InteractableType.NONE ? ("is interactable: <white>" + mat) :
@@ -61,14 +61,14 @@ public class MaterialRegistry {
     }
 
     public int getFragileCount() {
-        return fragileBlocks.size();
+        return fragileMaterials.size();
     }
 
     public int getConnectableCount() {
-        return connectableBlocks.size();
+        return connectableMaterials.size();
     }
 
     public int getInteractableCount() {
-        return interactableBlocks.size();
+        return interactableMaterials.size();
     }
 }

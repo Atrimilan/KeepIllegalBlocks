@@ -1,9 +1,9 @@
 package io.github.atrimilan.keepillegalblocks.core.types;
 
 public enum KibGroup {
-    FRAGILE("fragile-blocks."),
-    CONNECTABLE("connectable-blocks."),
-    INTERACTABLE("interactable-blocks.");
+    FRAGILE("fragile"),
+    CONNECTABLE("connectable"),
+    INTERACTABLE("interactable");
 
     private final String sectionKey;
 
@@ -12,6 +12,6 @@ public enum KibGroup {
     }
 
     public String getSectionKey() {
-        return sectionKey;
+        return sectionKey + "-materials.";
     }
 }

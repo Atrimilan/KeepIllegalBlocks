@@ -3,10 +3,10 @@ package io.github.atrimilan.keepillegalblocks.configuration;
 import io.github.atrimilan.keepillegalblocks.core.classifiers.ConnectableClassifier;
 import io.github.atrimilan.keepillegalblocks.core.classifiers.FragileClassifier;
 import io.github.atrimilan.keepillegalblocks.core.classifiers.InteractableClassifier;
-import io.github.atrimilan.keepillegalblocks.core.types.KibBlockType;
 import io.github.atrimilan.keepillegalblocks.core.types.ConnectableType;
 import io.github.atrimilan.keepillegalblocks.core.types.FragileType;
 import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
+import io.github.atrimilan.keepillegalblocks.core.types.KibBlockType;
 import io.github.atrimilan.keepillegalblocks.models.LoadResult;
 import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import org.bukkit.Material;
@@ -107,11 +107,11 @@ public class KibConfig {
         isOnlyEnabledInCreativeMode = configFile.getBoolean("only-use-kib-in-creative-mode");
         isPacketEventsEnabled = configFile.getBoolean("use-packet-events-if-detected");
 
-        int blacklistedFragile = loadRegistry(configFile, "fragile-blocks.", fragileBlocks,
+        int blacklistedFragile = loadRegistry(configFile, "fragile-materials.", fragileBlocks,
                                               fragileClassifier::classify);
-        int blacklistedInteractable = loadRegistry(configFile, "interactable-blocks.", interactableBlocks,
+        int blacklistedInteractable = loadRegistry(configFile, "interactable-materials.", interactableBlocks,
                                                    interactableClassifier::classify);
-        int blacklistedConnectable = loadRegistry(configFile, "connectable-blocks.", connectableBlocks,
+        int blacklistedConnectable = loadRegistry(configFile, "connectable-materials.", connectableBlocks,
                                                   connectableClassifier::classify);
 
         return List.of(new LoadResult("Fragile", fragileBlocks.size(), blacklistedFragile),

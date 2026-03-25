@@ -19,7 +19,7 @@ only-use-kib-in-creative-mode: true
 use-packet-events-if-detected: true
 
 # Blacklist interactable materials by their name, or disable categories below
-interactable-blocks:
+interactable-materials:
   blacklist: [ ]
   categories:
     campfires: true
@@ -42,7 +42,7 @@ interactable-blocks:
     wooden-buttons: true
 
 # Blacklist connectable materials by their name, or disable categories below
-connectable-blocks:
+connectable-materials:
   blacklist: [ ]
   categories:
     fences: true # Fences + Iron bars + Copper bars
@@ -50,7 +50,7 @@ connectable-blocks:
     walls: true
 
 # Blacklist fragile materials by their name, or disable categories below
-fragile-blocks:
+fragile-materials:
   blacklist: [ ]
   categories:
     amethyst-clusters: true
