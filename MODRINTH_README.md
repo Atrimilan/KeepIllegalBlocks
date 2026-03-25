@@ -57,9 +57,9 @@ blocks**, causing them to break.
 <br/>
 
 <details>
-<summary>🔵 List of fragile block categories</summary>
+<summary>🔵 List of fragile material categories</summary>
 
-List of fragile block categories that are automatically restored by KIB when broken:
+List of fragile material categories that are automatically restored by KIB when broken:
 
 * `amethyst-clusters`
 * `bamboos`
@@ -70,7 +70,7 @@ List of fragile block categories that are automatically restored by KIB when bro
 * `cakes`
 * `carpets`
 * `cave-vines`
-* `chorus-plants`
+* `chorus-plants` _(except chorus flowers, which are not supported yet)_
 * `cocoa`
 * `comparators`
 * `corals` _(does not apply to waterlogged corals)_
@@ -117,13 +117,14 @@ List of fragile block categories that are automatically restored by KIB when bro
 </details>
 
 <details>
-<summary>🔴 List of interactable block categories</summary>
+<summary>🔴 List of interactable material categories</summary>
 
-List of interactable blocks categories recorded by KIB:
+List of interactable material categories recorded by KIB:
 
 * `campfires`
 * `candles`
 * `cauldrons`
+* `cave-vines` _(taking their berries)_
 * `comparators`
 * `composters`
 * `copper-blocks` _(non-plain copper blocks that can be waxed or scraped)_
@@ -132,18 +133,32 @@ List of interactable blocks categories recorded by KIB:
 * `end-portal-frames`
 * `gates`
 * `lecterns` _(putting a book on them)_
+* `levers`
 * `repeaters`
-* `switches` _(levers and buttons)_
+* `stone-buttons`
+* `sweet-berry-bushes` _(taking their berries)_
 * `trap-doors`
+* `wooden-buttons`
+
+</details>
+
+<details>
+<summary>🟢 List of connectable material categories</summary>
+
+List of connectable material categories recorded by KIB:
+
+* `fences` _(fences, iron bars and copper bars)_
+* `glass-panes`
+* `walls`
 
 </details>
 
 <br/>
 
 > **NOTE -** KIB does **not** support underwater restorations. This is why `seagrass` and `kelp` are not included in the
-> fragile block list.
+> fragile material list.
 
-> **WARNING -** Even after being restored by KIB, some fragile block will still update naturally, such as cactus
+> **WARNING -** Even after being restored by KIB, some fragile blocks will still update naturally, such as cactus
 > breaking as they grow, or coral dying when not waterlogged. This is the default behavior of the game, KIB will NOT
 > prevent this, even if they were initially placed using plugins like WorldEdit or Axiom (which rely on advanced chunk
 > management systems).
@@ -164,7 +179,7 @@ everything accidentally... 😅
 
 In your server directory, you can edit `./plugins/KeepIllegalBlocks/config.yml` to:
 
-* Blacklist some fragile or interactable blocks _(everything is enabled by default)_
+* Blacklist some fragile or interactable materials _(everything is enabled by default)_
 * Change the maximum number of fragile blocks to restore _(default: 500)_
 * Only allow KIB in creative mode _(default: true)_
 * Use [PacketEvents](https://modrinth.com/plugin/packetevents) if it is detected _(default: true)_

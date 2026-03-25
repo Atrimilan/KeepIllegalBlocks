@@ -55,10 +55,9 @@ Interacting with an **interactable block** triggers a physical update that propa
 **→ This plugin fixes this behavior by restoring broken blocks.**
 
 <details>
-<summary><b>🔵 Expand list of fragile block categories</b></summary>
-<br/>
+<summary>🔵 List of fragile material categories</summary>
 
-List of fragile block categories that are automatically restored by KIB when broken:
+List of fragile material categories that are automatically restored by KIB when broken:
 
 * `amethyst-clusters`
 * `bamboos`
@@ -69,7 +68,7 @@ List of fragile block categories that are automatically restored by KIB when bro
 * `cakes`
 * `carpets`
 * `cave-vines`
-* `chorus-plants`
+* `chorus-plants` _(except chorus flowers, which are not supported yet)_
 * `cocoa`
 * `comparators`
 * `corals` _(does not apply to waterlogged corals)_
@@ -116,14 +115,14 @@ List of fragile block categories that are automatically restored by KIB when bro
 </details>
 
 <details>
-<summary><b>🔴 Expand list of interactable block categories</b></summary>
-<br/>
+<summary>🔴 List of interactable material categories</summary>
 
-List of interactable blocks categories recorded by KIB:
+List of interactable material categories recorded by KIB:
 
 * `campfires`
 * `candles`
 * `cauldrons`
+* `cave-vines` _(taking their berries)_
 * `comparators`
 * `composters`
 * `copper-blocks` _(non-plain copper blocks that can be waxed or scraped)_
@@ -132,15 +131,29 @@ List of interactable blocks categories recorded by KIB:
 * `end-portal-frames`
 * `gates`
 * `lecterns` _(putting a book on them)_
+* `levers`
 * `repeaters`
-* `switches` _(levers and buttons)_
+* `stone-buttons`
+* `sweet-berry-bushes` _(taking their berries)_
 * `trap-doors`
+* `wooden-buttons`
+
+</details>
+
+<details>
+<summary>🟢 List of connectable material categories</summary>
+
+List of connectable material categories recorded by KIB:
+
+* `fences` _(fences, iron bars and copper bars)_
+* `glass-panes`
+* `walls`
 
 </details>
 
 > [!NOTE]
-> KIB does not support underwater restorations. This is why `seagrass` and `kelp` are not included in the fragile block
-> list.
+> KIB does not support underwater restorations. This is why `seagrass` and `kelp` are not included in the fragile
+> material list.
 
 ### 2. Why would I need it?
 
@@ -153,8 +166,8 @@ everything accidentally... 😅
 ### 3. How does it work?
 
 Technically, the plugin detects player interactions with interactable blocks and performs a
-[BFS](https://en.wikipedia.org/wiki/Breadth-first_search) to record all chained fragile blocks,
-and it restores any that have been broken.
+[BFS](https://en.wikipedia.org/wiki/Breadth-first_search) to record all chained fragile blocks, and it restores any that
+have been broken.
 
 For performance reasons, a block limit is set, which is **500 by default**.
 
@@ -180,7 +193,7 @@ Place the JAR file in the `./plugins` directory of your server.
 
 In your server directory, you can edit `./plugins/KeepIllegalBlocks/config.yml` to:
 
-* Blacklist some fragile or interactable blocks _(everything is enabled by default)_
+* Blacklist some fragile or interactable materials _(everything is enabled by default)_
 * Change the maximum number of fragile blocks to restore _(default: 500)_
 * Only allow KIB in creative mode _(default: true)_
 * Use [PacketEvents](https://modrinth.com/plugin/packetevents) if it is detected _(default: true)_
