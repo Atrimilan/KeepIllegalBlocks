@@ -124,7 +124,7 @@ public class BlockRestorationService {
     public void scheduleRestoration(BfsResult bfsResult, InteractableType interactableType) {
         if (bfsResult == null || !bfsResult.hasBlocksToRestore()) return; // Return if there's nothing to restore
 
-        ItemSpawnListener itemSpawnListener = new ItemSpawnListener(bfsResult, plugin);
+        ItemSpawnListener itemSpawnListener = new ItemSpawnListener(plugin, bfsResult, materialRegistry);
         Object packetListener = settings.isPacketEventsEnabled() ? //
                                 PacketEventsAdapter.registerFragileBlockBreakListener(bfsResult) : null;
 

@@ -1,5 +1,6 @@
 package io.github.atrimilan.keepillegalblocks.listeners;
 
+import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
 import io.github.atrimilan.keepillegalblocks.models.BfsResult;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -11,15 +12,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class ItemSpawnListener implements Listener {
 
     private final BfsResult result;
+    private final MaterialRegistry materialRegistry;
 
-    public ItemSpawnListener(BfsResult result, JavaPlugin plugin) {
-        this.result = result;
+    public ItemSpawnListener(JavaPlugin plugin, BfsResult result, MaterialRegistry materialRegistry) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        this.result = result;
+        this.materialRegistry = materialRegistry;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onItemSpawn(ItemSpawnEvent event) {
-        if (result.boundingBox().contains(event.getLocation().toVector()) && event.getEntity().getThrower() == null) {
+        if (result.boundingBox().contains(event.getLocation().toVector()) && event.getEntity().getThrower() == null
+            && materialRegistry.isFragile(event.getEntity().getItemStack().getType())) {
             event.setCancelled(true);
         }
     }
