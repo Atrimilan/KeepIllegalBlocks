@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
@@ -25,6 +26,11 @@ public class BukkitMockFactory {
         lenient().when(block.getLocation()).thenReturn(location);
         lenient().when(block.getState()).thenReturn(state);
         lenient().when(state.getBlock()).thenReturn(block);
+
+        // Define default BlockData (for connectable blocks comparison)
+        BlockData defaultBlockData = mock(BlockData.class);
+        lenient().when(block.getBlockData()).thenReturn(defaultBlockData);
+        lenient().when(state.getBlockData()).thenReturn(defaultBlockData);
 
         // Set AIR as default relative
         Block airBlock = mock(Block.class);

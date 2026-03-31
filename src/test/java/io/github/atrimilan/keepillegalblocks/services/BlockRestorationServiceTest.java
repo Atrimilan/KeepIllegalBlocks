@@ -2,8 +2,9 @@ package io.github.atrimilan.keepillegalblocks.services;
 
 import com.github.retrooper.packetevents.event.PacketListenerCommon;
 import io.github.atrimilan.keepillegalblocks.BukkitMockFactory;
-import io.github.atrimilan.keepillegalblocks.configuration.KibConfig;
-import io.github.atrimilan.keepillegalblocks.configuration.types.InteractableType;
+import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
+import io.github.atrimilan.keepillegalblocks.core.Settings;
+import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
 import io.github.atrimilan.keepillegalblocks.listeners.ItemSpawnListener;
 import io.github.atrimilan.keepillegalblocks.models.BfsResult;
 import io.github.atrimilan.keepillegalblocks.models.InteractableWrapper;
@@ -13,6 +14,7 @@ import org.bukkit.Server;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.BoundingBox;
@@ -38,7 +40,10 @@ class BlockRestorationServiceTest {
     private BlockRestorationService service;
 
     @Mock
-    private KibConfig config;
+    private Settings settings;
+
+    @Mock
+    private MaterialRegistry materialRegistry;
 
     @Mock
     private JavaPlugin plugin;
@@ -60,25 +65,30 @@ class BlockRestorationServiceTest {
 
     @BeforeEach
     void setUp() {
-        when(config.getPlugin()).thenReturn(plugin);
-        service = spy(new BlockRestorationService(config));
+        service = spy(new BlockRestorationService(plugin, materialRegistry, settings));
     }
 
-    private Block mockSourceBlock(Material sourceMaterial, boolean withRelatives) {
+    private Block mockSourceBlock(Material sourceMaterial, boolean withFragileRelatives,
+                                  boolean withConnectableRelatives) {
         Block source = BukkitMockFactory.mockBlock(sourceMaterial);
 
-        if (withRelatives) {
+        if (withFragileRelatives) {
             Block north = BukkitMockFactory.mockBlock(Material.STONE_BUTTON);
             Block east = BukkitMockFactory.mockBlock(Material.STONE_BUTTON);
             Block up = BukkitMockFactory.mockBlock(Material.STONE_BUTTON);
             BukkitMockFactory.setBlockRelative(source, BlockFace.NORTH, north);
             BukkitMockFactory.setBlockRelative(source, BlockFace.EAST, east);
             BukkitMockFactory.setBlockRelative(source, BlockFace.UP, up);
-
-            lenient().when(config.isFragile(Material.STONE_BUTTON)).thenReturn(true);
-        } else {
-            lenient().when(config.isFragile(Material.AIR)).thenReturn(false);
+            lenient().when(materialRegistry.isFragile(Material.STONE_BUTTON)).thenReturn(true);
         }
+        if (withConnectableRelatives) {
+            Block south = BukkitMockFactory.mockBlock(Material.BRICK_WALL);
+            Block down = BukkitMockFactory.mockBlock(Material.BRICK_WALL);
+            BukkitMockFactory.setBlockRelative(source, BlockFace.SOUTH, south);
+            BukkitMockFactory.setBlockRelative(source, BlockFace.DOWN, down);
+            lenient().when(materialRegistry.isConnectable(Material.BRICK_WALL)).thenReturn(true);
+        }
+
         return source;
     }
 
@@ -86,93 +96,102 @@ class BlockRestorationServiceTest {
 
     @Test
     void shouldRecordBlockStates() {
-        lenient().when(config.isFragile(Material.OAK_DOOR)).thenReturn(true); // Set interactable as also fragile
+        lenient().when(materialRegistry.isFragile(Material.OAK_DOOR)).thenReturn(true); // Interactable also fragile
 
-        Block source = mockSourceBlock(Material.OAK_DOOR, true);
+        Block source = mockSourceBlock(Material.OAK_DOOR, true, true);
         BfsResult res = service.recordBlockStates(source, 50);
 
-        assertTrue(res.boundingBox().getVolume() >= 1); // 1x1x1 (because fragile blocks positions are 0 in the mock)
+        assertTrue(res.boundingBox().getVolume() >= 1); // 1x1x1 (because recorded blocks positions are 0 in the mock)
         assertEquals(source.getState(), res.interactableBlock().blockState());
-        assertEquals(3, res.fragileBlocks().size());
+        assertEquals(5, res.fragileBlocks().size() + res.connectableBlocks().size());
         assertTrue(res.interactableBlock().isAlsoFragile()); // Interactable is also fragile
-        verify(config, times(3)).isFragile(Material.STONE_BUTTON);
-        verify(config).isFragile(Material.OAK_DOOR);
+        verify(materialRegistry, times(3)).isFragile(Material.STONE_BUTTON);
+        verify(materialRegistry, times(2)).isConnectable(Material.BRICK_WALL);
+        verify(materialRegistry).isFragile(Material.OAK_DOOR);
     }
 
     @Test
     void shouldRecordBlockStatesWhenInteractableIsNotFragile() {
-        Block source = mockSourceBlock(Material.COMPOSTER, true);
+        Block source = mockSourceBlock(Material.COMPOSTER, true, false);
         BfsResult res = service.recordBlockStates(source, 50);
 
         assertTrue(res.boundingBox().getVolume() >= 1); // 1x1x1 (because fragile blocks positions are 0 in the mock)
         assertEquals(source.getState(), res.interactableBlock().blockState());
-        assertEquals(3, res.fragileBlocks().size());
+        assertEquals(3, res.fragileBlocks().size() + res.connectableBlocks().size());
         assertFalse(res.interactableBlock().isAlsoFragile()); // Interactable is not fragile
-        verify(config, times(3)).isFragile(Material.STONE_BUTTON);
-        verify(config).isFragile(Material.COMPOSTER);
+        verify(materialRegistry, times(3)).isFragile(Material.STONE_BUTTON);
+        verify(materialRegistry, never()).isConnectable(Material.BRICK_WALL);
+        verify(materialRegistry).isFragile(Material.COMPOSTER);
     }
 
     @Test
     void shouldRecordBlockStatesWhenMaxBlocksIsLow() {
-        Block source = mockSourceBlock(Material.COMPOSTER, true);
+        Block source = mockSourceBlock(Material.COMPOSTER, true, true);
         BfsResult res = service.recordBlockStates(source, 2); // Set max blocks to 2
 
         assertTrue(res.boundingBox().getVolume() >= 1);
         assertEquals(source.getState(), res.interactableBlock().blockState());
-        assertEquals(2, res.fragileBlocks().size()); // Only 2 blocks can be recorded
+        assertEquals(2, res.fragileBlocks().size() + res.connectableBlocks().size()); // Only 2 blocks can be recorded
         assertFalse(res.interactableBlock().isAlsoFragile());
-        verify(config, times(3)).isFragile(Material.STONE_BUTTON);
-        verify(config).isFragile(Material.COMPOSTER);
+        // In the BFS method, 1st scanned block is a fragile (BlockFace.UP), and 2nd is a connectable (BlockFace.DOWN)
+        verify(materialRegistry, times(1)).isFragile(Material.STONE_BUTTON);
+        verify(materialRegistry, times(1)).isConnectable(Material.BRICK_WALL);
+        verify(materialRegistry).isFragile(Material.COMPOSTER);
     }
 
     @Test
     void shouldRecordBlockStatesWithNoRelatives() {
-        Block source = mockSourceBlock(Material.COMPOSTER, false);
+        Block source = mockSourceBlock(Material.COMPOSTER, false, false);
         BfsResult res = service.recordBlockStates(source, 50);
 
         assertTrue(res.boundingBox().getVolume() >= 1);
         assertEquals(source.getState(), res.interactableBlock().blockState());
-        assertEquals(0, res.fragileBlocks().size()); // No relatives
-        assertFalse(res.interactableBlock().isAlsoFragile());
-        verify(config, times(6)).isFragile(Material.AIR);
-        verify(config).isFragile(Material.COMPOSTER);
+        assertEquals(0, res.fragileBlocks().size() + res.connectableBlocks().size());
+        assertFalse(res.interactableBlock().isAlsoFragile()); // Interactable is not fragile
+        verify(materialRegistry, never()).isFragile(Material.STONE_BUTTON);
+        verify(materialRegistry, never()).isConnectable(Material.BRICK_WALL);
+        verify(materialRegistry, atLeastOnce()).isFragile(Material.AIR);
+        verify(materialRegistry, atLeastOnce()).isConnectable(Material.AIR);
+        verify(materialRegistry).isFragile(Material.COMPOSTER);
     }
 
     @Test
-    void shouldRecordBlockStatesWithNoFragileRelatives2() {
-        Block source = mockSourceBlock(Material.COMPOSTER, true);
+    void shouldRecordBlockStatesWithNoRelativesButInteractableIsAlsoFragile() {
+        lenient().when(materialRegistry.isFragile(Material.OAK_DOOR)).thenReturn(true); // Interactable also fragile
 
-        when(config.isFragile(Material.STONE_BUTTON)).thenReturn(false); // Stub as not fragile
-
+        Block source = mockSourceBlock(Material.OAK_DOOR, false, false);
         BfsResult res = service.recordBlockStates(source, 50);
 
         assertTrue(res.boundingBox().getVolume() >= 1);
         assertEquals(source.getState(), res.interactableBlock().blockState());
-        assertEquals(0, res.fragileBlocks().size()); // No relatives
-        assertFalse(res.interactableBlock().isAlsoFragile());
-        verify(config, times(3)).isFragile(Material.STONE_BUTTON);
-        verify(config).isFragile(Material.COMPOSTER);
+        assertEquals(0, res.fragileBlocks().size() + res.connectableBlocks().size());
+        assertTrue(res.interactableBlock().isAlsoFragile()); // Interactable is fragile
+        verify(materialRegistry, never()).isFragile(Material.STONE_BUTTON);
+        verify(materialRegistry, never()).isConnectable(Material.BRICK_WALL);
+        verify(materialRegistry, atLeastOnce()).isFragile(Material.AIR);
+        verify(materialRegistry, atLeastOnce()).isConnectable(Material.AIR);
+        verify(materialRegistry).isFragile(Material.OAK_DOOR);
     }
 
     @Test
     void shouldNotRecordBlockStatesWhenSourceIsNull() {
-        clearInvocations(config); // Clear invocation in service init
+        clearInvocations(materialRegistry); // Clear invocation in service init
 
         BfsResult res = service.recordBlockStates(null, 50);
 
         assertNull(res);
-        verifyNoInteractions(config);
+        verifyNoInteractions(materialRegistry);
     }
 
     @Test
     void shouldNotRecordBlockStatesWhenMaxBlocksIsZero() {
-        clearInvocations(config); // Clear invocation in service init
-        Block source = mockSourceBlock(Material.STONE_BUTTON, true);
+        clearInvocations(materialRegistry); // Clear invocation in service init
+        Block source = mockSourceBlock(Material.STONE_BUTTON, true, true);
 
         BfsResult res = service.recordBlockStates(source, 0);
 
         assertNull(res);
-        verifyNoInteractions(config); // No fragile blocks were recorded
+        verifyNoInteractions(materialRegistry); // No fragile blocks were recorded
     }
 
     // ********** Tests - Should schedule restoration **********
@@ -189,7 +208,7 @@ class BlockRestorationServiceTest {
     @MethodSource("provideRestorationParameters")
     void shouldScheduleRestorationTest(boolean isPacketEventsPresent, Material currentInteractableMaterial,
                                        InteractableType interactableType) {
-        when(config.isPacketEventsPresent()).thenReturn(isPacketEventsPresent);
+        when(settings.isPacketEventsEnabled()).thenReturn(isPacketEventsPresent);
         when(plugin.getServer()).thenReturn(server);
         when(server.getScheduler()).thenReturn(scheduler);
 
@@ -201,7 +220,14 @@ class BlockRestorationServiceTest {
         // Prepare BFS result
         BlockState unbrokenFragile = BukkitMockFactory.mockBlockState(Material.OAK_DOOR);
         BlockState brokenFragile = BukkitMockFactory.mockBlockState(Material.AIR);
-        BfsResult res = new BfsResult(interactableBlock, Set.of(unbrokenFragile, brokenFragile), boundingBox);
+        BlockState changedConnectable = BukkitMockFactory.mockBlockState(Material.BRICK_WALL);
+        BlockState unchangedConnectable = BukkitMockFactory.mockBlockState(Material.GLASS_PANE);
+        BfsResult res = new BfsResult(interactableBlock, Set.of(unbrokenFragile, brokenFragile),
+                                      Set.of(changedConnectable, unchangedConnectable), boundingBox);
+
+        // Make sure the current BlockData of the connectable is different from the recorded one
+        when(changedConnectable.getBlockData()).thenReturn(mock(BlockData.class));
+        when(changedConnectable.getBlock().getBlockData()).thenReturn(mock(BlockData.class));
 
         Object packetEventsListener = mock(PacketListenerCommon.class);
 
@@ -252,30 +278,32 @@ class BlockRestorationServiceTest {
             int updateCount = hasSecondUpdate ? 2 : 1;
             verify(brokenFragile, times(updateCount)).update(true, false);
             verify(unbrokenFragile, never()).update(anyBoolean(), anyBoolean());
+            verify(changedConnectable, times(updateCount)).update(true, false);
+            verify(unchangedConnectable, never()).update(anyBoolean(), anyBoolean());
             verify(interactableState, interactableIsAlsoFragile ? times(updateCount) : never()).update(true, false);
         }
     }
 
     @Test
     void shouldNotScheduleRestorationWhenBfsResultIsNull() {
-        clearInvocations(config);
+        clearInvocations(settings);
 
         service.scheduleRestoration(null, InteractableType.CAULDRON);
 
         verifyNoInteractions(scheduler);
-        verifyNoInteractions(config);
+        verifyNoInteractions(settings);
     }
 
     @Test
-    void shouldNotScheduleRestorationWhenFragileBlockSetIsEmpty() {
-        clearInvocations(config);
+    void shouldNotScheduleRestorationWhenThereAreNoFragileNorConnectableBlocks() {
+        clearInvocations(settings);
 
         var interactableBlock = new InteractableWrapper(BukkitMockFactory.mockBlockState(Material.CAULDRON), false);
-        BfsResult res = new BfsResult(interactableBlock, Collections.emptySet(), boundingBox);
+        BfsResult res = new BfsResult(interactableBlock, Collections.emptySet(), Collections.emptySet(), boundingBox);
 
         service.scheduleRestoration(res, InteractableType.CAULDRON);
 
         verifyNoInteractions(scheduler);
-        verifyNoInteractions(config);
+        verifyNoInteractions(settings);
     }
 }
