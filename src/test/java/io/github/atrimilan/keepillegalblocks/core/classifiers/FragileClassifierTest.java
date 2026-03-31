@@ -1,6 +1,6 @@
-package io.github.atrimilan.keepillegalblocks.configuration.classifiers;
+package io.github.atrimilan.keepillegalblocks.core.classifiers;
 
-import io.github.atrimilan.keepillegalblocks.configuration.types.FragileType;
+import io.github.atrimilan.keepillegalblocks.core.types.FragileType;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Bed;

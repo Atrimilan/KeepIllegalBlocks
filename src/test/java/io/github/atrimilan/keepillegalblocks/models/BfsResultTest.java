@@ -16,51 +16,62 @@ import static org.junit.jupiter.api.Assertions.*;
 class BfsResultTest {
 
     @Mock
-    private BlockState interactableBlockState;
+    private BlockState fragileBS;
 
     @Mock
-    private BlockState fragileBlockState;
+    private BlockState connectableBS;
+
+    @Mock
+    private BlockState interactableBS;
 
     @Mock
     private BoundingBox boundingBox;
 
     @Test
     void shouldGetWorld() {
-        InteractableWrapper wrapper = new InteractableWrapper(interactableBlockState, false);
-        BfsResult result = new BfsResult(wrapper, Collections.emptySet(), boundingBox);
+        InteractableWrapper wrapper = new InteractableWrapper(interactableBS, false);
+        BfsResult result = new BfsResult(wrapper, Collections.emptySet(), Collections.emptySet(), boundingBox);
 
-        assertEquals(interactableBlockState.getWorld(), result.getWorld());
+        assertEquals(interactableBS.getWorld(), result.getWorld());
     }
 
     @Test
-    void shouldHaveFragileBlocksWhenFragileBlocksNotEmpty() {
-        InteractableWrapper wrapper = new InteractableWrapper(interactableBlockState, false);
-        BfsResult result = new BfsResult(wrapper, Set.of(fragileBlockState), boundingBox);
+    void shouldHaveBlocksToRestoreWhenFragileBlocksNotIsEmpty() {
+        InteractableWrapper wrapper = new InteractableWrapper(interactableBS, false);
+        BfsResult result = new BfsResult(wrapper, Set.of(fragileBS), Collections.emptySet(), boundingBox);
 
         assertTrue(result.hasBlocksToRestore());
     }
 
     @Test
-    void shouldHaveFragileBlocksWhenInteractableBlockIsAlsoFragile() {
-        InteractableWrapper wrapper = new InteractableWrapper(interactableBlockState, true);
-        BfsResult result = new BfsResult(wrapper, Collections.emptySet(), boundingBox);
+    void shouldHaveBlocksToRestoreWhenConnectableBlocksIsNotEmpty() {
+        InteractableWrapper wrapper = new InteractableWrapper(interactableBS, false);
+        BfsResult result = new BfsResult(wrapper, Collections.emptySet(), Set.of(connectableBS), boundingBox);
+
+        assertTrue(result.hasBlocksToRestore());
+    }
+
+    @Test
+    void shouldHaveBlocksToRestoreWhenInteractableBlockIsAlsoFragile() {
+        InteractableWrapper wrapper = new InteractableWrapper(interactableBS, true);
+        BfsResult result = new BfsResult(wrapper, Collections.emptySet(), Collections.emptySet(), boundingBox);
 
         assertTrue(result.hasBlocksToRestore());
     }
 
     @Test
     void shouldGetAllFragileBlocks() {
-        InteractableWrapper wrapper = new InteractableWrapper(interactableBlockState, true);
-        BfsResult result = new BfsResult(wrapper, Set.of(fragileBlockState), boundingBox);
+        InteractableWrapper wrapper = new InteractableWrapper(interactableBS, true);
+        BfsResult result = new BfsResult(wrapper, Set.of(fragileBS), Set.of(connectableBS), boundingBox);
 
         assertTrue(result.hasBlocksToRestore());
-        assertEquals(Set.of(interactableBlockState, fragileBlockState), result.getAllFragileBlocks());
+        assertEquals(Set.of(interactableBS, fragileBS), result.getAllFragileBlocks()); // Connectable is not fragile
     }
 
     @Test
     void shouldNotHaveFragileBlocks() {
-        InteractableWrapper wrapper = new InteractableWrapper(interactableBlockState, false);
-        BfsResult result = new BfsResult(wrapper, Collections.emptySet(), boundingBox);
+        InteractableWrapper wrapper = new InteractableWrapper(interactableBS, false);
+        BfsResult result = new BfsResult(wrapper, Collections.emptySet(), Collections.emptySet(), boundingBox);
 
         assertFalse(result.hasBlocksToRestore());
         assertEquals(Collections.emptySet(), result.getAllFragileBlocks());

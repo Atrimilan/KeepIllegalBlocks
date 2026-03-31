@@ -24,7 +24,7 @@ class DebugUtilsTest {
 
 
     @Test
-    void shouldNotSendChatWhenDebugIsDisabled()  {
+    void shouldNotSendChatWhenDebugIsDisabled() {
         DebugUtils.setDebugEnabled(false);
 
         Server mockServer = mock(Server.class);
@@ -36,7 +36,7 @@ class DebugUtilsTest {
 
 
     @Test
-    void shouldNotSendChatByDefault()  {
+    void shouldNotSendChatByDefault() {
         Server mockServer = mock(Server.class);
         DebugUtils.setServer(mockServer);
 

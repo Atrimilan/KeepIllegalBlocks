@@ -1,5 +1,6 @@
 package io.github.atrimilan.keepillegalblocks.listeners;
 
+import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
 import io.github.atrimilan.keepillegalblocks.models.BfsResult;
 import io.github.atrimilan.keepillegalblocks.models.InteractableWrapper;
 import org.bukkit.Location;
@@ -8,6 +9,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.Item;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.ItemSpawnEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.BoundingBox;
@@ -15,7 +17,6 @@ import org.bukkit.util.Vector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,6 +39,12 @@ class ItemSpawnListenerTest {
     private PluginManager pluginManager;
 
     @Mock
+    private MaterialRegistry materialRegistry;
+
+    @Mock
+    private ItemStack itemStack;
+
+    @Mock
     ItemSpawnEvent event;
 
     @Mock
@@ -51,12 +58,13 @@ class ItemSpawnListenerTest {
     @BeforeEach
     void setUp() {
         var boundingBox = new BoundingBox(0, 0, 0, 2, 2, 2);
-        var bfsResult = new BfsResult(new InteractableWrapper(mock(BlockState.class), false), Set.of(), boundingBox);
+        var bfsResult = new BfsResult( //
+                new InteractableWrapper(mock(BlockState.class), false), Set.of(), Set.of(), boundingBox);
 
         when(plugin.getServer()).thenReturn(server);
         when(server.getPluginManager()).thenReturn(pluginManager);
 
-        listener = new ItemSpawnListener(bfsResult, plugin);
+        listener = new ItemSpawnListener(plugin, bfsResult, materialRegistry);
     }
 
     @Test
@@ -65,6 +73,8 @@ class ItemSpawnListenerTest {
         when(location.toVector()).thenReturn(new Vector(0, 1, 1));
         when(event.getEntity()).thenReturn(item);
         when(item.getThrower()).thenReturn(null);
+        when(item.getItemStack()).thenReturn(itemStack);
+        when(materialRegistry.isFragile(itemStack.getType())).thenReturn(true);
 
         listener.onItemSpawn(event);
 
@@ -87,6 +97,20 @@ class ItemSpawnListenerTest {
         when(location.toVector()).thenReturn(new Vector(1, 0, 0));
         when(event.getEntity()).thenReturn(item);
         when(item.getThrower()).thenReturn(UUID.randomUUID());
+
+        listener.onItemSpawn(event);
+
+        verify(event, never()).setCancelled(anyBoolean());
+    }
+
+    @Test
+    void onItemSpawn_ShouldNotCancelWhenItemMaterialIsNotFragile() {
+        when(event.getLocation()).thenReturn(location);
+        when(location.toVector()).thenReturn(new Vector(0, 1, 1));
+        when(event.getEntity()).thenReturn(item);
+        when(item.getThrower()).thenReturn(null);
+        when(item.getItemStack()).thenReturn(itemStack);
+        when(materialRegistry.isFragile(itemStack.getType())).thenReturn(false);
 
         listener.onItemSpawn(event);
 
