@@ -22,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -59,7 +60,7 @@ class FragileBlockBreakListenerTest {
         BlockState fragile = BukkitMockFactory.mockBlockState(Material.AIR);
         BukkitMockFactory.setCoordinates(fragile, X_INT, Y_INT, Z_INT);
 
-        BfsResult bfsResult = new BfsResult(interactableWrapper, Set.of(fragile), boundingBox);
+        BfsResult bfsResult = new BfsResult(interactableWrapper, Set.of(fragile), Collections.emptySet(), boundingBox);
 
         listener = spy(new FragileBlockBreakListener(bfsResult));
 
@@ -131,6 +132,9 @@ class FragileBlockBreakListenerTest {
     private WrapperPlayServerMultiBlockChange.EncodedBlock mockEncodedBlock(boolean isAir) {
         var block = mock(WrapperPlayServerMultiBlockChange.EncodedBlock.class);
         when(block.getBlockId()).thenReturn(isAir ? 0 : 1);
+        when(block.getX()).thenReturn(X_INT);
+        when(block.getY()).thenReturn(Y_INT);
+        when(block.getZ()).thenReturn(Z_INT);
         return block;
     }
 
