@@ -62,7 +62,7 @@ public class RegistryLoader {
      * @param <T>              An implementation of {@link KibBlockType}
      * @return The count of blacklisted materials
      */
-    private <T extends KibBlockType> int loadRegistry(Settings settings, KibGroup group,
+    protected <T extends KibBlockType> int loadRegistry(Settings settings, KibGroup group,
                                                       Function<Material, T> classifierMethod,
                                                       BiConsumer<Material, T> registrySetter) {
         Set<String> blacklist = settings.getBlacklistedMaterialsForGroup(group);
@@ -70,7 +70,7 @@ public class RegistryLoader {
 
         int blacklistedCount = 0;
 
-        for (Material mat : Material.values()) {
+        for (Material mat : getAllMaterials()) {
             if (!mat.isBlock() || mat.isAir() || mat.isLegacy()) continue;
 
             if (blacklist.contains(mat.name())) {
@@ -91,5 +91,12 @@ public class RegistryLoader {
         }
 
         return blacklistedCount;
+    }
+
+    /**
+     * @return An array of all available {@link Material}
+     */
+    protected Material[] getAllMaterials() {
+        return Material.values();
     }
 }

@@ -1,10 +1,11 @@
 package io.github.atrimilan.keepillegalblocks.core.classifiers;
 
 import io.github.atrimilan.keepillegalblocks.core.types.ConnectableType;
-import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.type.*;
+import org.bukkit.block.data.type.Fence;
+import org.bukkit.block.data.type.GlassPane;
+import org.bukkit.block.data.type.Wall;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
