@@ -134,8 +134,8 @@ modrinth {
     uploadFile.set(tasks.shadowJar)
 
     dependencies {
-        // https://modrinth.com/plugin/packetevents/version/2.11.2+spigot
-        optional.version("packetevents", "2.11.2+spigot")
+        // https://modrinth.com/plugin/packetevents/version/2.12.1+spigot
+        optional.version("packetevents", "2.12.1+spigot")
     }
 }
 

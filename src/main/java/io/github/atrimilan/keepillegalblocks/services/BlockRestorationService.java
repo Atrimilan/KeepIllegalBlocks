@@ -102,8 +102,9 @@ public class BlockRestorationService {
             }
         }
 
-        DebugUtils.sendChat(() -> "Fragile blocks count: <white>" + (fragileBlocks.size()) + "<gray>/" + maxBlocks,
-                            INFO);
+        DebugUtils.sendChat(() -> "Recorded <white>" + fragileBlocks.size() + "</white> fragile blocks and <white>" +
+                                  connectableBlocks.size() + "</white> connectable blocks <gray>(max: " + maxBlocks +
+                                  ")", INFO);
 
         boolean isInteractableAlsoFragile = materialRegistry.isFragile(sourceBlock.getType());
         var interactable = new InteractableWrapper(sourceBlock.getState(), isInteractableAlsoFragile);
@@ -169,9 +170,10 @@ public class BlockRestorationService {
     }
 
     /**
-     * Unregister fragile block break PacketEvents listener (if plugin is present)
+     * Unregister event listeners.
      *
-     * @param packetListener The PacketEvents listener to unregister
+     * @param packetListener    The PacketEvents listener to unregister (if the plugin is present)
+     * @param itemSpawnListener The ItemSpawnListener to unregister
      */
     private void unregisterListeners(Object packetListener, ItemSpawnListener itemSpawnListener) {
         if (packetListener != null) PacketEventsAdapter.unregisterListener(packetListener);
