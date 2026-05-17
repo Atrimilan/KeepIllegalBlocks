@@ -11,12 +11,11 @@ import org.bukkit.block.data.type.*;
  * @see ConnectableClassifier
  * @see FragileClassifier
  */
-public class InteractableClassifier extends AbstractClassifier {
+public class InteractableClassifier extends AbstractClassifier<InteractableType> {
 
-    public InteractableType classify(Material mat) {
-        BlockData data = mat.createBlockData();
-
-        return switch (data) {
+    @Override
+    protected InteractableType classifyBlockData(BlockData blockData) {
+        return switch (blockData) {
             case Campfire ignored -> InteractableType.CAMPFIRE;
             case Candle ignored -> InteractableType.CANDLE;
             case CaveVines ignored -> InteractableType.CAVE_VINES;
@@ -30,17 +29,22 @@ public class InteractableClassifier extends AbstractClassifier {
             case Repeater ignored -> InteractableType.REPEATER;
             case TrapDoor ignored -> InteractableType.TRAP_DOOR;
 
-            default -> switch (data.getMaterial()) {
-                case Material m when isCauldron(m) -> InteractableType.CAULDRON;
-                case Material m when isNonPlainCopperBlock(m) -> InteractableType.COPPER_BLOCK;
-                case Material m when isStoneButton(m) -> InteractableType.STONE_BUTTON;
-                case Material m when isWoodenButton(m) -> InteractableType.WOODEN_BUTTON;
-                case COMPOSTER -> InteractableType.COMPOSTER;
-                case LEVER -> InteractableType.LEVER;
-                case SWEET_BERRY_BUSH -> InteractableType.SWEET_BERRY_BUSH;
+            default -> InteractableType.NONE;
+        };
+    }
 
-                default -> InteractableType.NONE;
-            };
+    @Override
+    protected InteractableType classifyMaterial(Material material) {
+        return switch (material) {
+            case Material m when isCauldron(m) -> InteractableType.CAULDRON;
+            case Material m when isNonPlainCopperBlock(m) -> InteractableType.COPPER_BLOCK;
+            case Material m when isStoneButton(m) -> InteractableType.STONE_BUTTON;
+            case Material m when isWoodenButton(m) -> InteractableType.WOODEN_BUTTON;
+            case COMPOSTER -> InteractableType.COMPOSTER;
+            case LEVER -> InteractableType.LEVER;
+            case SWEET_BERRY_BUSH -> InteractableType.SWEET_BERRY_BUSH;
+
+            default -> InteractableType.NONE;
         };
     }
 }

@@ -71,7 +71,7 @@ public class RegistryLoader {
         int blacklistedCount = 0;
 
         for (Material mat : getAllMaterials()) {
-            if (!mat.isBlock() || mat.isAir() || mat.isLegacy()) continue;
+            if (mat.isAir() || mat.isLegacy()) continue;
 
             if (blacklist.contains(mat.name())) {
                 blacklistedCount++; // Material is blacklisted

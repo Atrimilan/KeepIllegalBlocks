@@ -13,16 +13,22 @@ import org.bukkit.block.data.type.Wall;
  * @see FragileClassifier
  * @see InteractableClassifier
  */
-public class ConnectableClassifier extends AbstractClassifier {
+public class ConnectableClassifier extends AbstractClassifier<ConnectableType> {
 
-    public ConnectableType classify(Material mat) {
-        BlockData data = mat.createBlockData();
-
-        return switch (data) {
+    @Override
+    protected ConnectableType classifyBlockData(BlockData blockData) {
+        return switch (blockData) {
             case Fence ignored -> ConnectableType.FENCE; // Fences + Iron bars + Copper bars
             case GlassPane ignored -> ConnectableType.GLASS_PANE;
             case Wall ignored -> ConnectableType.WALL;
 
+            default -> ConnectableType.NONE;
+        };
+    }
+
+    @Override
+    protected ConnectableType classifyMaterial(Material material) {
+        return switch (material) {
             default -> ConnectableType.NONE;
         };
     }
