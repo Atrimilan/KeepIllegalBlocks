@@ -71,9 +71,18 @@ public abstract class AbstractClassifier<T extends KibBlockType> {
         return MaterialTags.CORAL.isTagged(m);
     }
 
-    protected boolean isCrop(Material m) {
-        return Tag.CROPS.isTagged(m) || Material.ATTACHED_MELON_STEM.equals(m) ||
-               Material.ATTACHED_PUMPKIN_STEM.equals(m);
+    protected boolean isSeeds(Material m) {
+        return Tag.CROPS.isTagged(m) ||
+               Material.ATTACHED_MELON_STEM.equals(m) ||
+               Material.ATTACHED_PUMPKIN_STEM.equals(m) ||
+               Material.WHEAT_SEEDS.equals(m) ||
+               Material.MELON_SEEDS.equals(m) ||
+               Material.PUMPKIN_SEEDS.equals(m) ||
+               Material.BEETROOT_SEEDS.equals(m) ||
+               Material.TORCHFLOWER_SEEDS.equals(m) ||
+               Material.PITCHER_POD.equals(m) ||
+               Material.CARROT.equals(m) ||
+               Material.POTATO.equals(m);
     }
 
     protected boolean isFlower(Material m) {

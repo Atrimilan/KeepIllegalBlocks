@@ -8,8 +8,7 @@ package io.github.atrimilan.keepillegalblocks.core.types;
  * Some interactable blocks automatically trigger a second update after a few ticks. Currently, only
  * {@link InteractableType#STONE_BUTTON} and {@link InteractableType#WOODEN_BUTTON} can do this.
  *
- * @see ConnectableType
- * @see FragileType
+ * @see ReactiveType
  */
 public enum InteractableType implements KibBlockType {
     CAMPFIRE("campfires"),

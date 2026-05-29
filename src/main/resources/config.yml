@@ -1,12 +1,12 @@
-# ###################################################################################################################### #
-#   _  _____ ___                                                                                                         #
-#  | |/ /_ _| _ )   This file can be used to customize the plugin's behavior. You can exclude some fragile, connectable  #
-#  | ' < | || _ \   or interactable materials, either by blacklisting them or by disabling preconfigured categories.     #
-#  |_|\_\___|___/   See all up-to-date material names here: https://jd.papermc.io/paper/org/bukkit/Material.html         #
-#                                                                                                                        #
-# ###################################################################################################################### #
+# ################################################################################################################ #
+#   _  _____ ___                                                                                                   #
+#  | |/ /_ _| _ )   This file can be used to customize the plugin's behavior. You can exclude some reactive or     #
+#  | ' < | || _ \   interactable materials, either by blacklisting them or by disabling preconfigured categories.  #
+#  |_|\_\___|___/   See all up-to-date material names here: https://jd.papermc.io/paper/org/bukkit/Material.html   #
+#                                                                                                                  #
+# ################################################################################################################ #
 
-# Maximum number of fragile blocks to record.
+# Maximum number of reactive blocks to record.
 # Setting this value too high is not recommended, as it could be exploited by a lag machine on your server.
 # 500 is sufficient as you will rarely reach that many blocks.
 max-blocks: 500
@@ -41,16 +41,8 @@ interactable-materials:
     trap-doors: true
     wooden-buttons: true
 
-# Blacklist connectable materials by their name, or disable categories below
-connectable-materials:
-  blacklist: [ ]
-  categories:
-    fences: true # Fences + Iron bars + Copper bars
-    glass-panes: true
-    walls: true
-
-# Blacklist fragile materials by their name, or disable categories below
-fragile-materials:
+# Blacklist reactive materials by their name, or disable categories below
+reactive-materials:
   blacklist: [ ]
   categories:
     amethyst-clusters: true
@@ -66,20 +58,22 @@ fragile-materials:
     cocoa: true
     comparators: true
     corals: true # Does not apply to waterlogged corals
-    crops: true
     dead-bushes: true
     doors: true
     dripleaves: true
+    fences: true # Fences + Iron bars + Copper bars
     ferns: true # Ferns + Large ferns
     flowers: true
     frogspawn: true
     fungus: true
+    glass-panes: true
     glow-lichens: true
     grass: true
     hanging-roots: true
     hanging-signs: true
     ladders: true
     lanterns: true
+    leaf-litters: true
     lily-pads: true
     mangrove-propagules: true
     mushrooms: true
@@ -95,6 +89,7 @@ fragile-materials:
     scaffolding: true
     sculk-veins: true
     sea-pickles: true
+    seeds: true # Seeds + crops
     signs: true
     snow: true
     sugar-canes: true
@@ -104,4 +99,5 @@ fragile-materials:
     tripwire-hooks: true
     twisting-vines: true # Twisting vines + Twisting vine plants
     vines: true
+    walls: true
     weeping-vines: true # Weeping vines + Weeping vine plants

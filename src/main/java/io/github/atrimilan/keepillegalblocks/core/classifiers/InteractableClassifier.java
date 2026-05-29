@@ -8,8 +8,7 @@ import org.bukkit.block.data.type.*;
 /**
  * See more details about "interactable" blocks here: {@link InteractableType}.
  *
- * @see ConnectableClassifier
- * @see FragileClassifier
+ * @see ReactiveClassifier
  */
 public class InteractableClassifier extends AbstractClassifier<InteractableType> {
 

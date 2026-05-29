@@ -1,12 +1,13 @@
 package io.github.atrimilan.keepillegalblocks.services;
 
-import io.github.atrimilan.keepillegalblocks.core.types.FragileType;
+import io.github.atrimilan.keepillegalblocks.core.types.ReactiveType;
 import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
 import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
 import io.github.atrimilan.keepillegalblocks.core.Settings;
 import io.github.atrimilan.keepillegalblocks.listeners.ItemSpawnListener;
 import io.github.atrimilan.keepillegalblocks.models.BfsResult;
-import io.github.atrimilan.keepillegalblocks.models.InteractableWrapper;
+import io.github.atrimilan.keepillegalblocks.models.InteractableBlockWrapper;
+import io.github.atrimilan.keepillegalblocks.models.ReactiveBlockWrapper;
 import io.github.atrimilan.keepillegalblocks.packets.PacketEventsAdapter;
 import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import org.bukkit.Location;
@@ -14,14 +15,12 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.BoundingBox;
 
-import java.util.ArrayDeque;
-import java.util.HashSet;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType.INFO;
 
@@ -41,8 +40,7 @@ public class BlockRestorationService {
     }
 
     /**
-     * Perform a Breadth-First Search (BFS) to record all fragile and connectable blocks states, and calculate their
-     * bounding box.
+     * Perform a Breadth-First Search (BFS) to record all reactive blocks states, and calculate their bounding box.
      *
      * @param sourceBlock The interactable block that the player interacted with
      * @param maxBlocks   The maximum number of blocks to record
@@ -59,8 +57,7 @@ public class BlockRestorationService {
         // Initialize BFS variables
         Queue<Block> queue = new ArrayDeque<>();
         Set<Location> visited = new HashSet<>();
-        Set<BlockState> fragileBlocks = new HashSet<>();
-        Set<BlockState> connectableBlocks = new HashSet<>();
+        Set<ReactiveBlockWrapper> reactiveBlocks = new HashSet<>();
 
         Location sourceBlockLoc = sourceBlock.getLocation();
         visited.add(sourceBlockLoc);
@@ -73,13 +70,11 @@ public class BlockRestorationService {
             Block currentBlock = queue.poll();
 
             if (currentBlock != sourceBlock) { // Skip interactable source block
-                if (materialRegistry.isFragile(currentBlock.getType())) {
-                    fragileBlocks.add(currentBlock.getState()); // Save fragile block state
-                    nbBlocks++;
-                } else if (materialRegistry.isConnectable(currentBlock.getType())) {
-                    connectableBlocks.add(currentBlock.getState()); // Save connectable block state
-                    nbBlocks++;
-                } else continue;
+                ReactiveType reactiveType = materialRegistry.getReactiveType(currentBlock.getType());
+                if (reactiveType == ReactiveType.NONE) continue;
+
+                reactiveBlocks.add(new ReactiveBlockWrapper(currentBlock.getState(), reactiveType.isConnectable()));
+                nbBlocks++;
 
                 // Update bounding box
                 minX = Math.min(minX, currentBlock.getX());
@@ -102,21 +97,21 @@ public class BlockRestorationService {
             }
         }
 
-        DebugUtils.sendChat(() -> "Recorded <white>" + fragileBlocks.size() + "</white> fragile blocks and <white>" +
-                                  connectableBlocks.size() + "</white> connectable blocks <gray>(max: " + maxBlocks +
-                                  ")", INFO);
+        DebugUtils.sendChat(
+                () -> "Recorded <white>" + reactiveBlocks.size() + "</white> reactive blocks <gray>(max: " + maxBlocks +
+                      ")", INFO);
 
-        boolean isInteractableAlsoFragile = materialRegistry.isFragile(sourceBlock.getType());
-        var interactable = new InteractableWrapper(sourceBlock.getState(), isInteractableAlsoFragile);
+        boolean isInteractableAlsoReactive = materialRegistry.isReactive(sourceBlock.getType());
+        var interactable = new InteractableBlockWrapper(sourceBlock.getState(), isInteractableAlsoReactive);
         var boundingBox = new BoundingBox(minX, minY, minZ, maxX + 1D, maxY + 1D, maxZ + 1D);
 
-        return new BfsResult(interactable, fragileBlocks, connectableBlocks, boundingBox);
+        return new BfsResult(interactable, reactiveBlocks, boundingBox);
     }
 
     /**
-     * Schedule restoration of fragile blocks that might have been broken after the update of an interactable block.
-     * <li>The initial restoration is scheduled in 2 ticks, because some fragile blocks are not broken within the first
-     * tick. See which blocks are involved in {@link FragileType}.</li>
+     * Schedule restoration of reactive blocks that might have been broken or updated.
+     * <li>The initial restoration is scheduled in 2 ticks, because some reactive blocks are not broken or updated
+     * within the first tick. See which blocks are involved in {@link ReactiveType}.</li>
      * <li>If the interactable block will trigger a second update (such as a button), an additional restoration is
      * scheduled after a delay (which depends on the {@link InteractableType}).</li>
      *
@@ -127,7 +122,7 @@ public class BlockRestorationService {
 
         ItemSpawnListener itemSpawnListener = new ItemSpawnListener(plugin, bfsResult, materialRegistry);
         Object packetListener = settings.isPacketEventsEnabled() ? //
-                                PacketEventsAdapter.registerFragileBlockBreakListener(bfsResult) : null;
+                                PacketEventsAdapter.registerReactiveBlockUpdateListener(bfsResult) : null;
 
         BukkitScheduler scheduler = plugin.getServer().getScheduler();
 
@@ -152,19 +147,17 @@ public class BlockRestorationService {
     }
 
     /**
-     * Restore the fragile blocks that have been broken (including the interactable block if it is also fragile).
+     * Restore the reactive blocks that have been broken or updated (including the interactable block if it's also
+     * reactive).
      *
      * @param bfsResult The BFS result to iterate over
      */
     private void applyRestoration(BfsResult bfsResult) {
-        for (BlockState state : bfsResult.getAllFragileBlocks()) {
-            if (wasReplacedByAir(state)) {
-                state.update(true, false); // Force restore without physic
-            }
-        }
-        for (BlockState state : bfsResult.connectableBlocks()) {
-            if (hasBlockDataChanged(state)) {
-                state.update(true, false); // Force restore without physic
+        for (ReactiveBlockWrapper reactiveBlock : bfsResult.getAllReactiveBlocks()) {
+            boolean shouldRestore = reactiveBlock.isConnectable() ? wasUpdated(reactiveBlock.state()) :
+                                    wasReplacedByAir(reactiveBlock.state());
+            if (shouldRestore) {
+                reactiveBlock.state().update(true, false); // Force restore without physic
             }
         }
     }
@@ -193,7 +186,7 @@ public class BlockRestorationService {
      * @param state The block state to check
      * @return Whether the block's data has changed.
      */
-    boolean hasBlockDataChanged(BlockState state) {
+    boolean wasUpdated(BlockState state) {
         Block currentBlock = state.getBlock();
         return !currentBlock.getBlockData().equals(state.getBlockData());
     }

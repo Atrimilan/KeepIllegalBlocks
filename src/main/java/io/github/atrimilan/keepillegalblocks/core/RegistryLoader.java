@@ -1,7 +1,6 @@
 package io.github.atrimilan.keepillegalblocks.core;
 
-import io.github.atrimilan.keepillegalblocks.core.classifiers.ConnectableClassifier;
-import io.github.atrimilan.keepillegalblocks.core.classifiers.FragileClassifier;
+import io.github.atrimilan.keepillegalblocks.core.classifiers.ReactiveClassifier;
 import io.github.atrimilan.keepillegalblocks.core.classifiers.InteractableClassifier;
 import io.github.atrimilan.keepillegalblocks.core.types.KibBlockType;
 import io.github.atrimilan.keepillegalblocks.core.types.KibGroup;
@@ -22,8 +21,7 @@ public class RegistryLoader {
 
     private final MaterialRegistry registry;
 
-    private final FragileClassifier fragileClassifier = new FragileClassifier();
-    private final ConnectableClassifier connectableClassifier = new ConnectableClassifier();
+    private final ReactiveClassifier reactiveClassifier = new ReactiveClassifier();
     private final InteractableClassifier interactableClassifier = new InteractableClassifier();
 
     public RegistryLoader(MaterialRegistry registry) {
@@ -40,15 +38,12 @@ public class RegistryLoader {
     public List<LoadResult> fillMaterialRegistry(Settings settings) {
         registry.clearAll();
 
-        int blacklistedFragileCount = loadRegistry(settings, FRAGILE, fragileClassifier::classify,
-                                                   registry::registerFragile);
-        int blacklistedConnectableCount = loadRegistry(settings, CONNECTABLE, connectableClassifier::classify,
-                                                       registry::registerConnectable);
+        int blacklistedReactiveCount = loadRegistry(settings, REACTIVE, reactiveClassifier::classify,
+                                                   registry::registerReactive);
         int blacklistedInteractableCount = loadRegistry(settings, INTERACTABLE, interactableClassifier::classify,
                                                         registry::registerInteractable);
 
-        return List.of(new LoadResult("Fragile", registry.getFragileCount(), blacklistedFragileCount),
-                       new LoadResult("Connectable", registry.getConnectableCount(), blacklistedConnectableCount),
+        return List.of(new LoadResult("Reactive", registry.getReactiveCount(), blacklistedReactiveCount),
                        new LoadResult("Interactable", registry.getInteractableCount(), blacklistedInteractableCount));
     }
 
@@ -63,8 +58,8 @@ public class RegistryLoader {
      * @return The count of blacklisted materials
      */
     protected <T extends KibBlockType> int loadRegistry(Settings settings, KibGroup group,
-                                                      Function<Material, T> classifierMethod,
-                                                      BiConsumer<Material, T> registrySetter) {
+                                                        Function<Material, T> classifierMethod,
+                                                        BiConsumer<Material, T> registrySetter) {
         Set<String> blacklist = settings.getBlacklistedMaterialsForGroup(group);
         Set<String> enabledCategories = settings.getEnabledCategoriesForGroup(group);
 

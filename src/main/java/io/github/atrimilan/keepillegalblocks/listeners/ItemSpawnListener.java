@@ -21,13 +21,13 @@ public class ItemSpawnListener implements Listener {
     }
 
     /**
-     * Listen to {@link ItemSpawnEvent} and cancel them if they are dropped from broken fragile blocks that will be
+     * Listen to {@link ItemSpawnEvent} and cancel them if they are dropped from broken reactive blocks that will be
      * restored. <b>This is important to prevent item duplication.<b/>
      */
     @EventHandler(priority = EventPriority.LOWEST)
     public void onItemSpawn(ItemSpawnEvent event) {
         if (result.boundingBox().contains(event.getLocation().toVector()) && event.getEntity().getThrower() == null &&
-            materialRegistry.isFragile(event.getEntity().getItemStack().getType())) {
+            materialRegistry.isReactive(event.getEntity().getItemStack().getType())) {
             event.setCancelled(true);
         }
     }

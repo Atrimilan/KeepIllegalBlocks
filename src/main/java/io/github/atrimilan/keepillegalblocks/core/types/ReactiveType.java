@@ -12,10 +12,9 @@ package io.github.atrimilan.keepillegalblocks.core.types;
  * {@code SCAFFOLDING}, {@code SUGAR_CANE}, {@code TWISTING_VINES} and {@code TWISTING_VINES_PLANT},
  * {@code WEEPING_VINES} and {@code WEEPING_VINES_PLANT}
  *
- * @see ConnectableType
  * @see InteractableType
  */
-public enum FragileType implements KibBlockType {
+public enum ReactiveType implements KibBlockType {
     AMETHYST_CLUSTER("amethyst-clusters"),
     BAMBOO("bamboos"),
     BANNER("banners"),
@@ -24,25 +23,27 @@ public enum FragileType implements KibBlockType {
     CACTUS("cactus"),
     CAKE("cakes"),
     CARPET("carpets"),
-    CAVE_VINES("cave-vines"),
-    CHORUS_PLANT("chorus-plants"), // FIXME: CHORUS_FLOWER behavior seems different, restoration only works with second update of buttons
+    CAVE_VINES("cave-vines", true),
+    CHORUS_PLANT("chorus-plants"), // FIXME: Add support for CHORUS_FLOWER
     COCOA("cocoa"),
     COMPARATOR("comparators"),
     CORAL("corals"),
-    CROP("crops"),
     DEAD_BUSH("dead-bushes"),
     DOOR("doors"),
     DRIPLEAF("dripleaves"),
+    FENCE("fences", true),
     FERN("ferns"),
     FLOWER("flowers"),
     FROGSPAWN("frogspawn"),
     FUNGUS("fungus"),
+    GLASS_PANE("glass-panes", true),
     GLOW_LICHEN("glow-lichens"),
     GRASS("grass"),
     HANGING_ROOTS("hanging-roots"),
     HANGING_SIGN("hanging-signs"),
     LADDER("ladders"),
     LANTERN("lanterns"),
+    LEAF_LITTER("leaf-litters"),
     LILY_PAD("lily-pads"),
     MANGROVE_PROPAGULE("mangrove-propagules"),
     MUSHROOM("mushrooms"),
@@ -50,7 +51,7 @@ public enum FragileType implements KibBlockType {
     NETHER_SPROUTS("nether-sprouts"),
     NETHER_WART("nether-warts"),
     NONE(null),
-    POINTED_DRIPSTONE("pointed-dripstones"),
+    POINTED_DRIPSTONE("pointed-dripstones", true),
     PRESSURE_PLATE("pressure-plates"),
     RAIL("rails"),
     REDSTONE_WIRE("redstone-wires"),
@@ -59,6 +60,7 @@ public enum FragileType implements KibBlockType {
     SCAFFOLDING("scaffolding"),
     SCULK_VEIN("sculk-veins"),
     SEA_PICKLE("sea-pickles"),
+    SEEDS("seeds"),
     SIGN("signs"),
     SNOW("snow"),
     SUGAR_CANE("sugar-canes"),
@@ -66,14 +68,23 @@ public enum FragileType implements KibBlockType {
     SWITCH("switches"),
     TORCH("torches"),
     TRIPWIRE_HOOK("tripwire-hooks"),
-    TWISTING_VINES("twisting-vines"),
+    TWISTING_VINES("twisting-vines", true),
     VINE("vines"),
-    WEEPING_VINES("weeping-vines");
+    WALL("walls", true),
+    WEEPING_VINES("weeping-vines", true);
 
     private final String configKey;
 
-    FragileType(String configKey) {
+    private final boolean isConnectable;
+
+    ReactiveType(String configKey) {
         this.configKey = configKey;
+        this.isConnectable = false;
+    }
+
+    ReactiveType(String configKey, boolean isConnectable) {
+        this.configKey = configKey;
+        this.isConnectable = isConnectable;
     }
 
     @Override
@@ -82,7 +93,11 @@ public enum FragileType implements KibBlockType {
     }
 
     @Override
-    public FragileType getNone() {
+    public ReactiveType getNone() {
         return NONE;
+    }
+
+    public boolean isConnectable() {
+        return isConnectable;
     }
 }
