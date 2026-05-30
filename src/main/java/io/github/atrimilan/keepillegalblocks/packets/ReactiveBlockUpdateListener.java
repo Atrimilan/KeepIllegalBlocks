@@ -85,9 +85,8 @@ public class ReactiveBlockUpdateListener implements PacketListener {
     }
 
     /**
-     * Tweak the {@code MULTI_BLOCK_CHANGE} packet to pretend that fragile blocks have not been broken, and that
-     * connectable blocks have not been updated. This hides (or at least reduces) block flickering, making client-side
-     * rendering smoother.
+     * Tweak the {@code MULTI_BLOCK_CHANGE} packet to pretend that reactive blocks have not been temporarily broken or
+     * updated. This hides (or at least reduces) block flickering, making client-side rendering smoother.
      *
      * @param event  The packet event
      * @param packet The wrapped packet to tweak
@@ -99,15 +98,8 @@ public class ReactiveBlockUpdateListener implements PacketListener {
         var blocksToBeSent = new WrapperPlayServerMultiBlockChange.EncodedBlock[packetBlocks.length];
 
         for (var b : packetBlocks) {
-            // Ignore block update if it's AIR (id = 0) and in the fragile list, or if it's in the connectable list
+            // Ignore block update if it's AIR (id = 0) and in the reactive block list, or if it's in the connectable reactive block list
             // --> Because in those cases, the block is restored, so it should be removed from the packet
-//            boolean removeBlockFromPacket = // b.getBlockId() == 0 && // TODO
-//                    reactiveBlockVectors.contains(packVector(b.getX(), b.getY(), b.getZ()));
-
-//          boolean removeBlockFromPacket =
-//              (b.getBlockId() == 0 && fragileBlockVectors.contains(packVector(b.getX(), b.getY(), b.getZ()))) ||
-//              connectableBlockVectors.contains(packVector(b.getX(), b.getY(), b.getZ()));
-
             long vector = packVector(b.getX(), b.getY(), b.getZ());
             boolean removeBlockFromPacket = (b.getBlockId() == 0 && reactiveBlockVectors.contains(vector))
                                             || connectableReactiveBlockVectors.contains(vector);
