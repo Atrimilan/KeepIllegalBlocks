@@ -6,9 +6,9 @@ import io.github.atrimilan.keepillegalblocks.core.types.KibBlockType;
 import io.github.atrimilan.keepillegalblocks.core.types.KibGroup;
 import io.github.atrimilan.keepillegalblocks.models.LoadResult;
 import org.bukkit.Material;
+import org.bukkit.block.data.BlockData;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -39,9 +39,9 @@ public class RegistryLoader {
         registry.clearAll();
 
         int blacklistedReactiveCount = loadRegistry(settings, REACTIVE, reactiveClassifier::classify,
-                                                   registry::registerReactive);
+                                                    registry::registerReactive, true);
         int blacklistedInteractableCount = loadRegistry(settings, INTERACTABLE, interactableClassifier::classify,
-                                                        registry::registerInteractable);
+                                                        registry::registerInteractable, false);
 
         return List.of(new LoadResult("Reactive", registry.getReactiveCount(), blacklistedReactiveCount),
                        new LoadResult("Interactable", registry.getInteractableCount(), blacklistedInteractableCount));
@@ -50,20 +50,24 @@ public class RegistryLoader {
     /**
      * Classify material of the given group, and add it to the material registry.
      *
-     * @param settings         The {@link Settings} to use to load the registry
-     * @param group            The {@link KibGroup}
-     * @param classifierMethod The classifier method to execute
-     * @param registrySetter   The registry setter to execute
-     * @param <T>              An implementation of {@link KibBlockType}
+     * @param settings                      The {@link Settings} to use to load the registry
+     * @param group                         The {@link KibGroup}
+     * @param classifierMethod              The classifier method to execute
+     * @param registrySetter                The registry setter to execute
+     * @param propagateToPlacementMaterials Whether to propagate the classification to placement materials (see
+     *                                      {@link BlockData#getPlacementMaterial})
+     * @param <T>                           An implementation of {@link KibBlockType}
      * @return The count of blacklisted materials
      */
     protected <T extends KibBlockType> int loadRegistry(Settings settings, KibGroup group,
                                                         Function<Material, T> classifierMethod,
-                                                        BiConsumer<Material, T> registrySetter) {
+                                                        BiConsumer<Material, T> registrySetter,
+                                                        boolean propagateToPlacementMaterials) {
         Set<String> blacklist = settings.getBlacklistedMaterialsForGroup(group);
         Set<String> enabledCategories = settings.getEnabledCategoriesForGroup(group);
 
         int blacklistedCount = 0;
+        Map<Material, T> classifiedMaterials = new EnumMap<>(Material.class);
 
         for (Material mat : getAllMaterials()) {
             if (mat.isAir() || mat.isLegacy()) continue;
@@ -82,7 +86,27 @@ public class RegistryLoader {
                 continue;
             }
 
+            classifiedMaterials.put(mat, type);
             registrySetter.accept(mat, type); // Add the material to the material registry
+        }
+
+        if (propagateToPlacementMaterials) {
+            for (Map.Entry<Material, T> entry : classifiedMaterials.entrySet()) {
+                Material mat = entry.getKey();
+                T type = entry.getValue();
+
+                try {
+                    BlockData blockData = mat.createBlockData();
+                    Material placementMaterial = blockData.getPlacementMaterial();
+
+                    // If not AIR (default when there's no placement material), and if not already classified
+                    if (placementMaterial != Material.AIR && !classifiedMaterials.containsKey(placementMaterial)) {
+                        registrySetter.accept(placementMaterial, type); // Add placement material to material registry
+                    }
+                } catch (IllegalArgumentException ignored) {
+                    // Skip if BlockData cannot be created
+                }
+            }
         }
 
         return blacklistedCount;

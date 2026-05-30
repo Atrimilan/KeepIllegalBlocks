@@ -58,18 +58,17 @@ public class ReactiveClassifier extends AbstractClassifier<ReactiveType> {
             case Material m when isBanner(m) -> ReactiveType.BANNER; // Normal + Wall
             case Material m when isCarpet(m) -> ReactiveType.CARPET;
             case Material m when isCoral(m) -> ReactiveType.CORAL; // Normal + Wall
+            case Material m when isCrops(m) -> ReactiveType.CROPS;
             case Material m when isFlower(m) -> ReactiveType.FLOWER;
             case Material m when isMushroom(m) -> ReactiveType.MUSHROOM;
             case Material m when isPressurePlate(m) -> ReactiveType.PRESSURE_PLATE;
             case Material m when isSapling(m) -> ReactiveType.SAPLING;
-            case Material m when isSeeds(m) -> ReactiveType.SEEDS;
             case Material m when isSign(m) -> ReactiveType.SIGN; // Normal + Wall
             case Material m when isTorch(m) -> ReactiveType.TORCH; // Normal + Redstone + Soul
 
             case AMETHYST_SHARD -> ReactiveType.AMETHYST_CLUSTER; // Prevent shards duplication (on restore)
             case BAMBOO_SAPLING -> ReactiveType.BAMBOO;
             case CACTUS -> ReactiveType.CACTUS;
-            case GLOW_BERRIES -> ReactiveType.CAVE_VINES; // Prevent berries duplication (on restore)
             case CHORUS_PLANT, CHORUS_FRUIT -> ReactiveType.CHORUS_PLANT; // FIXME: Add support for CHORUS_FLOWER
             case DEAD_BUSH -> ReactiveType.DEAD_BUSH;
             case BIG_DRIPLEAF_STEM -> ReactiveType.DRIPLEAF;
@@ -83,7 +82,6 @@ public class ReactiveClassifier extends AbstractClassifier<ReactiveType> {
             case CRIMSON_ROOTS, WARPED_ROOTS -> ReactiveType.NETHER_ROOTS;
             case NETHER_SPROUTS -> ReactiveType.NETHER_SPROUTS;
             case NETHER_WART -> ReactiveType.NETHER_WART;
-            case REDSTONE -> ReactiveType.REDSTONE_WIRE;
             case SUGAR_CANE -> ReactiveType.SUGAR_CANE;
             case SWEET_BERRY_BUSH -> ReactiveType.SWEET_BERRY_BUSH;
             case TWISTING_VINES, TWISTING_VINES_PLANT -> ReactiveType.TWISTING_VINES;

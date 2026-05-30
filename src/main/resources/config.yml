@@ -56,6 +56,7 @@ reactive-materials:
     cave-vines: true # Cave vines + Cave vine plants
     chorus-plants: true # Chorus plants only (chorus flowers are not supported yet)
     cocoa: true
+    crops: true
     comparators: true
     corals: true # Does not apply to waterlogged corals
     dead-bushes: true
@@ -89,7 +90,6 @@ reactive-materials:
     scaffolding: true
     sculk-veins: true
     sea-pickles: true
-    seeds: true # Seeds + crops
     signs: true
     snow: true
     sugar-canes: true
