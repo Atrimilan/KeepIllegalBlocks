@@ -1,12 +1,12 @@
 package io.github.atrimilan.keepillegalblocks.core.types;
 
 /**
- * An “interactable” is a block that a player can interact with directly (by right-clicking on it), and which triggers
- * an update to the physics of its adjacent blocks. For example, blocks such as doors, levers, candles, etc. are
- * considered interactable, while blocks such as chests, grindstones, enchanting tables, etc. are not.
+ * An interactable block is one that a player can interact with directly by right-clicking, triggering a physics update
+ * on its adjacent blocks. For example, blocks such as doors, levers, candles, etc. are considered interactable, while
+ * blocks such as chests, grindstones, enchanting tables, etc. are not.
  * <p>
- * Some interactable blocks automatically trigger a second update after a few ticks. Currently, only
- * {@link InteractableType#STONE_BUTTON} and {@link InteractableType#WOODEN_BUTTON} can do this.
+ * Some interactable blocks schedule a second physics update after a few ticks. Currently, only
+ * {@link InteractableType#STONE_BUTTON} and {@link InteractableType#WOODEN_BUTTON} have this behavior.
  *
  * @see ReactiveType
  */
@@ -53,6 +53,10 @@ public enum InteractableType implements KibBlockType {
     @Override
     public InteractableType getNone() {
         return NONE;
+    }
+
+    public boolean hasSecondUpdate() {
+        return delayBeforeSecondUpdate > 0;
     }
 
     public long getDelayBeforeSecondUpdate() {

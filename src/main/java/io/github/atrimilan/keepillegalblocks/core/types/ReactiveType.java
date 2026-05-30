@@ -1,16 +1,22 @@
 package io.github.atrimilan.keepillegalblocks.core.types;
 
 /**
- * A "fragile" is a block that can be placed illegally in a way that the game's physics would not normally allow. They
- * can usually be placed with a Debug Stick, or plugins like Axiom or WorldEdit. A fragile block will break when a
- * physics update is triggered on one of its adjacent blocks. For example, if a torch is placed on a levitating button,
- * interacting with it will destroy both of them.
+ * A reactive block is one that reacts to a physics update triggered on one of its adjacent blocks and may therefore
+ * break or update its block data.
  * <p>
- * All chained fragile blocks break on the first tick, except for the following ones, which break in a cascade starting
- * on the second tick after interaction: {@code BAMBOO} (not {@code BAMBOO_SAPLING}), {@code CACTUS}, {@code CAVE_VINES}
- * and {@code CAVE_VINES_PLANT}, {@code CHORUS_PLANT} and {@code CHORUS_FLOWER},  {@code POINTED_DRIPSTONE},
- * {@code SCAFFOLDING}, {@code SUGAR_CANE}, {@code TWISTING_VINES} and {@code TWISTING_VINES_PLANT},
- * {@code WEEPING_VINES} and {@code WEEPING_VINES_PLANT}
+ * These blocks can be placed illegally in a way that the game's physics would not normally allow, by using a Debug
+ * Stick or plugins like Axiom or WorldEdit. For example, a torch can be placed on a levitating button, and interacting
+ * with the button will destroy both blocks.
+ * <p>
+ * Most reactive blocks break instantly on the first tick, except for the following cascade-breaking blocks, which break
+ * progressively starting on the second tick after interaction: {@code BAMBOO} (not {@code BAMBOO_SAPLING}),
+ * {@code CACTUS}, {@code CAVE_VINES} and {@code CAVE_VINES_PLANT}, {@code CHORUS_PLANT} and {@code CHORUS_FLOWER},
+ * {@code POINTED_DRIPSTONE}, {@code SCAFFOLDING}, {@code SUGAR_CANE}, {@code TWISTING_VINES} and
+ * {@code TWISTING_VINES_PLANT}, {@code WEEPING_VINES} and {@code WEEPING_VINES_PLANT}.
+ * <p>
+ * A reactive block is "connectable" when it automatically connects to adjacent blocks, such as fences or walls. These
+ * connections can also be modified illegally, and they will return to their normal connection state when a physics
+ * update is triggered on an adjacent block.
  *
  * @see InteractableType
  */
