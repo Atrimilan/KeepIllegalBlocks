@@ -96,7 +96,7 @@ public class RegistryLoader {
                 T type = entry.getValue();
 
                 try {
-                    BlockData blockData = mat.createBlockData();
+                    BlockData blockData = getBlockData(mat);
                     Material placementMaterial = blockData.getPlacementMaterial();
 
                     // If not AIR (default when there's no placement material), and if not already classified
@@ -110,6 +110,10 @@ public class RegistryLoader {
         }
 
         return blacklistedCount;
+    }
+
+    protected BlockData getBlockData(Material material) {
+        return material.createBlockData();
     }
 
     /**

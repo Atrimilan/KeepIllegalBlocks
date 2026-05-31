@@ -1,7 +1,6 @@
 package io.github.atrimilan.keepillegalblocks.core;
 
-import io.github.atrimilan.keepillegalblocks.core.types.ConnectableType;
-import io.github.atrimilan.keepillegalblocks.core.types.FragileType;
+import io.github.atrimilan.keepillegalblocks.core.types.ReactiveType;
 import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
 import org.bukkit.Material;
 import org.junit.jupiter.api.Test;
@@ -19,47 +18,34 @@ class MaterialRegistryTest {
 
     @Test
     void shouldGetCountsAndClearAll() {
-        materialRegistry.registerFragile(Material.RED_BED, FragileType.BED);
-        materialRegistry.registerConnectable(Material.ACACIA_FENCE, ConnectableType.FENCE);
+        materialRegistry.registerReactive(Material.RED_BED, ReactiveType.BED);
         materialRegistry.registerInteractable(Material.STONE_BUTTON, InteractableType.STONE_BUTTON);
 
-        assertEquals(1, materialRegistry.getFragileCount());
-        assertEquals(1, materialRegistry.getConnectableCount());
+        assertEquals(1, materialRegistry.getReactiveCount());
         assertEquals(1, materialRegistry.getInteractableCount());
 
-        assertTrue(materialRegistry.isFragile(Material.RED_BED));
-        assertTrue(materialRegistry.isConnectable(Material.ACACIA_FENCE));
+        assertTrue(materialRegistry.isReactive(Material.RED_BED));
 
         materialRegistry.clearAll();
 
-        assertEquals(0, materialRegistry.getFragileCount());
-        assertEquals(0, materialRegistry.getConnectableCount());
+        assertEquals(0, materialRegistry.getReactiveCount());
         assertEquals(0, materialRegistry.getInteractableCount());
 
-        assertFalse(materialRegistry.isFragile(Material.RED_BED));
-        assertFalse(materialRegistry.isConnectable(Material.ACACIA_FENCE));
+        assertFalse(materialRegistry.isReactive(Material.RED_BED));
     }
 
     @Test
-    void shouldBeFragile() {
-        materialRegistry.registerFragile(Material.RED_BED, FragileType.BED);
-        assertTrue(materialRegistry.isFragile(Material.RED_BED));
+    void shouldBeReactive() {
+        materialRegistry.registerReactive(Material.RED_BED, ReactiveType.BED);
+        assertTrue(materialRegistry.isReactive(Material.RED_BED));
+        assertEquals(ReactiveType.BED, materialRegistry.getReactiveType(Material.RED_BED));
 
-        materialRegistry.registerFragile(Material.QUARTZ_BLOCK, FragileType.NONE);
-        assertFalse(materialRegistry.isFragile(Material.QUARTZ_BLOCK));
+        materialRegistry.registerReactive(Material.QUARTZ_BLOCK, ReactiveType.NONE);
+        assertFalse(materialRegistry.isReactive(Material.QUARTZ_BLOCK));
+        assertEquals(ReactiveType.NONE, materialRegistry.getReactiveType(Material.QUARTZ_BLOCK));
 
-        assertFalse(materialRegistry.isFragile(Material.CRAFTING_TABLE));
-    }
-
-    @Test
-    void shouldBeConnectable() {
-        materialRegistry.registerConnectable(Material.ACACIA_FENCE, ConnectableType.FENCE);
-        assertTrue(materialRegistry.isConnectable(Material.ACACIA_FENCE));
-
-        materialRegistry.registerConnectable(Material.QUARTZ_BLOCK, ConnectableType.NONE);
-        assertFalse(materialRegistry.isConnectable(Material.QUARTZ_BLOCK));
-
-        assertFalse(materialRegistry.isConnectable(Material.CRAFTING_TABLE));
+        assertFalse(materialRegistry.isReactive(Material.CRAFTING_TABLE));
+        assertEquals(ReactiveType.NONE, materialRegistry.getReactiveType(Material.CRAFTING_TABLE));
     }
 
     @Test

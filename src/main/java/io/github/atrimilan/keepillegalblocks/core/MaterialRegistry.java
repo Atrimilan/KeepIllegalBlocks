@@ -1,9 +1,8 @@
 package io.github.atrimilan.keepillegalblocks.core;
 
-import io.github.atrimilan.keepillegalblocks.core.types.ReactiveType;
 import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
+import io.github.atrimilan.keepillegalblocks.core.types.ReactiveType;
 import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
-import net.minecraft.world.level.block.Block;
 import org.bukkit.Material;
 
 import java.util.EnumMap;

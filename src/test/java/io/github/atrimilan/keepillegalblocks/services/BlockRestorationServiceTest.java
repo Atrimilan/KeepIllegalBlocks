@@ -5,16 +5,17 @@ import io.github.atrimilan.keepillegalblocks.BukkitMockFactory;
 import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
 import io.github.atrimilan.keepillegalblocks.core.Settings;
 import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
+import io.github.atrimilan.keepillegalblocks.core.types.ReactiveType;
 import io.github.atrimilan.keepillegalblocks.listeners.ItemSpawnListener;
 import io.github.atrimilan.keepillegalblocks.models.BfsResult;
-import io.github.atrimilan.keepillegalblocks.models.InteractableWrapper;
+import io.github.atrimilan.keepillegalblocks.models.InteractableBlockWrapper;
+import io.github.atrimilan.keepillegalblocks.models.ReactiveBlockWrapper;
 import io.github.atrimilan.keepillegalblocks.packets.PacketEventsAdapter;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.BoundingBox;
@@ -58,70 +59,82 @@ class BlockRestorationServiceTest {
     private BoundingBox boundingBox;
 
     @Captor
-    ArgumentCaptor<Runnable> taskCaptor;
+    ArgumentCaptor<Runnable> tick1Captor;
 
     @Captor
-    ArgumentCaptor<Runnable> secondTaskCaptor;
+    ArgumentCaptor<Runnable> tick2Captor;
+
+    @Captor
+    ArgumentCaptor<Runnable> secondUpdateCaptor;
 
     @BeforeEach
     void setUp() {
         service = spy(new BlockRestorationService(plugin, materialRegistry, settings));
     }
 
-    private Block mockSourceBlock(Material sourceMaterial, boolean withFragileRelatives,
-                                  boolean withConnectableRelatives) {
+    private Block mockSourceBlock(Material sourceMaterial, boolean withReactiveRelatives,
+                                  boolean withConnectableReactiveRelatives) {
         Block source = BukkitMockFactory.mockBlock(sourceMaterial);
 
-        if (withFragileRelatives) {
+        lenient().when(materialRegistry.getReactiveType(any(Material.class))).thenReturn(ReactiveType.NONE);
+
+        if (withReactiveRelatives) {
             Block north = BukkitMockFactory.mockBlock(Material.STONE_BUTTON);
             Block east = BukkitMockFactory.mockBlock(Material.STONE_BUTTON);
             Block up = BukkitMockFactory.mockBlock(Material.STONE_BUTTON);
             BukkitMockFactory.setBlockRelative(source, BlockFace.NORTH, north);
             BukkitMockFactory.setBlockRelative(source, BlockFace.EAST, east);
             BukkitMockFactory.setBlockRelative(source, BlockFace.UP, up);
-            lenient().when(materialRegistry.isFragile(Material.STONE_BUTTON)).thenReturn(true);
+
+            ReactiveType reactiveType = mock(ReactiveType.class);
+            lenient().when(reactiveType.isConnectable()).thenReturn(false);
+            lenient().when(materialRegistry.getReactiveType(Material.STONE_BUTTON)).thenReturn(reactiveType);
         }
-        if (withConnectableRelatives) {
+        if (withConnectableReactiveRelatives) {
             Block south = BukkitMockFactory.mockBlock(Material.BRICK_WALL);
             Block down = BukkitMockFactory.mockBlock(Material.BRICK_WALL);
             BukkitMockFactory.setBlockRelative(source, BlockFace.SOUTH, south);
             BukkitMockFactory.setBlockRelative(source, BlockFace.DOWN, down);
-            lenient().when(materialRegistry.isConnectable(Material.BRICK_WALL)).thenReturn(true);
+
+            ReactiveType reactiveType = mock(ReactiveType.class);
+            lenient().when(reactiveType.isConnectable()).thenReturn(true);
+            lenient().when(materialRegistry.getReactiveType(Material.BRICK_WALL)).thenReturn(reactiveType);
         }
 
         return source;
     }
 
-    // ********** Tests - Should record fragile block states **********
+    // ********** Tests - Should record reactive block states **********
 
     @Test
     void shouldRecordBlockStates() {
-        lenient().when(materialRegistry.isFragile(Material.OAK_DOOR)).thenReturn(true); // Interactable also fragile
+        lenient().when(materialRegistry.isReactive(Material.OAK_DOOR)).thenReturn(true); // Interactable also reactive
 
         Block source = mockSourceBlock(Material.OAK_DOOR, true, true);
         BfsResult res = service.recordBlockStates(source, 50);
 
         assertTrue(res.boundingBox().getVolume() >= 1); // 1x1x1 (because recorded blocks positions are 0 in the mock)
         assertEquals(source.getState(), res.interactableBlock().blockState());
-        assertEquals(5, res.fragileBlocks().size() + res.connectableBlocks().size());
-        assertTrue(res.interactableBlock().isAlsoFragile()); // Interactable is also fragile
-        verify(materialRegistry, times(3)).isFragile(Material.STONE_BUTTON);
-        verify(materialRegistry, times(2)).isConnectable(Material.BRICK_WALL);
-        verify(materialRegistry).isFragile(Material.OAK_DOOR);
+        assertEquals(5, res.reactiveBlocks().size());
+        assertTrue(res.interactableBlock().isAlsoReactive()); // Interactable is also reactive
+        assertEquals(6, res.getAllReactiveBlocks().size());
+        verify(materialRegistry, times(3)).getReactiveType(Material.STONE_BUTTON);
+        verify(materialRegistry, times(2)).getReactiveType(Material.BRICK_WALL);
+        verify(materialRegistry).isReactive(Material.OAK_DOOR);
     }
 
     @Test
-    void shouldRecordBlockStatesWhenInteractableIsNotFragile() {
+    void shouldRecordBlockStatesWhenInteractableIsNotReactive() {
         Block source = mockSourceBlock(Material.COMPOSTER, true, false);
         BfsResult res = service.recordBlockStates(source, 50);
 
-        assertTrue(res.boundingBox().getVolume() >= 1); // 1x1x1 (because fragile blocks positions are 0 in the mock)
+        assertTrue(res.boundingBox().getVolume() >= 1); // 1x1x1 (because reactive blocks positions are 0 in the mock)
         assertEquals(source.getState(), res.interactableBlock().blockState());
-        assertEquals(3, res.fragileBlocks().size() + res.connectableBlocks().size());
-        assertFalse(res.interactableBlock().isAlsoFragile()); // Interactable is not fragile
-        verify(materialRegistry, times(3)).isFragile(Material.STONE_BUTTON);
-        verify(materialRegistry, never()).isConnectable(Material.BRICK_WALL);
-        verify(materialRegistry).isFragile(Material.COMPOSTER);
+        assertEquals(3, res.reactiveBlocks().size());
+        assertFalse(res.interactableBlock().isAlsoReactive()); // Interactable is not reactive
+        verify(materialRegistry, times(3)).getReactiveType(Material.STONE_BUTTON);
+        verify(materialRegistry, never()).getReactiveType(Material.BRICK_WALL);
+        verify(materialRegistry).isReactive(Material.COMPOSTER);
     }
 
     @Test
@@ -131,12 +144,12 @@ class BlockRestorationServiceTest {
 
         assertTrue(res.boundingBox().getVolume() >= 1);
         assertEquals(source.getState(), res.interactableBlock().blockState());
-        assertEquals(2, res.fragileBlocks().size() + res.connectableBlocks().size()); // Only 2 blocks can be recorded
-        assertFalse(res.interactableBlock().isAlsoFragile());
-        // In the BFS method, 1st scanned block is a fragile (BlockFace.UP), and 2nd is a connectable (BlockFace.DOWN)
-        verify(materialRegistry, times(1)).isFragile(Material.STONE_BUTTON);
-        verify(materialRegistry, times(1)).isConnectable(Material.BRICK_WALL);
-        verify(materialRegistry).isFragile(Material.COMPOSTER);
+        assertEquals(2, res.reactiveBlocks().size()); // Only 2 blocks can be recorded
+        assertFalse(res.interactableBlock().isAlsoReactive());
+        // In the BFS method, 1st scanned block is a normal reactive (BlockFace.UP), and 2nd is a connectable reactive (BlockFace.DOWN)
+        verify(materialRegistry, times(1)).getReactiveType(Material.STONE_BUTTON);
+        verify(materialRegistry, times(1)).getReactiveType(Material.BRICK_WALL);
+        verify(materialRegistry).isReactive(Material.COMPOSTER);
     }
 
     @Test
@@ -146,31 +159,30 @@ class BlockRestorationServiceTest {
 
         assertTrue(res.boundingBox().getVolume() >= 1);
         assertEquals(source.getState(), res.interactableBlock().blockState());
-        assertEquals(0, res.fragileBlocks().size() + res.connectableBlocks().size());
-        assertFalse(res.interactableBlock().isAlsoFragile()); // Interactable is not fragile
-        verify(materialRegistry, never()).isFragile(Material.STONE_BUTTON);
-        verify(materialRegistry, never()).isConnectable(Material.BRICK_WALL);
-        verify(materialRegistry, atLeastOnce()).isFragile(Material.AIR);
-        verify(materialRegistry, atLeastOnce()).isConnectable(Material.AIR);
-        verify(materialRegistry).isFragile(Material.COMPOSTER);
+        assertEquals(0, res.getAllReactiveBlocks().size());
+        assertFalse(res.interactableBlock().isAlsoReactive()); // Interactable is not reactive
+        verify(materialRegistry, never()).getReactiveType(Material.STONE_BUTTON);
+        verify(materialRegistry, never()).getReactiveType(Material.BRICK_WALL);
+        verify(materialRegistry, atLeastOnce()).getReactiveType(Material.AIR);
+        verify(materialRegistry).isReactive(Material.COMPOSTER);
     }
 
     @Test
-    void shouldRecordBlockStatesWithNoRelativesButInteractableIsAlsoFragile() {
-        lenient().when(materialRegistry.isFragile(Material.OAK_DOOR)).thenReturn(true); // Interactable also fragile
+    void shouldRecordBlockStatesWithNoRelativesButInteractableIsAlsoReactive() {
+        lenient().when(materialRegistry.isReactive(Material.OAK_DOOR)).thenReturn(true); // Interactable also reactive
 
         Block source = mockSourceBlock(Material.OAK_DOOR, false, false);
         BfsResult res = service.recordBlockStates(source, 50);
 
         assertTrue(res.boundingBox().getVolume() >= 1);
         assertEquals(source.getState(), res.interactableBlock().blockState());
-        assertEquals(0, res.fragileBlocks().size() + res.connectableBlocks().size());
-        assertTrue(res.interactableBlock().isAlsoFragile()); // Interactable is fragile
-        verify(materialRegistry, never()).isFragile(Material.STONE_BUTTON);
-        verify(materialRegistry, never()).isConnectable(Material.BRICK_WALL);
-        verify(materialRegistry, atLeastOnce()).isFragile(Material.AIR);
-        verify(materialRegistry, atLeastOnce()).isConnectable(Material.AIR);
-        verify(materialRegistry).isFragile(Material.OAK_DOOR);
+        assertEquals(0, res.reactiveBlocks().size());
+        assertTrue(res.interactableBlock().isAlsoReactive()); // Interactable is reactive
+        assertEquals(1, res.getAllReactiveBlocks().size());
+        verify(materialRegistry, never()).getReactiveType(Material.STONE_BUTTON);
+        verify(materialRegistry, never()).getReactiveType(Material.BRICK_WALL);
+        verify(materialRegistry, atLeastOnce()).getReactiveType(Material.AIR);
+        verify(materialRegistry).isReactive(Material.OAK_DOOR);
     }
 
     @Test
@@ -191,7 +203,7 @@ class BlockRestorationServiceTest {
         BfsResult res = service.recordBlockStates(source, 0);
 
         assertNull(res);
-        verifyNoInteractions(materialRegistry); // No fragile blocks were recorded
+        verifyNoInteractions(materialRegistry); // No reactive blocks were recorded
     }
 
     // ********** Tests - Should schedule restoration **********
@@ -199,8 +211,8 @@ class BlockRestorationServiceTest {
     static Stream<Arguments> provideRestorationParameters() {
         return Stream.of( // isPacketEventsPresent, currentInteractableMaterial, interactableType
                 Arguments.of(true, Material.COMPOSTER, InteractableType.COMPOSTER),
-                Arguments.of(false, Material.AIR, InteractableType.STONE_BUTTON), // AIR -> Is also fragile
-                Arguments.of(true, Material.AIR, InteractableType.WOODEN_BUTTON), // AIR -> Is also fragile
+                Arguments.of(false, Material.AIR, InteractableType.STONE_BUTTON), // AIR -> Is also reactive
+                Arguments.of(true, Material.AIR, InteractableType.WOODEN_BUTTON), // AIR -> Is also reactive
                 Arguments.of(false, Material.COMPOSTER, InteractableType.COMPOSTER));
     }
 
@@ -213,21 +225,25 @@ class BlockRestorationServiceTest {
         when(server.getScheduler()).thenReturn(scheduler);
 
         // Prepare interactable
-        boolean interactableIsAlsoFragile = Material.AIR.equals(currentInteractableMaterial);
+        boolean interactableIsAlsoReactive = Material.AIR.equals(currentInteractableMaterial);
         BlockState interactableState = BukkitMockFactory.mockBlockState(currentInteractableMaterial);
-        InteractableWrapper interactableBlock = new InteractableWrapper(interactableState, interactableIsAlsoFragile);
+        InteractableBlockWrapper interactableBlock = new InteractableBlockWrapper(interactableState,
+                                                                                  interactableIsAlsoReactive);
 
         // Prepare BFS result
-        BlockState unbrokenFragile = BukkitMockFactory.mockBlockState(Material.OAK_DOOR);
-        BlockState brokenFragile = BukkitMockFactory.mockBlockState(Material.AIR);
-        BlockState changedConnectable = BukkitMockFactory.mockBlockState(Material.BRICK_WALL);
-        BlockState unchangedConnectable = BukkitMockFactory.mockBlockState(Material.GLASS_PANE);
-        BfsResult res = new BfsResult(interactableBlock, Set.of(unbrokenFragile, brokenFragile),
-                                      Set.of(changedConnectable, unchangedConnectable), boundingBox);
+        BlockState updatedState = BukkitMockFactory.mockBlockState(Material.BRICK_WALL);
+        BlockState brokenState = BukkitMockFactory.mockBlockState(Material.STONE_BUTTON);
+        BlockState unchangedState = BukkitMockFactory.mockBlockState(Material.STONE);
 
-        // Make sure the current BlockData of the connectable is different from the recorded one
-        when(changedConnectable.getBlockData()).thenReturn(mock(BlockData.class));
-        when(changedConnectable.getBlock().getBlockData()).thenReturn(mock(BlockData.class));
+        ReactiveBlockWrapper updatedReactive = new ReactiveBlockWrapper(updatedState, true);
+        ReactiveBlockWrapper brokenReactive = new ReactiveBlockWrapper(brokenState, false);
+        ReactiveBlockWrapper unchangedReactive = new ReactiveBlockWrapper(unchangedState, false);
+
+        doReturn(true).when(service).wasUpdated(updatedReactive.state());
+        lenient().doReturn(true).when(service).wasReplacedByAir(brokenReactive.state());
+
+        BfsResult res = new BfsResult(interactableBlock, Set.of(updatedReactive, brokenReactive, unchangedReactive),
+                                      boundingBox);
 
         Object packetEventsListener = mock(PacketListenerCommon.class);
 
@@ -236,51 +252,46 @@ class BlockRestorationServiceTest {
 
             if (isPacketEventsPresent) {
                 packetEventsMock //
-                        .when(() -> PacketEventsAdapter.registerFragileBlockBreakListener(res))
+                        .when(() -> PacketEventsAdapter.registerReactiveBlockUpdateListener(res))
                         .thenReturn(packetEventsListener);
             }
 
-            // Call main method
             service.scheduleRestoration(res, interactableType);
 
             // Capture and execute scheduled tasks
-            verify(scheduler, times(1)).runTaskLater(eq(plugin), taskCaptor.capture(), eq(2L));
-            taskCaptor.getValue().run();
+            verify(scheduler, times(1)).runTaskLater(eq(plugin), tick1Captor.capture(), eq(1L));
+            tick1Captor.getValue().run();
+            verify(scheduler, times(1)).runTaskLater(eq(plugin), tick2Captor.capture(), eq(2L));
+            tick2Captor.getValue().run();
 
             // Get the ItemSpawnListener instance
             assertEquals(1, itemSpawnListenerMock.constructed().size());
             ItemSpawnListener listenerInstance = itemSpawnListenerMock.constructed().getFirst();
 
+            boolean hasSecondUpdate = interactableType.hasSecondUpdate(); // Whether a second restoration must be scheduled
             long delay = interactableType.getDelayBeforeSecondUpdate();
-            boolean hasSecondUpdate = delay > 0; // A second restoration must be scheduled
 
             if (hasSecondUpdate) {
                 // Listeners must not be unregistered yet
                 verify(listenerInstance, never()).unregister();
-                if (isPacketEventsPresent) {
-                    packetEventsMock.verify(() -> PacketEventsAdapter.unregisterListener(any()), never());
-                }
-
-                // Capture and execute the second scheduled tasks
-                verify(scheduler, times(1)).runTaskLater(eq(plugin), secondTaskCaptor.capture(), eq(delay));
-                secondTaskCaptor.getValue().run();
+                verify(scheduler, times(2)).runTaskLater(eq(plugin), secondUpdateCaptor.capture(), eq(delay));
+                secondUpdateCaptor.getAllValues().forEach(Runnable::run);
             }
 
             // Listeners must now be unregistered once
             verify(listenerInstance, times(1)).unregister();
             if (isPacketEventsPresent) {
-                packetEventsMock.verify(() -> PacketEventsAdapter.registerFragileBlockBreakListener(res), times(1));
+                packetEventsMock.verify(() -> PacketEventsAdapter.registerReactiveBlockUpdateListener(res), times(1));
                 packetEventsMock.verify(() -> PacketEventsAdapter.unregisterListener(packetEventsListener), times(1));
             } else {
                 packetEventsMock.verifyNoInteractions();
             }
 
             int updateCount = hasSecondUpdate ? 2 : 1;
-            verify(brokenFragile, times(updateCount)).update(true, false);
-            verify(unbrokenFragile, never()).update(anyBoolean(), anyBoolean());
-            verify(changedConnectable, times(updateCount)).update(true, false);
-            verify(unchangedConnectable, never()).update(anyBoolean(), anyBoolean());
-            verify(interactableState, interactableIsAlsoFragile ? times(updateCount) : never()).update(true, false);
+            verify(updatedReactive.state(), times(updateCount)).update(true, false);
+            verify(brokenReactive.state(), times(updateCount)).update(true, false);
+            verify(unchangedReactive.state(), never()).update(anyBoolean(), anyBoolean());
+            verify(interactableState, interactableIsAlsoReactive ? times(updateCount) : never()).update(true, false);
         }
     }
 
@@ -295,11 +306,12 @@ class BlockRestorationServiceTest {
     }
 
     @Test
-    void shouldNotScheduleRestorationWhenThereAreNoFragileNorConnectableBlocks() {
+    void shouldNotScheduleRestorationWhenThereAreNoReactiveBlocks() {
         clearInvocations(settings);
 
-        var interactableBlock = new InteractableWrapper(BukkitMockFactory.mockBlockState(Material.CAULDRON), false);
-        BfsResult res = new BfsResult(interactableBlock, Collections.emptySet(), Collections.emptySet(), boundingBox);
+        var interactableBlock = new InteractableBlockWrapper(BukkitMockFactory.mockBlockState(Material.CAULDRON),
+                                                             false);
+        BfsResult res = new BfsResult(interactableBlock, Collections.emptySet(), boundingBox);
 
         service.scheduleRestoration(res, InteractableType.CAULDRON);
 

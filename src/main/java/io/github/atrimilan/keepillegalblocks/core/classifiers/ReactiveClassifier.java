@@ -58,7 +58,7 @@ public class ReactiveClassifier extends AbstractClassifier<ReactiveType> {
             case Material m when isBanner(m) -> ReactiveType.BANNER; // Normal + Wall
             case Material m when isCarpet(m) -> ReactiveType.CARPET;
             case Material m when isCoral(m) -> ReactiveType.CORAL; // Normal + Wall
-            case Material m when isCrops(m) -> ReactiveType.CROPS;
+            case Material m when isCrops(m) -> ReactiveType.CROP;
             case Material m when isFlower(m) -> ReactiveType.FLOWER;
             case Material m when isMushroom(m) -> ReactiveType.MUSHROOM;
             case Material m when isPressurePlate(m) -> ReactiveType.PRESSURE_PLATE;

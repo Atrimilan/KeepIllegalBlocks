@@ -34,7 +34,7 @@ public enum ReactiveType implements KibBlockType {
     COCOA("cocoa"),
     COMPARATOR("comparators"),
     CORAL("corals"),
-    CROPS("crops"),
+    CROP("crops"),
     DEAD_BUSH("dead-bushes"),
     DOOR("doors"),
     DRIPLEAF("dripleaves"),

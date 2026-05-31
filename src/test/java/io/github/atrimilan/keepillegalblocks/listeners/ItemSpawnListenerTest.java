@@ -2,7 +2,7 @@ package io.github.atrimilan.keepillegalblocks.listeners;
 
 import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
 import io.github.atrimilan.keepillegalblocks.models.BfsResult;
-import io.github.atrimilan.keepillegalblocks.models.InteractableWrapper;
+import io.github.atrimilan.keepillegalblocks.models.InteractableBlockWrapper;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.block.BlockState;
@@ -59,7 +59,7 @@ class ItemSpawnListenerTest {
     void setUp() {
         var boundingBox = new BoundingBox(0, 0, 0, 2, 2, 2);
         var bfsResult = new BfsResult( //
-                new InteractableWrapper(mock(BlockState.class), false), Set.of(), Set.of(), boundingBox);
+                new InteractableBlockWrapper(mock(BlockState.class), false), Set.of(), boundingBox);
 
         when(plugin.getServer()).thenReturn(server);
         when(server.getPluginManager()).thenReturn(pluginManager);
@@ -74,7 +74,7 @@ class ItemSpawnListenerTest {
         when(event.getEntity()).thenReturn(item);
         when(item.getThrower()).thenReturn(null);
         when(item.getItemStack()).thenReturn(itemStack);
-        when(materialRegistry.isFragile(itemStack.getType())).thenReturn(true);
+        when(materialRegistry.isReactive(itemStack.getType())).thenReturn(true);
 
         listener.onItemSpawn(event);
 
@@ -110,7 +110,7 @@ class ItemSpawnListenerTest {
         when(event.getEntity()).thenReturn(item);
         when(item.getThrower()).thenReturn(null);
         when(item.getItemStack()).thenReturn(itemStack);
-        when(materialRegistry.isFragile(itemStack.getType())).thenReturn(false);
+        when(materialRegistry.isReactive(itemStack.getType())).thenReturn(false);
 
         listener.onItemSpawn(event);
 
