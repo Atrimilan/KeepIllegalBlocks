@@ -95,16 +95,14 @@ public class RegistryLoader {
                 Material mat = entry.getKey();
                 T type = entry.getValue();
 
-                try {
-                    BlockData blockData = getBlockData(mat);
-                    Material placementMaterial = blockData.getPlacementMaterial();
+                BlockData blockData = getBlockData(mat);
+                if (blockData == null) continue; // Skip, this material is not a block
 
-                    // If not AIR (default when there's no placement material), and if not already classified
-                    if (placementMaterial != Material.AIR && !classifiedMaterials.containsKey(placementMaterial)) {
-                        registrySetter.accept(placementMaterial, type); // Add placement material to material registry
-                    }
-                } catch (IllegalArgumentException ignored) {
-                    // Skip if BlockData cannot be created
+                Material placementMaterial = blockData.getPlacementMaterial();
+
+                // If not AIR (default when there's no placement material), and if not already classified
+                if (placementMaterial != Material.AIR && !classifiedMaterials.containsKey(placementMaterial)) {
+                    registrySetter.accept(placementMaterial, type); // Add placement material to material registry
                 }
             }
         }
@@ -113,7 +111,11 @@ public class RegistryLoader {
     }
 
     protected BlockData getBlockData(Material material) {
-        return material.createBlockData();
+        try {
+            return material.createBlockData();
+        } catch (IllegalArgumentException | NullPointerException ignored) {
+            return null;
+        }
     }
 
     /**

@@ -6,6 +6,8 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Rail;
 import org.bukkit.block.data.type.*;
 
+import java.util.Arrays;
+
 /**
  * See more details about "reactive" blocks here: {@link ReactiveType}.
  *
@@ -34,7 +36,9 @@ public class ReactiveClassifier extends AbstractClassifier<ReactiveType> {
             case HangingSign ignored -> ReactiveType.HANGING_SIGN;
             case Ladder ignored -> ReactiveType.LADDER;
             case Lantern ignored -> ReactiveType.LANTERN;
-            case LeafLitter ignored -> ReactiveType.LEAF_LITTER;
+            // TODO - Set up proper backward compatibility
+            case BlockData bd when Arrays.stream(bd.getClass().getInterfaces())
+                    .anyMatch(i -> "LeafLitter".equals(i.getSimpleName())) -> ReactiveType.LEAF_LITTER;
             case MangrovePropagule ignored -> ReactiveType.MANGROVE_PROPAGULE;
             case PointedDripstone ignored -> ReactiveType.POINTED_DRIPSTONE;
             case Rail ignored -> ReactiveType.RAIL;
