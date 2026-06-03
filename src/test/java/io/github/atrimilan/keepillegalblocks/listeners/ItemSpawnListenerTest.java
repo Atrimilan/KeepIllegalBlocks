@@ -104,7 +104,7 @@ class ItemSpawnListenerTest {
     }
 
     @Test
-    void onItemSpawn_ShouldNotCancelWhenItemMaterialIsNotFragile() {
+    void onItemSpawn_ShouldNotCancelWhenItemMaterialIsNotReactive() {
         when(event.getLocation()).thenReturn(location);
         when(location.toVector()).thenReturn(new Vector(0, 1, 1));
         when(event.getEntity()).thenReturn(item);

@@ -160,7 +160,7 @@ List of interactable material categories recorded by KIB:
 </details>
 
 > [!NOTE]
-> KIB does not support underwater restorations. This is why `seagrass` and `kelp` are not included in the reactive
+> KIB does **not** support underwater restorations. This is why `seagrass` and `kelp` are not included in the reactive
 > material list.
 
 ### 2. Why would I need it?
@@ -180,7 +180,7 @@ that have been broken or updated.
 For performance reasons, a block limit is set, which is **500 by default**.
 
 > [!WARNING]
-> Even after being restored by KIB, some reactive block will still update naturally, such as cactus breaking as they
+> Even after being restored by KIB, some reactive blocks will still update naturally, such as cactus breaking as they
 > grow, or coral dying when not waterlogged. **This is the default behavior of the game, KIB will NOT prevent this**,
 > even if they were initially placed using plugins like WorldEdit or Axiom (which rely on advanced chunk management
 > systems).

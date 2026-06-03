@@ -44,7 +44,7 @@ class BfsResultTest {
     }
 
     @Test
-    void shouldHaveBlocksToRestoreWhenInteractableBlockIsAlsoFragile() {
+    void shouldHaveBlocksToRestoreWhenInteractableBlockIsAlsoReactive() {
         InteractableBlockWrapper ibw = new InteractableBlockWrapper(interactableBS, true);
 
         BfsResult result = new BfsResult(ibw, Collections.emptySet(), boundingBox);
@@ -64,7 +64,7 @@ class BfsResultTest {
     }
 
     @Test
-    void shouldNotHaveFragileBlocks() {
+    void shouldNotHaveReactiveBlocks() {
         InteractableBlockWrapper ibw = new InteractableBlockWrapper(interactableBS, false);
 
         BfsResult result = new BfsResult(ibw, Collections.emptySet(), boundingBox);

@@ -1,13 +1,10 @@
 package io.github.atrimilan.keepillegalblocks.core;
 
-import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
 import io.github.atrimilan.keepillegalblocks.core.types.KibGroup;
 import io.github.atrimilan.keepillegalblocks.core.types.ReactiveType;
 import io.github.atrimilan.keepillegalblocks.models.LoadResult;
-import net.minecraft.world.level.redstone.Redstone;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.type.Bamboo;
 import org.bukkit.block.data.type.Cocoa;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
