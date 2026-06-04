@@ -77,6 +77,7 @@ tasks {
                 """
                 allow-nether=false
                 enable-command-block=true
+                difficulty=peaceful
                 gamemode=creative
                 level-type=minecraft\:flat
                 motd=A local Paper server
