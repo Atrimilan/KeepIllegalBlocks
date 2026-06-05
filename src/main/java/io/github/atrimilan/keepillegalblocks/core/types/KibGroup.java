@@ -1,9 +1,8 @@
 package io.github.atrimilan.keepillegalblocks.core.types;
 
 public enum KibGroup {
-    FRAGILE("fragile"),
-    CONNECTABLE("connectable"),
-    INTERACTABLE("interactable");
+    INTERACTABLE("interactable"),
+    REACTIVE("reactive");
 
     private final String sectionKey;
 

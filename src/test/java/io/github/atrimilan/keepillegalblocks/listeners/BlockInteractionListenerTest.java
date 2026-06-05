@@ -5,7 +5,7 @@ import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
 import io.github.atrimilan.keepillegalblocks.core.Settings;
 import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
 import io.github.atrimilan.keepillegalblocks.models.BfsResult;
-import io.github.atrimilan.keepillegalblocks.models.InteractableWrapper;
+import io.github.atrimilan.keepillegalblocks.models.InteractableBlockWrapper;
 import io.github.atrimilan.keepillegalblocks.services.BlockRestorationService;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -60,7 +60,7 @@ class BlockInteractionListenerTest {
         Material interactableMat = Material.STONE_BUTTON;
         InteractableType interactableType = InteractableType.STONE_BUTTON;
         BfsResult bfsResult = new BfsResult(
-                new InteractableWrapper(BukkitMockFactory.mockBlockState(interactableMat), false), Set.of(), Set.of(),
+                new InteractableBlockWrapper(BukkitMockFactory.mockBlockState(interactableMat), false), Set.of(),
                 mock(BoundingBox.class));
 
         when(settings.isOnlyEnabledInCreativeMode()).thenReturn(true);

@@ -20,15 +20,16 @@ public class BlockInteractionListener implements Listener {
     private final MaterialRegistry materialRegistry;
     private final Settings settings;
 
-    public BlockInteractionListener(BlockRestorationService service, MaterialRegistry materialRegistry, Settings settings) {
+    public BlockInteractionListener(BlockRestorationService service, MaterialRegistry materialRegistry,
+                                    Settings settings) {
         this.service = service;
         this.materialRegistry = materialRegistry;
         this.settings = settings;
     }
 
     /**
-     * Listen to player interactions with interactable blocks, and restore any fragile blocks that break or connectable
-     * blocks that update as a result of the interaction.
+     * Listen to player interactions with interactable blocks, and restore any reactive blocks that were broken or had
+     * their block data updated as a result of the interaction.
      * <p>
      * The event will be ignored if:
      * <li>KIB is only enabled in Creative mode and player is not in Creative mode</li>
@@ -41,7 +42,8 @@ public class BlockInteractionListener implements Listener {
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (settings.isOnlyEnabledInCreativeMode() && !GameMode.CREATIVE.equals(event.getPlayer().getGameMode())) return;
+        if (settings.isOnlyEnabledInCreativeMode() && !GameMode.CREATIVE.equals(event.getPlayer().getGameMode()))
+            return;
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (event.getHand() != EquipmentSlot.HAND) return;
         if (event.getPlayer().isSneaking() && event.getItem() != null) return;
@@ -52,11 +54,10 @@ public class BlockInteractionListener implements Listener {
         InteractableType interactableType = materialRegistry.getInteractableType(sourceBlock.getType());
         if (InteractableType.NONE.equals(interactableType)) return;
 
-        // Perform a BFS to record all fragile and connectable blocks, so that they can be restored
-        // if they are broken or updated due to the player interaction
+        // Perform a BFS to record all reactive blocks
         BfsResult result = service.recordBlockStates(sourceBlock, settings.getMaxBlocks());
 
-        // Schedule block restoration
+        // Schedule restoration of reactive blocks that may have been broken or updated due to the player interaction
         service.scheduleRestoration(result, interactableType);
     }
 }

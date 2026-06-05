@@ -7,7 +7,8 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEf
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerMultiBlockChange;
 import io.github.atrimilan.keepillegalblocks.BukkitMockFactory;
 import io.github.atrimilan.keepillegalblocks.models.BfsResult;
-import io.github.atrimilan.keepillegalblocks.models.InteractableWrapper;
+import io.github.atrimilan.keepillegalblocks.models.InteractableBlockWrapper;
+import io.github.atrimilan.keepillegalblocks.models.ReactiveBlockWrapper;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
@@ -22,18 +23,19 @@ import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class FragileBlockBreakListenerTest {
+class ReactiveBlockUpdateListenerTest {
 
-    private static final int X_INT = 10, Y_INT = 64, Z_INT = 10;
+    private static final int REACTIVE_X = 10, REACTIVE_Y = 64, REACTIVE_Z = 10; // X = 10
+    private static final int CONNECTABLE_X = 11, CONNECTABLE_Y = 64, CONNECTABLE_Z = 10; // X = 11
+    private static final int NON_REACTIVE_X = 12, NON_REACTIVE_Y = 64, NON_REACTIVE_Z = 10; // X = 12
 
-    private FragileBlockBreakListener listener;
+    private ReactiveBlockUpdateListener listener;
 
     @Mock
     private PacketSendEvent event;
@@ -53,16 +55,22 @@ class FragileBlockBreakListenerTest {
     @BeforeEach
     void setUp() {
         // Prepare BFS result
-        InteractableWrapper interactableWrapper = new InteractableWrapper(
+        InteractableBlockWrapper interactableBlockWrapper = new InteractableBlockWrapper(
                 BukkitMockFactory.mockBlockState(Material.OAK_DOOR), false);
-        when(interactableWrapper.blockState().getWorld()).thenReturn(world);
+        when(interactableBlockWrapper.blockState().getWorld()).thenReturn(world);
 
-        BlockState fragile = BukkitMockFactory.mockBlockState(Material.AIR);
-        BukkitMockFactory.setCoordinates(fragile, X_INT, Y_INT, Z_INT);
+        BlockState reactiveState = BukkitMockFactory.mockBlockState(Material.AIR);
+        BukkitMockFactory.setCoordinates(reactiveState, REACTIVE_X, REACTIVE_Y, REACTIVE_Z);
+        ReactiveBlockWrapper reactiveWrapper = new ReactiveBlockWrapper(reactiveState, false);
 
-        BfsResult bfsResult = new BfsResult(interactableWrapper, Set.of(fragile), Collections.emptySet(), boundingBox);
+        BlockState connectableState = BukkitMockFactory.mockBlockState(Material.BRICK_WALL);
+        BukkitMockFactory.setCoordinates(connectableState, CONNECTABLE_X, CONNECTABLE_Y, CONNECTABLE_Z);
+        ReactiveBlockWrapper connectableWrapper = new ReactiveBlockWrapper(connectableState, true);
 
-        listener = spy(new FragileBlockBreakListener(bfsResult));
+        BfsResult bfsResult = new BfsResult(interactableBlockWrapper, Set.of(reactiveWrapper, connectableWrapper),
+                                            boundingBox);
+
+        listener = spy(new ReactiveBlockUpdateListener(bfsResult));
 
         lenient().when(event.getPlayer()).thenReturn(player);
         lenient().when(player.getWorld()).thenReturn(world);
@@ -107,7 +115,7 @@ class FragileBlockBreakListenerTest {
     void shouldCancelEffectPacket() {
         when(event.getPacketType()).thenReturn(PacketType.Play.Server.EFFECT);
         mockedEffect = mockConstruction(WrapperPlayServerEffect.class, (mock, context) -> {
-            when(mock.getPosition()).thenReturn(new Vector3i(X_INT, Y_INT, Z_INT));
+            when(mock.getPosition()).thenReturn(new Vector3i(REACTIVE_X, REACTIVE_Y, REACTIVE_Z));
         });
 
         listener.onPacketSend(event);
@@ -116,7 +124,7 @@ class FragileBlockBreakListenerTest {
     }
 
     @Test
-    void shouldNotCancelEffectWhenVectorIsNotInFragileBlockVectors() {
+    void shouldNotCancelEffectWhenVectorIsNotInReactiveBlockVectors() {
         when(event.getPacketType()).thenReturn(PacketType.Play.Server.EFFECT);
         mockedEffect = mockConstruction(WrapperPlayServerEffect.class, (mock, context) -> {
             when(mock.getPosition()).thenReturn(new Vector3i(1, 2, 3));
@@ -129,12 +137,12 @@ class FragileBlockBreakListenerTest {
 
     // ********** MULTI_BLOCK_CHANGE Packet **********
 
-    private WrapperPlayServerMultiBlockChange.EncodedBlock mockEncodedBlock(boolean isAir) {
+    private WrapperPlayServerMultiBlockChange.EncodedBlock mockEncodedBlock(boolean isAir, int x, int y, int z) {
         var block = mock(WrapperPlayServerMultiBlockChange.EncodedBlock.class);
         when(block.getBlockId()).thenReturn(isAir ? 0 : 1);
-        when(block.getX()).thenReturn(X_INT);
-        when(block.getY()).thenReturn(Y_INT);
-        when(block.getZ()).thenReturn(Z_INT);
+        when(block.getX()).thenReturn(x);
+        when(block.getY()).thenReturn(y);
+        when(block.getZ()).thenReturn(z);
         return block;
     }
 
@@ -142,10 +150,12 @@ class FragileBlockBreakListenerTest {
     void shouldTweakMultiBlockChangePacket() {
         when(event.getPacketType()).thenReturn(PacketType.Play.Server.MULTI_BLOCK_CHANGE);
 
-        var fragileBlock = mockEncodedBlock(true);
-        var safeBlock = mockEncodedBlock(false);
+        // Block position was initialized in @BeforeEach
+        var brokenBlock = mockEncodedBlock(true, REACTIVE_X, REACTIVE_Y, REACTIVE_Z); // To remove (AIR = broken)
+        var updatedBlock = mockEncodedBlock(false, CONNECTABLE_X, CONNECTABLE_Y, CONNECTABLE_Z); // To remove
+        var safeBlock = mockEncodedBlock(false, NON_REACTIVE_X, NON_REACTIVE_Y, NON_REACTIVE_Z); // To keep
 
-        WrapperPlayServerMultiBlockChange.EncodedBlock[] blocks = {fragileBlock, safeBlock};
+        WrapperPlayServerMultiBlockChange.EncodedBlock[] blocks = {brokenBlock, updatedBlock, safeBlock};
 
         mockedMultiBlock = mockConstruction(WrapperPlayServerMultiBlockChange.class, (mock, context) -> {
             when(mock.getBlocks()).thenReturn(blocks);
@@ -154,24 +164,24 @@ class FragileBlockBreakListenerTest {
         listener.onPacketSend(event);
 
         var captor = ArgumentCaptor.forClass(WrapperPlayServerMultiBlockChange.EncodedBlock[].class);
-
-        verify(mockedMultiBlock.constructed().getFirst()).setBlocks(captor.capture());
-        verify(event).markForReEncode(true);
+        verify(mockedMultiBlock.constructed().getFirst(), times(1)).setBlocks(captor.capture());
+        verify(event, times(1)).markForReEncode(true);
         verify(event, never()).setCancelled(anyBoolean());
 
-        WrapperPlayServerMultiBlockChange.EncodedBlock[] result = captor.getValue();
+        var result = captor.getValue();
         assertEquals(1, result.length);
-        assertEquals(safeBlock, result[0]); // The safe block is kept in the packet to be sent
+        assertEquals(safeBlock, result[0]); // Only the safe block was NOT removed from the packet
     }
 
     @Test
-    void shouldNotTweakMultiBlockChangeWhenPacketContainsNoAirBlock() {
+    void shouldNotTweakMultiBlockChangeWhenReactiveBlockIsNotBrokenNorUpdated() {
         when(event.getPacketType()).thenReturn(PacketType.Play.Server.MULTI_BLOCK_CHANGE);
 
-        var fragileBlock = mockEncodedBlock(false); // Was not replaced by AIR
-        var safeBlock = mockEncodedBlock(false);
+        // Reactive is not AIR so it's not broken, and it must be kept in the packet
+        var nonBrokenReactiveBlock = mockEncodedBlock(false, REACTIVE_X, REACTIVE_Y, REACTIVE_Z);
+        var safeBlock = mockEncodedBlock(false, NON_REACTIVE_X, NON_REACTIVE_Y, NON_REACTIVE_Z);
 
-        WrapperPlayServerMultiBlockChange.EncodedBlock[] blocks = {fragileBlock, safeBlock};
+        WrapperPlayServerMultiBlockChange.EncodedBlock[] blocks = {nonBrokenReactiveBlock, safeBlock};
 
         mockedMultiBlock = mockConstruction(WrapperPlayServerMultiBlockChange.class, (mock, context) -> {
             when(mock.getBlocks()).thenReturn(blocks);

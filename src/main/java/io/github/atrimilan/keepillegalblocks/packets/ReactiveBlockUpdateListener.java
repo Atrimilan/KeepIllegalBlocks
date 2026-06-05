@@ -6,6 +6,7 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEffect;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerMultiBlockChange;
 import io.github.atrimilan.keepillegalblocks.models.BfsResult;
+import io.github.atrimilan.keepillegalblocks.models.ReactiveBlockWrapper;
 import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import org.bukkit.World;
@@ -20,31 +21,35 @@ import static com.github.retrooper.packetevents.protocol.packettype.PacketType.P
 import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType.WARN;
 
 /**
- * Listen to packets events sent to players when fragile blocks are broken, and cancel or tweak them in order to improve
- * client-side rendering and performances:
- * <li>Cancel break effect (sounds and particles).</li>
- * <li>Fake fragile blocks presence, and connectable blocks connection, until they are restored.</li>
+ * Listen to packets events sent to players when reactive blocks are broken or updated, and cancel or tweak them in
+ * order to improve the following client-side rendering and performances:
+ * <li>Cancel break effects (sounds and particles).</li>
+ * <li>Fake reactive blocks presence when they are broken.</li>
+ * <li>Fake reactive blocks connection when they are connectable and updated.</li>
  */
-public class FragileBlockBreakListener implements PacketListener {
+public class ReactiveBlockUpdateListener implements PacketListener {
 
     private final World world;
-    private final LongOpenHashSet fragileBlockVectors;
-    private final LongOpenHashSet connectableBlockVectors;
+    private final LongOpenHashSet reactiveBlockVectors;
+    private final LongOpenHashSet connectableReactiveBlockVectors;
 
-    public FragileBlockBreakListener(BfsResult bfsResult) {
+    public ReactiveBlockUpdateListener(BfsResult bfsResult) {
         this.world = bfsResult.getWorld();
 
-        Set<BlockState> fragileBlockStates = bfsResult.getAllFragileBlocks();
-        Set<BlockState> connectableBlockStates = bfsResult.connectableBlocks();
+        Set<ReactiveBlockWrapper> reactiveBlocks = bfsResult.getAllReactiveBlocks();
 
-        this.fragileBlockVectors = new LongOpenHashSet(fragileBlockStates.size());
-        this.connectableBlockVectors = new LongOpenHashSet(connectableBlockStates.size());
+        this.reactiveBlockVectors = new LongOpenHashSet(reactiveBlocks.size());
+        this.connectableReactiveBlockVectors = new LongOpenHashSet(reactiveBlocks.size());
 
-        for (BlockState s : fragileBlockStates)
-            this.fragileBlockVectors.add(packVector(s.getX(), s.getY(), s.getZ()));
+        for (ReactiveBlockWrapper rbw : reactiveBlocks) {
+            BlockState s = rbw.state();
 
-        for (BlockState s : connectableBlockStates)
-            this.connectableBlockVectors.add(packVector(s.getX(), s.getY(), s.getZ()));
+            this.reactiveBlockVectors.add(packVector(s.getX(), s.getY(), s.getZ()));
+
+            if (rbw.isConnectable()) {
+                this.connectableReactiveBlockVectors.add(packVector(s.getX(), s.getY(), s.getZ()));
+            }
+        }
     }
 
     @Override
@@ -60,9 +65,12 @@ public class FragileBlockBreakListener implements PacketListener {
     }
 
     /**
-     * Cancel the {@code EFFECT} packet to hide break particles and cancel break sounds of fragile blocks. This makes
-     * client-side rendering smoother, but also improves performance, as displaying a large number of particles can be
-     * quite slow on some clients.
+     * Cancel the {@code EFFECT} packet to hide break particles and cancel break sounds of broken reactive blocks. This
+     * makes client-side rendering smoother, but also improves performance, as displaying a large number of particles
+     * can be quite slow on some clients.
+     * <p>
+     * Connectable-only reactive blocks (fences, walls...) never generate {@code EFFECT} packets when updated, so this
+     * only affects blocks that can actually break.
      *
      * @param event  The packet event
      * @param packet The wrapped packet to cancel
@@ -71,15 +79,14 @@ public class FragileBlockBreakListener implements PacketListener {
         Vector3i pos = packet.getPosition();
         long vector = packVector(pos.getX(), pos.getY(), pos.getZ());
 
-        if (fragileBlockVectors.contains(vector)) {
+        if (reactiveBlockVectors.contains(vector)) {
             event.setCancelled(true);
         }
     }
 
     /**
-     * Tweak the {@code MULTI_BLOCK_CHANGE} packet to pretend that fragile blocks have not been broken, and that
-     * connectable blocks have not been updated. This hides (or at least reduces) block flickering, making client-side
-     * rendering smoother.
+     * Tweak the {@code MULTI_BLOCK_CHANGE} packet to pretend that reactive blocks have not been temporarily broken or
+     * updated. This hides (or at least reduces) block flickering, making client-side rendering smoother.
      *
      * @param event  The packet event
      * @param packet The wrapped packet to tweak
@@ -91,11 +98,11 @@ public class FragileBlockBreakListener implements PacketListener {
         var blocksToBeSent = new WrapperPlayServerMultiBlockChange.EncodedBlock[packetBlocks.length];
 
         for (var b : packetBlocks) {
-            // Ignore block update if it's AIR (id = 0) and in the fragile list, or if it's in the connectable list
+            // Ignore block update if it's AIR (id = 0) and in the reactive block list, or if it's in the connectable reactive block list
             // --> Because in those cases, the block is restored, so it should be removed from the packet
-            boolean removeBlockFromPacket =
-                    (b.getBlockId() == 0 && fragileBlockVectors.contains(packVector(b.getX(), b.getY(), b.getZ()))) ||
-                    connectableBlockVectors.contains(packVector(b.getX(), b.getY(), b.getZ()));
+            long vector = packVector(b.getX(), b.getY(), b.getZ());
+            boolean removeBlockFromPacket = (b.getBlockId() == 0 && reactiveBlockVectors.contains(vector))
+                                            || connectableReactiveBlockVectors.contains(vector);
 
             // Update the list of blocks to be present in the packet
             if (!removeBlockFromPacket) {

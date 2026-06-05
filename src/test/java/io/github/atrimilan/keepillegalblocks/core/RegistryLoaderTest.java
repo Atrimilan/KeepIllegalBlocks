@@ -1,10 +1,11 @@
 package io.github.atrimilan.keepillegalblocks.core;
 
-import io.github.atrimilan.keepillegalblocks.core.types.ConnectableType;
 import io.github.atrimilan.keepillegalblocks.core.types.KibGroup;
+import io.github.atrimilan.keepillegalblocks.core.types.ReactiveType;
 import io.github.atrimilan.keepillegalblocks.models.LoadResult;
 import org.bukkit.Material;
-import org.bukkit.block.data.type.Fence;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.Cocoa;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,7 +18,6 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,33 +36,40 @@ class RegistryLoaderTest {
     @Test
     void shouldFillMaterialRegistry() {
         // Given
-        Material mockAir = mock(Material.class);
-        Material mockFence = mock(Material.class);
-        when(mockFence.isBlock()).thenReturn(true);
-        when(mockFence.createBlockData()).thenReturn(mock(Fence.class));
-        doReturn(new Material[]{mockAir, mockFence}).when(registryLoader).getAllMaterials();
+        Material cocoa = mock(Material.class);
+        BlockData cocoaBD = mock(Cocoa.class);
+        when(cocoa.isBlock()).thenReturn(true);
+        when(cocoa.ordinal()).thenReturn(1); // Specify ordinal because "classifiedMaterials" is an EnumMap
+        when(cocoa.createBlockData()).thenReturn(cocoaBD);
+        doReturn(new Material[]{cocoa}).when(registryLoader).getAllMaterials();
 
-        // Mock settings for CONNECTABLE
-        when(settings.getBlacklistedMaterialsForGroup(KibGroup.CONNECTABLE)).thenReturn(Collections.emptySet());
-        when(settings.getEnabledCategoriesForGroup(KibGroup.CONNECTABLE)).thenReturn(Set.of("fences"));
-        when(materialRegistry.getConnectableCount()).thenReturn(1);
+        Material cocoaBeans = mock(Material.class);
+        when(cocoaBeans.ordinal()).thenReturn(2); // Force different ordinal for placementMaterial classification
+        when(cocoaBD.getPlacementMaterial()).thenReturn(cocoaBeans);
 
-        // Stub loadRegistry for FRAGILE and INTERACTABLE
-        lenient().doReturn(5).when(registryLoader).loadRegistry(eq(settings), eq(KibGroup.FRAGILE), any(), any());
-        lenient().doReturn(1).when(registryLoader).loadRegistry(eq(settings), eq(KibGroup.INTERACTABLE), any(), any());
-        when(materialRegistry.getFragileCount()).thenReturn(10);
+        doReturn(cocoaBD).when(registryLoader).getBlockData(any(Material.class));
+
+        // Mock settings for REACTIVE
+        when(settings.getBlacklistedMaterialsForGroup(KibGroup.REACTIVE)).thenReturn(Collections.emptySet());
+        when(settings.getEnabledCategoriesForGroup(KibGroup.REACTIVE)).thenReturn(Set.of("cocoa"));
+        when(materialRegistry.getReactiveCount()).thenReturn(10);
+
+        // Stub loadRegistry for INTERACTABLE
+        lenient().doReturn(5).when(registryLoader)
+                .loadRegistry(eq(settings), eq(KibGroup.INTERACTABLE), any(), any(), eq(false));
         when(materialRegistry.getInteractableCount()).thenReturn(20);
 
         // When
         List<LoadResult> results = registryLoader.fillMaterialRegistry(settings);
 
         // Then
-        verify(materialRegistry).registerConnectable(mockFence, ConnectableType.FENCE);
-        // FRAGILE and INTERACTABLE were not registered because they are stubbed
+        verify(materialRegistry).clearAll();
+        verify(materialRegistry).registerReactive(cocoa, ReactiveType.COCOA);
+        verify(materialRegistry).registerReactive(cocoaBeans, ReactiveType.COCOA); // Placement material
+        // INTERACTABLE was not registered because it is stubbed
 
-        assertEquals(3, results.size());
-        assertEquals(new LoadResult("Fragile", 10, 5), results.get(0));
-        assertEquals(new LoadResult("Connectable", 1, 0), results.get(1));
-        assertEquals(new LoadResult("Interactable", 20, 1), results.get(2));
+        assertEquals(2, results.size());
+        assertEquals(new LoadResult("Reactive", 10, 0), results.get(0));
+        assertEquals(new LoadResult("Interactable", 20, 5), results.get(1));
     }
 }

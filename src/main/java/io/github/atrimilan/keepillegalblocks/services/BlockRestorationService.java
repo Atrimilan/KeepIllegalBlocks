@@ -1,12 +1,13 @@
 package io.github.atrimilan.keepillegalblocks.services;
 
-import io.github.atrimilan.keepillegalblocks.core.types.FragileType;
-import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
 import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
 import io.github.atrimilan.keepillegalblocks.core.Settings;
+import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
+import io.github.atrimilan.keepillegalblocks.core.types.ReactiveType;
 import io.github.atrimilan.keepillegalblocks.listeners.ItemSpawnListener;
 import io.github.atrimilan.keepillegalblocks.models.BfsResult;
-import io.github.atrimilan.keepillegalblocks.models.InteractableWrapper;
+import io.github.atrimilan.keepillegalblocks.models.InteractableBlockWrapper;
+import io.github.atrimilan.keepillegalblocks.models.ReactiveBlockWrapper;
 import io.github.atrimilan.keepillegalblocks.packets.PacketEventsAdapter;
 import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import org.bukkit.Location;
@@ -41,8 +42,7 @@ public class BlockRestorationService {
     }
 
     /**
-     * Perform a Breadth-First Search (BFS) to record all fragile and connectable blocks states, and calculate their
-     * bounding box.
+     * Perform a Breadth-First Search (BFS) to record all reactive blocks states, and calculate their bounding box.
      *
      * @param sourceBlock The interactable block that the player interacted with
      * @param maxBlocks   The maximum number of blocks to record
@@ -59,8 +59,7 @@ public class BlockRestorationService {
         // Initialize BFS variables
         Queue<Block> queue = new ArrayDeque<>();
         Set<Location> visited = new HashSet<>();
-        Set<BlockState> fragileBlocks = new HashSet<>();
-        Set<BlockState> connectableBlocks = new HashSet<>();
+        Set<ReactiveBlockWrapper> reactiveBlocks = new HashSet<>();
 
         Location sourceBlockLoc = sourceBlock.getLocation();
         visited.add(sourceBlockLoc);
@@ -73,13 +72,11 @@ public class BlockRestorationService {
             Block currentBlock = queue.poll();
 
             if (currentBlock != sourceBlock) { // Skip interactable source block
-                if (materialRegistry.isFragile(currentBlock.getType())) {
-                    fragileBlocks.add(currentBlock.getState()); // Save fragile block state
-                    nbBlocks++;
-                } else if (materialRegistry.isConnectable(currentBlock.getType())) {
-                    connectableBlocks.add(currentBlock.getState()); // Save connectable block state
-                    nbBlocks++;
-                } else continue;
+                ReactiveType reactiveType = materialRegistry.getReactiveType(currentBlock.getType());
+                if (reactiveType == ReactiveType.NONE) continue;
+
+                reactiveBlocks.add(new ReactiveBlockWrapper(currentBlock.getState(), reactiveType.isConnectable()));
+                nbBlocks++;
 
                 // Update bounding box
                 minX = Math.min(minX, currentBlock.getX());
@@ -102,82 +99,99 @@ public class BlockRestorationService {
             }
         }
 
-        DebugUtils.sendChat(() -> "Recorded <white>" + fragileBlocks.size() + "</white> fragile blocks and <white>" +
-                                  connectableBlocks.size() + "</white> connectable blocks <gray>(max: " + maxBlocks +
-                                  ")", INFO);
+        DebugUtils.sendChat(
+                () -> "Recorded <white>" + reactiveBlocks.size() + "</white> reactive blocks <gray>(max: " + maxBlocks +
+                      ")", INFO);
 
-        boolean isInteractableAlsoFragile = materialRegistry.isFragile(sourceBlock.getType());
-        var interactable = new InteractableWrapper(sourceBlock.getState(), isInteractableAlsoFragile);
+        boolean isInteractableAlsoReactive = materialRegistry.isReactive(sourceBlock.getType());
+        var interactable = new InteractableBlockWrapper(sourceBlock.getState(), isInteractableAlsoReactive);
         var boundingBox = new BoundingBox(minX, minY, minZ, maxX + 1D, maxY + 1D, maxZ + 1D);
 
-        return new BfsResult(interactable, fragileBlocks, connectableBlocks, boundingBox);
+        return new BfsResult(interactable, reactiveBlocks, boundingBox);
     }
 
     /**
-     * Schedule restoration of fragile blocks that might have been broken after the update of an interactable block.
-     * <li>The initial restoration is scheduled in 2 ticks, because some fragile blocks are not broken within the first
-     * tick. See which blocks are involved in {@link FragileType}.</li>
-     * <li>If the interactable block will trigger a second update (such as a button), an additional restoration is
-     * scheduled after a delay (which depends on the {@link InteractableType}).</li>
+     * Schedule restoration of reactive blocks that might have been broken or updated.
+     * <li>Tick 1 - Connectable reactive blocks are restored if they have been updated.</li>
+     * <li>Tick 2 - Reactive blocks (connectable or not) are restored if they have been broken. This restoration is not
+     * scheduled for Tick 1, because the reactive blocks that break in cascade only start breaking starting from Tick 2.
+     * See which blocks are involved in {@link ReactiveType}.</li>
+     * <li>If the interactable block triggers a second update after a delay (such as a button), an additional
+     * restoration is scheduled after that delay. See which blocks are involved in {@link InteractableType}.</li>
      *
      * @param bfsResult All block states and their bounding box.
      */
     public void scheduleRestoration(BfsResult bfsResult, InteractableType interactableType) {
         if (bfsResult == null || !bfsResult.hasBlocksToRestore()) return; // Return if there's nothing to restore
 
+        /* Prepare block sets */
+
+        Set<ReactiveBlockWrapper> reactiveBlocks = bfsResult.getAllReactiveBlocks();
+        Set<ReactiveBlockWrapper> connectableReactiveBlocks = new HashSet<>();
+
+        for (ReactiveBlockWrapper reactiveBlock : reactiveBlocks) {
+            if (reactiveBlock.isConnectable()) {
+                connectableReactiveBlocks.add(reactiveBlock);
+            }
+        }
+
+        /* Register listeners */
+
         ItemSpawnListener itemSpawnListener = new ItemSpawnListener(plugin, bfsResult, materialRegistry);
         Object packetListener = settings.isPacketEventsEnabled() ? //
-                                PacketEventsAdapter.registerFragileBlockBreakListener(bfsResult) : null;
+                                PacketEventsAdapter.registerReactiveBlockUpdateListener(bfsResult) : null;
+
+        /* Schedule restorations */
 
         BukkitScheduler scheduler = plugin.getServer().getScheduler();
 
-        // Schedule initial restoration in 2 ticks
         scheduler.runTaskLater(plugin, () -> {
-            applyRestoration(bfsResult); // Apply restoration
+            restoreUpdatedConnectableBlocks(connectableReactiveBlocks); // Restore blocks that may have been updated
 
-            long delayBeforeSecondUpdate = interactableType.getDelayBeforeSecondUpdate();
-            boolean hasSecondUpdate = delayBeforeSecondUpdate > 0;
+            if (interactableType.hasSecondUpdate()) {
+                scheduler.runTaskLater(plugin, () -> restoreUpdatedConnectableBlocks(connectableReactiveBlocks),
+                                       interactableType.getDelayBeforeSecondUpdate());
+            }
+        }, 1L);
 
-            if (!hasSecondUpdate) {
-                unregisterListeners(packetListener, itemSpawnListener);
+        scheduler.runTaskLater(plugin, () -> {
+            restoreBrokenBlocks(reactiveBlocks); // Restore blocks that may have been broken
 
-            } else {
-                // If the interactable type has a second update, schedule another restoration
+            if (interactableType.hasSecondUpdate()) {
                 scheduler.runTaskLater(plugin, () -> {
-                    applyRestoration(bfsResult);
+                    restoreBrokenBlocks(reactiveBlocks);
                     unregisterListeners(packetListener, itemSpawnListener);
-                }, delayBeforeSecondUpdate); // Delay depends on the interactable type
+                }, interactableType.getDelayBeforeSecondUpdate());
+            } else {
+                unregisterListeners(packetListener, itemSpawnListener);
             }
         }, 2L);
     }
 
     /**
-     * Restore the fragile blocks that have been broken (including the interactable block if it is also fragile).
+     * Restore the reactive blocks that have been broken (including the interactable block if it's also reactive).
      *
-     * @param bfsResult The BFS result to iterate over
+     * @param reactiveBlockWrappers The set of reactive blocks to check and restore
      */
-    private void applyRestoration(BfsResult bfsResult) {
-        for (BlockState state : bfsResult.getAllFragileBlocks()) {
-            if (wasReplacedByAir(state)) {
-                state.update(true, false); // Force restore without physic
-            }
-        }
-        for (BlockState state : bfsResult.connectableBlocks()) {
-            if (hasBlockDataChanged(state)) {
-                state.update(true, false); // Force restore without physic
+    private void restoreBrokenBlocks(Set<ReactiveBlockWrapper> reactiveBlockWrappers) {
+        for (ReactiveBlockWrapper reactiveBlock : reactiveBlockWrappers) {
+            if (wasReplacedByAir(reactiveBlock.state())) {
+                reactiveBlock.state().update(true, false); // Force restore without physic
             }
         }
     }
 
     /**
-     * Unregister event listeners.
+     * Restore the reactive connectable blocks that have been updated.
      *
-     * @param packetListener    The PacketEvents listener to unregister (if the plugin is present)
-     * @param itemSpawnListener The ItemSpawnListener to unregister
+     * @param reactiveBlockWrappers The set of reactive blocks to check and restore
      */
-    private void unregisterListeners(Object packetListener, ItemSpawnListener itemSpawnListener) {
-        if (packetListener != null) PacketEventsAdapter.unregisterListener(packetListener);
-        if (itemSpawnListener != null) itemSpawnListener.unregister();
+    private void restoreUpdatedConnectableBlocks(Set<ReactiveBlockWrapper> reactiveBlockWrappers) {
+        for (ReactiveBlockWrapper reactiveBlock : reactiveBlockWrappers) {
+            if (wasUpdated(reactiveBlock.state())) {
+                reactiveBlock.state().update(true, false); // Force restore without physic
+            }
+        }
     }
 
     /**
@@ -193,8 +207,19 @@ public class BlockRestorationService {
      * @param state The block state to check
      * @return Whether the block's data has changed.
      */
-    boolean hasBlockDataChanged(BlockState state) {
+    boolean wasUpdated(BlockState state) {
         Block currentBlock = state.getBlock();
         return !currentBlock.getBlockData().equals(state.getBlockData());
+    }
+
+    /**
+     * Unregister event listeners.
+     *
+     * @param packetListener    The PacketEvents listener to unregister (if the plugin is present)
+     * @param itemSpawnListener The ItemSpawnListener to unregister
+     */
+    private void unregisterListeners(Object packetListener, ItemSpawnListener itemSpawnListener) {
+        if (packetListener != null) PacketEventsAdapter.unregisterListener(packetListener);
+        if (itemSpawnListener != null) itemSpawnListener.unregister();
     }
 }

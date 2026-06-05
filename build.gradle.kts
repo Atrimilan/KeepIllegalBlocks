@@ -1,11 +1,9 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import io.papermc.paperweight.userdev.ReobfArtifactConfiguration
 
 plugins {
     id("java")
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.19"
     id("xyz.jpenilla.run-paper") version "3.0.2"
-    id("com.gradleup.shadow") version "9.3.1"
+    id("com.gradleup.shadow") version "9.4.2"
     id("com.modrinth.minotaur") version "2.+"
 }
 
@@ -31,8 +29,9 @@ val packetEventsVersion: String by project
 val bStatsVersion: String by project
 
 dependencies {
-    // PaperMC (using paperweight-userdev)
-    paperweight.paperDevBundle(paperApiVersion)
+    // PaperMC
+    compileOnly("io.papermc.paper:paper-api:$paperApiVersion")
+    testImplementation("io.papermc.paper:paper-api:$paperApiVersion")
     // bStats (shaded jar)
     implementation("org.bstats:bstats-bukkit:$bStatsVersion")
     // PacketEvents (optional plugin)
@@ -46,14 +45,17 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-paperweight.reobfArtifactConfiguration = ReobfArtifactConfiguration.MOJANG_PRODUCTION
-
 val localServerDir = "local-server" // Change the server directory here
 val serverPort = 25565  // Change the server port here
 
+val sanitizedPaperVersion = paperApiVersion
+    .replace(Regex("\\.build.*"), "") // 26.1.2.build.+  ->  26.1.2
+    .replace("-R0.1-SNAPSHOT", "") // 1.20.6-R0.1-SNAPSHOT  ->  1.20.6
+
 tasks {
     runServer {
-        runDirectory.set(file("$localServerDir/$paperApiVersion"))
+        version.set(sanitizedPaperVersion)
+        runDirectory.set(file("$localServerDir/$sanitizedPaperVersion"))
 
         val customJvmArgs = mutableListOf( // Add custom JVM arguments here
             "-Dcom.mojang.eula.agree=true", "-Dserver.port=$serverPort"
@@ -65,8 +67,8 @@ tasks {
         println("Starting with JVM args: $jvmArgs")
 
         doFirst {
-            val serverProperties = file("$localServerDir/$paperApiVersion/server.properties")
-            val bukkitYml = file("$localServerDir/$paperApiVersion/bukkit.yml")
+            val serverProperties = file("$localServerDir/$sanitizedPaperVersion/server.properties")
+            val bukkitYml = file("$localServerDir/$sanitizedPaperVersion/bukkit.yml")
 
             listOf(serverProperties, bukkitYml).forEach { file ->
                 file.parentFile.mkdirs()
@@ -75,6 +77,7 @@ tasks {
                 """
                 allow-nether=false
                 enable-command-block=true
+                difficulty=peaceful
                 gamemode=creative
                 level-type=minecraft\:flat
                 motd=A local Paper server
@@ -140,5 +143,12 @@ modrinth {
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(resolveJavaVersion()))
+}
+
+fun resolveJavaVersion(): Int {
+    return when {
+        paperApiVersion.startsWith("26.") -> 25 // Java 25 since Minecraft 26.1
+        else -> 21 // Java 21 for Minecraft versions 1.20.5 to 1.21.11
+    }
 }

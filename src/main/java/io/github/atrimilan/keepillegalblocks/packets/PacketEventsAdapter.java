@@ -10,8 +10,8 @@ public class PacketEventsAdapter {
     private PacketEventsAdapter() {
     }
 
-    public static Object registerFragileBlockBreakListener(BfsResult bfsResult) {
-        FragileBlockBreakListener listener = new FragileBlockBreakListener(bfsResult);
+    public static Object registerReactiveBlockUpdateListener(BfsResult bfsResult) {
+        ReactiveBlockUpdateListener listener = new ReactiveBlockUpdateListener(bfsResult);
         return PacketEvents.getAPI().getEventManager().registerListener(listener, PacketListenerPriority.NORMAL);
     }
 

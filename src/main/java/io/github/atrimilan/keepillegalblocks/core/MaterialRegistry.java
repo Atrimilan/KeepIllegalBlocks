@@ -1,8 +1,7 @@
 package io.github.atrimilan.keepillegalblocks.core;
 
-import io.github.atrimilan.keepillegalblocks.core.types.ConnectableType;
-import io.github.atrimilan.keepillegalblocks.core.types.FragileType;
 import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
+import io.github.atrimilan.keepillegalblocks.core.types.ReactiveType;
 import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import org.bukkit.Material;
 
@@ -17,16 +16,11 @@ import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType
  */
 public class MaterialRegistry {
 
-    private final Map<Material, FragileType> fragileMaterials = new EnumMap<>(Material.class);
-    private final Map<Material, ConnectableType> connectableMaterials = new EnumMap<>(Material.class);
+    private final Map<Material, ReactiveType> reactiveMaterials = new EnumMap<>(Material.class);
     private final Map<Material, InteractableType> interactableMaterials = new EnumMap<>(Material.class);
 
-    public void registerFragile(Material mat, FragileType type) {
-        fragileMaterials.put(mat, type);
-    }
-
-    public void registerConnectable(Material mat, ConnectableType type) {
-        connectableMaterials.put(mat, type);
+    public void registerReactive(Material mat, ReactiveType type) {
+        reactiveMaterials.put(mat, type);
     }
 
     public void registerInteractable(Material mat, InteractableType type) {
@@ -34,19 +28,17 @@ public class MaterialRegistry {
     }
 
     public void clearAll() {
-        fragileMaterials.clear();
-        connectableMaterials.clear();
+        reactiveMaterials.clear();
         interactableMaterials.clear();
     }
 
-    public boolean isFragile(Material mat) {
-        if (mat == null || fragileMaterials.isEmpty()) return false;
-        return fragileMaterials.getOrDefault(mat, FragileType.NONE) != FragileType.NONE;
+    public boolean isReactive(Material mat) {
+        return getReactiveType(mat) != ReactiveType.NONE;
     }
 
-    public boolean isConnectable(Material mat) {
-        if (mat == null || connectableMaterials.isEmpty()) return false;
-        return connectableMaterials.getOrDefault(mat, ConnectableType.NONE) != ConnectableType.NONE;
+    public ReactiveType getReactiveType(Material mat) {
+        if (mat == null || reactiveMaterials.isEmpty()) return ReactiveType.NONE;
+        return reactiveMaterials.getOrDefault(mat, ReactiveType.NONE);
     }
 
     public InteractableType getInteractableType(Material mat) {
@@ -60,12 +52,8 @@ public class MaterialRegistry {
         return interactableType;
     }
 
-    public int getFragileCount() {
-        return fragileMaterials.size();
-    }
-
-    public int getConnectableCount() {
-        return connectableMaterials.size();
+    public int getReactiveCount() {
+        return reactiveMaterials.size();
     }
 
     public int getInteractableCount() {

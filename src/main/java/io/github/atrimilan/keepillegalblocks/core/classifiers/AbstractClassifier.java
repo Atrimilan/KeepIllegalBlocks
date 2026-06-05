@@ -71,9 +71,8 @@ public abstract class AbstractClassifier<T extends KibBlockType> {
         return MaterialTags.CORAL.isTagged(m);
     }
 
-    protected boolean isCrop(Material m) {
-        return Tag.CROPS.isTagged(m) || Material.ATTACHED_MELON_STEM.equals(m) ||
-               Material.ATTACHED_PUMPKIN_STEM.equals(m);
+    protected boolean isCrops(Material m) {
+        return Tag.CROPS.isTagged(m);
     }
 
     protected boolean isFlower(Material m) {

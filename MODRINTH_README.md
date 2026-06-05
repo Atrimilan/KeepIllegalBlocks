@@ -43,23 +43,24 @@ There you go 😎:
 
 ## So what's the point?
 
-"**Fragile blocks**" are illegal blocks that cannot normally be placed and are automatically broken by Minecraft
-physics. These **fragile blocks** can be placed using a Debug Stick or plugins such as WorldEdit or Axiom.
+A **"reactive block"** is a block that naturally updates or breaks due to Minecraft physics when an adjacent block is
+modified. When using tools like a Debug Stick or plugins such as WorldEdit or Axiom, you can place a reactive block in a
+way the game's physics would not normally allow. However, if an adjacent block is updated, the reactive block will
+either break or reset to its natural state.
 
-"**Interactable blocks**" are blocks that can be directly interacted with _(using right-click)_, and can cause **fragile
-blocks** to break.
+An **"interactable block"** is a block that a player can directly interact with by right-clicking. If reactive blocks
+are adjacent to an interactable block, they may break or update when the interactable is used.
 
-Interacting with an **interactable block** triggers a physical update that propagates through all chained **fragile
-blocks**, causing them to break.
+When a reactive block breaks or updates, adjacent reactive blocks can be affected too, causing a chain reaction.
 
-**--> This plugin prevents this behavior to protect your illegal builds, by restoring broken blocks.**
+**→ This plugin fixes this behavior by restoring broken or updated reactive blocks.**
 
 <br/>
 
 <details>
-<summary>🔵 List of fragile material categories</summary>
+<summary>🔵 List of reactive material categories</summary>
 
-List of fragile material categories that are automatically restored by KIB when broken:
+List of reactive material categories that are automatically restored by KIB when broken or updated:
 
 * `amethyst-clusters`
 * `bamboos`
@@ -78,16 +79,19 @@ List of fragile material categories that are automatically restored by KIB when 
 * `dead-bushes`
 * `doors`
 * `dripleaves`
+* `fences` _(fences, iron bars and copper bars)_
 * `ferns`
 * `flowers`
 * `frogspawn`
 * `fungus`
+* `glass-panes`
 * `glow-lichens`
 * `grass`
 * `hanging-roots`
 * `hanging-signs`
 * `ladders`
 * `lanterns`
+* `leaf-litters`
 * `lily-pads`
 * `mangrove-propagules`
 * `mushrooms`
@@ -112,6 +116,7 @@ List of fragile material categories that are automatically restored by KIB when 
 * `tripwire-hooks`
 * `twisting-vines`
 * `vines`
+* `walls`
 * `weeping-vines`
 
 </details>
@@ -143,24 +148,26 @@ List of interactable material categories recorded by KIB:
 </details>
 
 <details>
-<summary>🟢 List of connectable material categories</summary>
+<summary>🤔 Here are a few examples</summary>
 
-List of connectable material categories recorded by KIB:
-
-* `fences` _(fences, iron bars and copper bars)_
-* `glass-panes`
-* `walls`
+* Place a torch on a door. When you open the door, the torch breaks.
+  **→ The torch is "reactive", the door is "interactable".**
+* Stack multiple doors vertically and open the bottom one. All doors above break.
+  **→ All doors are "reactive", the bottom door is the "interactable" one.**
+* Place a row of walls, then use a Debug Stick to create crenels, and use Axiom to add a button on each. When you press
+  one button, all buttons break and all wall connections reset to their normal state.
+  **→ Walls and buttons are "reactive", the pressed button is also "interactable".**
 
 </details>
 
 <br/>
 
 > **NOTE -** KIB does **not** support underwater restorations. This is why `seagrass` and `kelp` are not included in the
-> fragile material list.
+> reactive material list.
 
-> **WARNING -** Even after being restored by KIB, some fragile blocks will still update naturally, such as cactus
-> breaking as they grow, or coral dying when not waterlogged. This is the default behavior of the game, KIB will NOT
-> prevent this, even if they were initially placed using plugins like WorldEdit or Axiom (which rely on advanced chunk
+> **WARNING -** Even after being restored by KIB, some reactive blocks will still update naturally, such as cactus
+> breaking as they grow, or coral dying when not waterlogged. **This is the default behavior of the game, KIB will NOT
+> prevent this**, even if they were initially placed using plugins like WorldEdit or Axiom (which rely on advanced chunk
 > management systems).
 
 <br/>
@@ -179,8 +186,8 @@ everything accidentally... 😅
 
 In your server directory, you can edit `./plugins/KeepIllegalBlocks/config.yml` to:
 
-* Blacklist some fragile or interactable materials _(everything is enabled by default)_
-* Change the maximum number of fragile blocks to restore _(default: 500)_
+* Blacklist some reactive or interactable materials _(everything is enabled by default)_
+* Change the maximum number of reactive blocks to restore _(default: 500)_
 * Only allow KIB in creative mode _(default: true)_
 * Use [PacketEvents](https://modrinth.com/plugin/packetevents) if it is detected _(default: true)_
 
@@ -194,5 +201,8 @@ player).
 **Yes, [PacketEvents](https://modrinth.com/plugin/packetevents) is highly recommended to improve client-side rendering
 and performance.**
 
-It is supported by KIB to tweak network packets and make restorations completely transparent by canceling fragile
-block break sounds and particles, as well as hiding flickering during restoration.
+It is automatically detected by KIB, and it is used to tweak network packets and make restorations completely
+transparent by canceling reactive block break sounds and particles, as well as hiding flickering during restoration.
+
+To find out which version of PacketEvents is recommended, check the “Dependencies” section for the version of KIB you
+want to install.

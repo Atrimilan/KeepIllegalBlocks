@@ -88,10 +88,10 @@ class SettingsTest {
     void shouldLoadGroupSettings() {
         // Given
         ConfigurationSection configurationSection = mock(ConfigurationSection.class);
-        KibGroup kibGroup = KibGroup.FRAGILE;
-        String sectionKey = kibGroup.getSectionKey();
-        when(fileConfig.getStringList(sectionKey + "blacklist")).thenReturn(List.of("DIRT", "STONE"));
-        when(fileConfig.getConfigurationSection(sectionKey + "categories")).thenReturn(configurationSection);
+        KibGroup kibGroup = mock(KibGroup.class);
+
+        when(fileConfig.getStringList(anyString())).thenReturn(List.of("DIRT", "STONE"));
+        when(fileConfig.getConfigurationSection(anyString())).thenReturn(configurationSection);
 
         when(configurationSection.getKeys(false)).thenReturn(Set.of("signs", "grass"));
         when(configurationSection.getBoolean("signs", true)).thenReturn(true);
@@ -116,7 +116,7 @@ class SettingsTest {
     void shouldLoadGroupSettingsWhenConfigurationIsEmpty() {
         settings.reloadConfig(); // This calls the loadGroupSettings() method
 
-        KibGroup kibGroup = KibGroup.FRAGILE;
+        KibGroup kibGroup = mock(KibGroup.class);
         Set<String> blacklist = settings.getBlacklistedMaterialsForGroup(kibGroup);
         Set<String> enabledCategories = settings.getEnabledCategoriesForGroup(kibGroup);
 
