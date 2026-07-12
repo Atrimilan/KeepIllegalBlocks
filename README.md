@@ -97,7 +97,6 @@ List of reactive material categories that are automatically restored by KIB when
 * `nether-roots`
 * `nether-sprouts`
 * `nether-warts`
-* `pointed-dripstones`
 * `pressure-plates`
 * `rails`
 * `redstone-wires`
@@ -108,6 +107,7 @@ List of reactive material categories that are automatically restored by KIB when
 * `sea-pickles`
 * `signs`
 * `snow`
+* `speleothems`
 * `sugar-canes`
 * `sweet-berry-bushes`
 * `switches` _(levers and buttons)_
@@ -248,3 +248,10 @@ You can enable debug mode with the following flags:
   ```sh
   -Dkeepillegalblocks.debug=true
   ```
+
+## FAQ
+
+**Why doesn't KIB restore my blocks when I break an adjacent block?**
+> KIB does not trigger when you break blocks manually (left-click); it only restores blocks that were accidentally
+> broken as a result of an interaction (right-click). This could be a improvement area, but I don't have to work on it
+> right now. However [Axiom](https://modrinth.com/mod/axiom) has a "No update" feature for this use case.

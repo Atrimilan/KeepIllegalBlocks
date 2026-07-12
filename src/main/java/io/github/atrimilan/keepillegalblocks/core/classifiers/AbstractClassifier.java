@@ -6,6 +6,9 @@ import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.data.BlockData;
 
+import java.util.Arrays;
+import java.util.Set;
+
 public abstract class AbstractClassifier<T extends KibBlockType> {
 
     /**
@@ -34,7 +37,7 @@ public abstract class AbstractClassifier<T extends KibBlockType> {
     protected BlockData getBlockData(Material material) {
         try {
             return material.createBlockData();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored) {
             return null;
         }
     }
@@ -42,6 +45,22 @@ public abstract class AbstractClassifier<T extends KibBlockType> {
     protected abstract T classifyMaterial(Material m);
 
     protected abstract T classifyBlockData(BlockData m);
+
+    /**
+     * Check if the block data class directly implements one of the given target interfaces.
+     *
+     * @param blockData        The {@link BlockData} to check
+     * @param targetInterfaces The simple names of the interfaces to look up
+     * @return {@code true} if the block data class implements one of the given target interfaces, {@code false}
+     * otherwise.
+     */
+    protected boolean hasAnyInterface(BlockData blockData, String... targetInterfaces) {
+        Set<String> targets = Set.of(targetInterfaces);
+
+        return Arrays.stream(blockData.getClass().getInterfaces())
+                .map(Class::getSimpleName)
+                .anyMatch(targets::contains);
+    }
 
     protected boolean isCauldron(Material m) {
         return Tag.CAULDRONS.isTagged(m);
