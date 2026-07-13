@@ -11,14 +11,14 @@
 # 500 is sufficient as you will rarely reach that many blocks.
 max-blocks: 500
 
-# By default, KIB is only be enabled in Creative mode.
+# By default, KIB is only enabled in Creative mode.
 only-use-kib-in-creative-mode: true
 
 # Toggle the use of the "PacketEvents" plugin if it is detected.
 # KIB will use it to improve client-side rendering and performance, for example by canceling break sounds and particles.
 use-packet-events-if-detected: true
 
-# Blacklist interactable materials by their name, or disable categories below
+# Blacklist interactable materials by their name, or disable categories below.
 interactable-materials:
   blacklist: [ ]
   categories:
@@ -41,7 +41,7 @@ interactable-materials:
     trap-doors: true
     wooden-buttons: true
 
-# Blacklist reactive materials by their name, or disable categories below
+# Blacklist reactive materials by their name, or disable categories below.
 reactive-materials:
   blacklist: [ ]
   categories:
@@ -81,7 +81,6 @@ reactive-materials:
     nether-roots: true
     nether-sprouts: true
     nether-warts: true
-    pointed-dripstones: true
     pressure-plates: true
     rails: true
     redstone-wires: true
@@ -92,6 +91,7 @@ reactive-materials:
     sea-pickles: true
     signs: true
     snow: true
+    speleothems: true # Pointed dripstones + Sulfur spikes
     sugar-canes: true
     sweet-berry-bushes: true
     switches: true # Levers + Stone buttons + Wooden buttons

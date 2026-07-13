@@ -98,7 +98,6 @@ List of reactive material categories that are automatically restored by KIB when
 * `nether-roots`
 * `nether-sprouts`
 * `nether-warts`
-* `pointed-dripstones`
 * `pressure-plates`
 * `rails`
 * `redstone-wires`
@@ -109,6 +108,7 @@ List of reactive material categories that are automatically restored by KIB when
 * `sea-pickles`
 * `signs`
 * `snow`
+* `speleothems`
 * `sugar-canes`
 * `sweet-berry-bushes`
 * `switches` _(levers and buttons)_
@@ -206,3 +206,12 @@ transparent by canceling reactive block break sounds and particles, as well as h
 
 To find out which version of PacketEvents is recommended, check the “Dependencies” section for the version of KIB you
 want to install.
+
+<br/>
+
+## FAQ
+
+**Why doesn't KIB restore my blocks when I break an adjacent block?**
+> KIB does not trigger when you break blocks manually (left-click); it only restores blocks that were accidentally
+> broken as a result of an interaction (right-click). This could be an improvement area, but I don't have time to work
+> on it at the moment. However, [Axiom](https://modrinth.com/mod/axiom) has a "No update" feature for this use case.

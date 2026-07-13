@@ -11,7 +11,7 @@ package io.github.atrimilan.keepillegalblocks.core.types;
  * Most reactive blocks break instantly on the first tick, except for the following cascade-breaking blocks, which break
  * progressively starting on the second tick after interaction: {@code BAMBOO} (not {@code BAMBOO_SAPLING}),
  * {@code CACTUS}, {@code CAVE_VINES} and {@code CAVE_VINES_PLANT}, {@code CHORUS_PLANT} and {@code CHORUS_FLOWER},
- * {@code POINTED_DRIPSTONE}, {@code SCAFFOLDING}, {@code SUGAR_CANE}, {@code TWISTING_VINES} and
+ * {@code POINTED_DRIPSTONE}, {@code SCAFFOLDING}, {@code SUGAR_CANE}, {@code SULFUR_SPIKE}, {@code TWISTING_VINES} and
  * {@code TWISTING_VINES_PLANT}, {@code WEEPING_VINES} and {@code WEEPING_VINES_PLANT}.
  * <p>
  * A reactive block is "connectable" when it automatically connects to adjacent blocks, such as fences or walls. These
@@ -58,7 +58,6 @@ public enum ReactiveType implements KibBlockType {
     NETHER_SPROUTS("nether-sprouts"),
     NETHER_WART("nether-warts"),
     NONE(null),
-    POINTED_DRIPSTONE("pointed-dripstones", true),
     PRESSURE_PLATE("pressure-plates"),
     RAIL("rails"),
     REDSTONE_WIRE("redstone-wires"),
@@ -69,6 +68,7 @@ public enum ReactiveType implements KibBlockType {
     SEA_PICKLE("sea-pickles"),
     SIGN("signs"),
     SNOW("snow"),
+    SPELEOTHEM("speleothems", true),
     SUGAR_CANE("sugar-canes"),
     SWEET_BERRY_BUSH("sweet-berry-bushes"),
     SWITCH("switches"),
