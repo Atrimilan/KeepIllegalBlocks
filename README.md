@@ -253,5 +253,5 @@ You can enable debug mode with the following flags:
 
 **Why doesn't KIB restore my blocks when I break an adjacent block?**
 > KIB does not trigger when you break blocks manually (left-click); it only restores blocks that were accidentally
-> broken as a result of an interaction (right-click). This could be a improvement area, but I don't have to work on it
-> right now. However [Axiom](https://modrinth.com/mod/axiom) has a "No update" feature for this use case.
+> broken as a result of an interaction (right-click). This could be an improvement area, but I don't have time to work
+> on it at the moment. However, [Axiom](https://modrinth.com/mod/axiom) has a "No update" feature for this use case.
