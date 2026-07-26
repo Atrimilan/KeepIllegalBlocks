@@ -46,7 +46,7 @@ class SettingsTest {
     }
 
     @Test
-    void shouldInitConfig_WithConfigUpdater() {
+    void shouldInitConfig() {
         // Given
         Logger logger = mock(Logger.class);
         Server server = mock(Server.class);
@@ -82,7 +82,7 @@ class SettingsTest {
     }
 
     @Test
-    void shouldInitConfig_WithConfigUpdaterException() {
+    void shouldInitConfigWithConfigUpdaterException() {
         // Given
         Logger logger = mock(Logger.class);
         Server server = mock(Server.class);

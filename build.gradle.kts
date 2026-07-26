@@ -84,7 +84,6 @@ tasks {
                 gamemode=creative
                 level-type=minecraft\:flat
                 motd=A local Paper server
-                online-mode=false
                 """.trimIndent()
             )
             bukkitYml.writeText( // Edit bukkit.yml here
