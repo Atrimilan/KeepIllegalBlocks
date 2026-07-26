@@ -27,6 +27,7 @@ version = projectVersion
 val paperApiVersion: String by project
 val packetEventsVersion: String by project
 val bStatsVersion: String by project
+val configUpdaterVersion: String by project
 
 dependencies {
     // PaperMC
@@ -34,6 +35,8 @@ dependencies {
     testImplementation("io.papermc.paper:paper-api:$paperApiVersion")
     // bStats (shaded jar)
     implementation("org.bstats:bstats-bukkit:$bStatsVersion")
+    // Configuration file
+    implementation("com.tchristofferson:ConfigUpdater:$configUpdaterVersion")
     // PacketEvents (optional plugin)
     compileOnly("com.github.retrooper:packetevents-spigot:$packetEventsVersion")
     testImplementation("com.github.retrooper:packetevents-spigot:$packetEventsVersion")
@@ -81,6 +84,7 @@ tasks {
                 gamemode=creative
                 level-type=minecraft\:flat
                 motd=A local Paper server
+                online-mode=false
                 """.trimIndent()
             )
             bukkitYml.writeText( // Edit bukkit.yml here
@@ -96,9 +100,14 @@ tasks {
         configurations = listOf(project.configurations.runtimeClasspath.get())
         archiveClassifier.set("") // Remove the "-all" classifier
 
-        // bStats configuration
-        dependencies { exclude { it.moduleGroup != "org.bstats" } }
+        dependencies {
+            exclude {
+                it.moduleGroup != "org.bstats" && it.moduleGroup != "com.tchristofferson"
+            }
+        }
+
         relocate("org.bstats", project.group.toString())
+        relocate("com.tchristofferson", project.group.toString())
     }
 
     jar {
