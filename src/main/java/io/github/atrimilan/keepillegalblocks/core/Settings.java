@@ -1,10 +1,12 @@
 package io.github.atrimilan.keepillegalblocks.core;
 
+import com.tchristofferson.configupdater.ConfigUpdater;
 import io.github.atrimilan.keepillegalblocks.core.types.KibGroup;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -30,14 +32,19 @@ public class Settings {
      */
     public void initConfig() {
         plugin.saveDefaultConfig(); // Save a full copy of the default config.yml file
-        plugin.getConfig().options().copyDefaults(true); // For any missing value, copy them from the default config.yml
-        plugin.saveConfig();
+
+        try {
+            ConfigUpdater.update(plugin, "config.yml", new File(plugin.getDataFolder(), "config.yml"));
+        } catch (Exception e) {
+            plugin.getLogger().severe("Failed to update config.yml with ConfigUpdater, copying defaults instead.");
+            plugin.getConfig().options().copyDefaults(true); // Copy any missing value from the default config.yml
+            plugin.saveConfig();
+        }
 
         packetEventsPresent = plugin.getServer().getPluginManager().isPluginEnabled("packetevents");
-
         plugin.getLogger().info(packetEventsPresent ?
-                                "PacketEvents is present, it will be used if \"use-packet-events-if-detected\" is enabled." :
-                                "PacketEvents is not present. It is recommended for better client-side rendering.");
+                                "PacketEvents is present, it will be used if \"use-packet-events-if-detected\" is enabled in the config." :
+                                "PacketEvents is not present, it is recommended for a smoother client-side experience.");
         loadConfig();
     }
 
