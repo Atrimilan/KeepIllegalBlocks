@@ -25,19 +25,23 @@ interactable-materials:
     campfires: true
     candles: true
     cauldrons: true
-    cave-vines: true # Taking their berries (Cave vines + Cave vine plants)
+    # Taking vine berries (Cave vines + Cave vine plants)
+    cave-vines: true
     comparators: true
     composters: true
-    copper-blocks: true # Non-plain copper blocks that can be waxed or scraped
+    # Non-plain copper blocks that can be waxed or scraped
+    copper-blocks: true
     daylight-detectors: true
     doors: true
     end-portal-frames: true
     gates: true
-    lecterns: true # Putting a book on them
+    # Putting a book on a lectern
+    lecterns: true
     levers: true
     repeaters: true
     stone-buttons: true
-    sweet-berry-bushes: true # Taking their berries
+    # Taking bush berries
+    sweet-berry-bushes: true
     trap-doors: true
     wooden-buttons: true
 
@@ -53,17 +57,22 @@ reactive-materials:
     cactus: true
     cakes: true
     carpets: true
-    cave-vines: true # Cave vines + Cave vine plants
-    chorus-plants: true # Chorus plants only (chorus flowers are not supported yet)
+    # Cave vines + Cave vine plants
+    cave-vines: true
+    # Chorus plants only (chorus flowers are not supported yet)
+    chorus-plants: true
     cocoa: true
     crops: true
     comparators: true
-    corals: true # Does not apply to waterlogged corals
+    # Does not apply to waterlogged corals
+    corals: true
     dead-bushes: true
     doors: true
     dripleaves: true
-    fences: true # Fences + Iron bars + Copper bars
-    ferns: true # Ferns + Large ferns
+    # Fences + Iron bars + Copper bars
+    fences: true
+    # Ferns + Large ferns
+    ferns: true
     flowers: true
     frogspawn: true
     fungus: true
@@ -91,13 +100,17 @@ reactive-materials:
     sea-pickles: true
     signs: true
     snow: true
-    speleothems: true # Pointed dripstones + Sulfur spikes
+    # Pointed dripstones + Sulfur spikes
+    speleothems: true
     sugar-canes: true
     sweet-berry-bushes: true
-    switches: true # Levers + Stone buttons + Wooden buttons
+    # Levers + Stone buttons + Wooden buttons
+    switches: true
     torches: true
     tripwire-hooks: true
-    twisting-vines: true # Twisting vines + Twisting vine plants
+    # Twisting vines + Twisting vine plants
+    twisting-vines: true
     vines: true
     walls: true
-    weeping-vines: true # Weeping vines + Weeping vine plants
+    # Weeping vines + Weeping vine plants
+    weeping-vines: true
