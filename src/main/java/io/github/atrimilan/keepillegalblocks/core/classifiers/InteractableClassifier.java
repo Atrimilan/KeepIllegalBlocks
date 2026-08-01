@@ -19,6 +19,7 @@ public class InteractableClassifier extends AbstractClassifier<InteractableType>
             case Candle ignored -> InteractableType.CANDLE;
             case CaveVines ignored -> InteractableType.CAVE_VINES;
             case CaveVinesPlant ignored -> InteractableType.CAVE_VINES;
+            case ChiseledBookshelf ignored -> InteractableType.CHISELED_BOOKSHELF;
             case Comparator ignored -> InteractableType.COMPARATOR;
             case DaylightDetector ignored -> InteractableType.DAYLIGHT_DETECTOR;
             case Door ignored -> InteractableType.DOOR;
