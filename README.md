@@ -256,3 +256,8 @@ You can enable debug mode with the following flags:
 > KIB does not trigger when you break blocks manually (left-click); it only restores blocks that were accidentally
 > broken as a result of an interaction (right-click). This could be an improvement area, but I don't have time to work
 > on it at the moment. However, [Axiom](https://modrinth.com/mod/axiom) has a "No update" feature for this use case.
+
+## bStats graph
+
+![KIB bStats](https://bstats.org/signatures/bukkit/Keep%20Illegal%20Blocks.svg)
+> [Click here](https://bstats.org/plugin/bukkit/Keep%20Illegal%20Blocks/28933) to open the KIB bStats page. 
