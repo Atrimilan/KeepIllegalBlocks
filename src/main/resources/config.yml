@@ -27,6 +27,8 @@ interactable-materials:
     cauldrons: true
     # Taking vine berries (Cave vines + Cave vine plants)
     cave-vines: true
+    # Putting or taking a book from a chiseled bookshelf
+    chiseled-bookshelves: true
     comparators: true
     composters: true
     # Non-plain copper blocks that can be waxed or scraped

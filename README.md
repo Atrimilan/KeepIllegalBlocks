@@ -69,17 +69,17 @@ List of reactive material categories that are automatically restored by KIB when
 * `cactus`
 * `cakes`
 * `carpets`
-* `cave-vines`
-* `chorus-plants` _(except chorus flowers, which are not supported yet)_
+* `cave-vines` _- Cave vines + Cave vine plants_
+* `chorus-plants` _-  Chorus plants only (chorus flowers are not supported yet)_
 * `cocoa`
-* `comparators`
-* `corals` _(does not apply to waterlogged corals)_
 * `crops`
+* `comparators`
+* `corals` _- Does not apply to waterlogged corals_
 * `dead-bushes`
 * `doors`
 * `dripleaves`
-* `fences` _(fences, iron bars and copper bars)_
-* `ferns`
+* `fences` _- Fences + Iron bars + Copper bars_
+* `ferns` _- Ferns + Large ferns_
 * `flowers`
 * `frogspawn`
 * `fungus`
@@ -107,16 +107,16 @@ List of reactive material categories that are automatically restored by KIB when
 * `sea-pickles`
 * `signs`
 * `snow`
-* `speleothems`
+* `speleothems` _- Pointed dripstones + Sulfur spikes_
 * `sugar-canes`
 * `sweet-berry-bushes`
-* `switches` _(levers and buttons)_
+* `switches` _- Levers + Stone buttons + Wooden buttons_
 * `torches`
 * `tripwire-hooks`
-* `twisting-vines`
+* `twisting-vines` _- Twisting vines + Twisting vine plants_
 * `vines`
 * `walls`
-* `weeping-vines`
+* `weeping-vines` _- Weeping vines + Weeping vine plants_
 
 </details>
 
@@ -128,19 +128,20 @@ List of interactable material categories recorded by KIB:
 * `campfires`
 * `candles`
 * `cauldrons`
-* `cave-vines` _(taking their berries)_
+* `cave-vines` _- Taking vine berries (Cave vines + Cave vine plants)_
+* `chiseled-bookshelves` _- Putting or taking a book from a chiseled bookshelf_
 * `comparators`
 * `composters`
-* `copper-blocks` _(non-plain copper blocks that can be waxed or scraped)_
+* `copper-blocks` _- Non-plain copper blocks that can be waxed or scraped_
 * `daylight-detectors`
 * `doors`
 * `end-portal-frames`
 * `gates`
-* `lecterns` _(putting a book on them)_
+* `lecterns` _- Putting a book on a lectern_
 * `levers`
 * `repeaters`
 * `stone-buttons`
-* `sweet-berry-bushes` _(taking their berries)_
+* `sweet-berry-bushes` _- Taking bush berries_
 * `trap-doors`
 * `wooden-buttons`
 

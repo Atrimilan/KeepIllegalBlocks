@@ -15,6 +15,7 @@ public enum InteractableType implements KibBlockType {
     CANDLE("candles"),
     CAULDRON("cauldrons"),
     CAVE_VINES("cave-vines"),
+    CHISELED_BOOKSHELF("chiseled-bookshelves"),
     COMPARATOR("comparators"),
     COMPOSTER("composters"),
     COPPER_BLOCK("copper-blocks"),

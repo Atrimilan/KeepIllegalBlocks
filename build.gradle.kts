@@ -2,6 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     id("java")
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.21"
     id("xyz.jpenilla.run-paper") version "3.0.2"
     id("com.gradleup.shadow") version "9.4.2"
     id("com.modrinth.minotaur") version "2.+"
@@ -30,9 +31,8 @@ val bStatsVersion: String by project
 val configUpdaterVersion: String by project
 
 dependencies {
-    // PaperMC
-    compileOnly("io.papermc.paper:paper-api:$paperApiVersion")
-    testImplementation("io.papermc.paper:paper-api:$paperApiVersion")
+    // PaperMC (via paperweight)
+    paperweight.paperDevBundle(paperApiVersion)
     // bStats (shaded jar)
     implementation("org.bstats:bstats-bukkit:$bStatsVersion")
     // Configuration file
