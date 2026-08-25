@@ -1,4 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import de.undercouch.gradle.tasks.download.Download
 
 plugins {
     id("java")
@@ -6,6 +7,7 @@ plugins {
     id("xyz.jpenilla.run-paper") version "3.0.2"
     id("com.gradleup.shadow") version "9.4.2"
     id("com.modrinth.minotaur") version "2.+"
+    id("de.undercouch.download") version "5.7.0"
 }
 
 repositories {
@@ -26,6 +28,7 @@ group = groupId
 version = projectVersion
 
 val paperApiVersion: String by project
+val serverType: String by project
 val packetEventsVersion: String by project
 val bStatsVersion: String by project
 val configUpdaterVersion: String by project
@@ -58,20 +61,29 @@ val sanitizedPaperVersion = paperApiVersion
 tasks {
     runServer {
         version.set(sanitizedPaperVersion)
-        runDirectory.set(file("$localServerDir/$sanitizedPaperVersion"))
+        runDirectory.set(file("$localServerDir/$serverType-$sanitizedPaperVersion"))
 
-        val customJvmArgs = mutableListOf( // Add custom JVM arguments here
+        // Select custom server type (otherwise defaults to Paper)
+        if (serverType == "purpur") {
+            serverJar(file("$localServerDir/downloaded-jar/purpur-$sanitizedPaperVersion.jar"))
+            dependsOn("downloadPurpurJar")
+        }
+
+        // Add custom JVM arguments
+        val customJvmArgs = mutableListOf(
             "-Dcom.mojang.eula.agree=true", "-Dserver.port=$serverPort"
         )
 
+        // Check if debug mode is enabled
         if (providers.gradleProperty("keepillegalblocks.debug").isPresent) customJvmArgs.add("-Dkeepillegalblocks.debug=true")
 
         jvmArgs(customJvmArgs)
-        println("Starting with JVM args: $jvmArgs")
+        println("Starting $serverType-$sanitizedPaperVersion server with JVM args: $jvmArgs")
 
+        // Configure server properties
         doFirst {
-            val serverProperties = file("$localServerDir/$sanitizedPaperVersion/server.properties")
-            val bukkitYml = file("$localServerDir/$sanitizedPaperVersion/bukkit.yml")
+            val serverProperties = file("$localServerDir/$serverType-$sanitizedPaperVersion/server.properties")
+            val bukkitYml = file("$localServerDir/$serverType-$sanitizedPaperVersion/bukkit.yml")
 
             listOf(serverProperties, bukkitYml).forEach { file ->
                 file.parentFile.mkdirs()
@@ -83,7 +95,7 @@ tasks {
                 difficulty=peaceful
                 gamemode=creative
                 level-type=minecraft\:flat
-                motd=A local Paper server
+                motd=A local ${serverType.replaceFirstChar { it.uppercase() }} server
                 """.trimIndent()
             )
             bukkitYml.writeText( // Edit bukkit.yml here
@@ -107,6 +119,12 @@ tasks {
 
         relocate("org.bstats", project.group.toString())
         relocate("com.tchristofferson", project.group.toString())
+    }
+
+    register("downloadPurpurJar", Download::class) {
+        src("https://api.purpurmc.org/v2/purpur/$sanitizedPaperVersion/latest/download")
+        dest(file("$localServerDir/downloaded-jar/purpur-$sanitizedPaperVersion.jar"))
+        onlyIf { !dest.exists() }
     }
 
     jar {
