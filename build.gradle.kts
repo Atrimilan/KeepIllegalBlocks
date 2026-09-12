@@ -84,8 +84,9 @@ tasks {
         doFirst {
             val serverProperties = file("$localServerDir/$serverType-$sanitizedPaperVersion/server.properties")
             val bukkitYml = file("$localServerDir/$serverType-$sanitizedPaperVersion/bukkit.yml")
+            val bStatsConfigYml = file("$localServerDir/$serverType-$sanitizedPaperVersion/plugins/bStats/config.yml")
 
-            listOf(serverProperties, bukkitYml).forEach { file ->
+            listOf(serverProperties, bukkitYml, bStatsConfigYml).forEach { file ->
                 file.parentFile.mkdirs()
             }
             serverProperties.writeText( // Edit server.properties here
@@ -104,6 +105,7 @@ tasks {
                   allow-end: false
                 """.trimIndent()
             )
+            bStatsConfigYml.writeText("enabled: false") // Disable bStats
         }
     }
 
