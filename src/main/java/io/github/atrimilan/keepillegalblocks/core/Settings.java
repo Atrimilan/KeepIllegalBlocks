@@ -2,6 +2,7 @@ package io.github.atrimilan.keepillegalblocks.core;
 
 import com.tchristofferson.configupdater.ConfigUpdater;
 import io.github.atrimilan.keepillegalblocks.core.types.KibGroup;
+import io.github.atrimilan.keepillegalblocks.core.types.KibRule;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -35,7 +36,7 @@ public class Settings {
 
         try {
             ConfigUpdater.update(plugin, "config.yml", new File(plugin.getDataFolder(), "config.yml"));
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             plugin.getLogger().severe("Failed to update config.yml with ConfigUpdater, copying defaults instead.");
             plugin.getConfig().options().copyDefaults(true); // Copy any missing value from the default config.yml
             plugin.saveConfig();
@@ -84,11 +85,11 @@ public class Settings {
         FileConfiguration config = plugin.getConfig();
 
         // Group's blacklist
-        blacklists.put(kibGroup, new HashSet<>(config.getStringList(kibGroup.getSectionKey() + "blacklist")));
+        blacklists.put(kibGroup, new HashSet<>(config.getStringList(kibGroup.getBlacklistSectionKey())));
 
         // Group's enabled categories
         Set<String> enabledSet = new HashSet<>();
-        ConfigurationSection section = config.getConfigurationSection(kibGroup.getSectionKey() + "categories");
+        ConfigurationSection section = config.getConfigurationSection(kibGroup.getCategoriesSectionKey());
         if (section != null) {
             for (String sKey : section.getKeys(false)) {
                 if (section.getBoolean(sKey, true)) {
@@ -134,5 +135,57 @@ public class Settings {
      */
     public Set<String> getEnabledCategoriesForGroup(KibGroup key) {
         return enabledCategories.getOrDefault(key, Collections.emptySet());
+    }
+
+    public Object getRule(KibRule rule) {
+        return switch (rule) {
+            case KibRule.MAX_BLOCKS -> maxBlocks;
+            case KibRule.ONLY_USE_KIB_IN_CREATIVE_MODE -> onlyEnabledInCreativeMode;
+            case KibRule.USE_PACKET_EVENTS_IF_DETECTED -> usePacketEventsIfDetected;
+        };
+    }
+
+    public void setRule(KibRule rule, Object value) {
+        this.setConfig(switch (rule) {
+            case KibRule.MAX_BLOCKS -> "max-blocks";
+            case KibRule.ONLY_USE_KIB_IN_CREATIVE_MODE -> "only-use-kib-in-creative-mode";
+            case KibRule.USE_PACKET_EVENTS_IF_DETECTED -> "use-packet-events-if-detected";
+        }, value);
+    }
+
+    private <T> void setConfig(String configKey, T configValue) {
+        plugin.getConfig().set(configKey, configValue);
+        plugin.saveConfig();
+        this.reloadConfig();
+    }
+
+    /**
+     * Add a material to the blacklist of the specified group.
+     *
+     * @param group    The {@link KibGroup} to add the material to.
+     * @param material The material name to add to the blacklist.
+     */
+    public void addToBlacklist(KibGroup group, String material) {
+        Set<String> blacklist = blacklists.getOrDefault(group, new HashSet<>());
+        blacklist.add(material);
+        blacklists.put(group, blacklist);
+
+        plugin.getConfig().set(group.getBlacklistSectionKey(), new ArrayList<>(blacklist));
+        plugin.saveConfig();
+    }
+
+    /**
+     * Remove a material from the blacklist of the specified group.
+     *
+     * @param group    The {@link KibGroup} to remove the material from.
+     * @param material The material name to remove from the blacklist.
+     */
+    public void removeFromBlacklist(KibGroup group, String material) {
+        Set<String> blacklist = blacklists.getOrDefault(group, new HashSet<>());
+        blacklist.remove(material);
+        blacklists.put(group, blacklist);
+
+        plugin.getConfig().set(group.getBlacklistSectionKey(), new ArrayList<>(blacklist));
+        plugin.saveConfig();
     }
 }

@@ -49,7 +49,7 @@ public class KeepIllegalBlocks extends JavaPlugin {
 
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             final Commands commands = event.registrar();
-            commands.register(kibCommand.create(), KibCommand.DESCRIPTION, KibCommand.ALIASES);
+            commands.register(kibCommand.build(), KibCommand.DESCRIPTION, KibCommand.ALIASES);
         });
     }
 }

@@ -1,56 +1,45 @@
 package io.github.atrimilan.keepillegalblocks.commands;
 
-import com.mojang.brigadier.Command;
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.github.atrimilan.keepillegalblocks.commands.kib.KibBlacklistCommandNode;
+import io.github.atrimilan.keepillegalblocks.commands.kib.KibHelpCommandNode;
+import io.github.atrimilan.keepillegalblocks.commands.kib.KibReloadCommandNode;
+import io.github.atrimilan.keepillegalblocks.commands.kib.KibRuleCommandNode;
 import io.github.atrimilan.keepillegalblocks.core.RegistryLoader;
 import io.github.atrimilan.keepillegalblocks.core.Settings;
-import io.github.atrimilan.keepillegalblocks.models.LoadResult;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.entity.Player;
 
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
 public class KibCommand {
 
-    public static final String DESCRIPTION = "Reload KeepIllegalBlocks";
+    public static final String DESCRIPTION = "Manage KIB configuration";
     public static final Set<String> ALIASES = Set.of("keepillegalblocks");
 
-    private final Settings settings;
-    private final RegistryLoader registryLoader;
-    private final Logger logger;
+    private final KibReloadCommandNode reloadCommand;
+    private final KibHelpCommandNode helpCommand;
+    private final KibBlacklistCommandNode blacklistCommand;
+    private final KibRuleCommandNode ruleCommand;
 
     public KibCommand(Settings settings, RegistryLoader registryLoader, Logger logger) {
-        this.settings = settings;
-        this.registryLoader = registryLoader;
-        this.logger = logger;
+        this.reloadCommand = new KibReloadCommandNode(settings, registryLoader, logger);
+        this.helpCommand = new KibHelpCommandNode();
+        this.blacklistCommand = new KibBlacklistCommandNode(settings);
+        this.ruleCommand = new KibRuleCommandNode(settings);
     }
 
     /**
-     * @return A LiteralCommandNode of the "/kib" command
+     * @return A {@link LiteralCommandNode} of the full {@code /kib} command
      */
-    public LiteralCommandNode<CommandSourceStack> create() {
-        // Usage: /kib reload
+    public LiteralCommandNode<CommandSourceStack> build() {
         return Commands.literal("kib") //
-                .requires(ctx -> ctx.getSender().hasPermission("kib.reload"))//
-                .then(Commands.literal("reload").executes(this::reloadKib)) //
+                .requires(ctx -> ctx.getSender().hasPermission("kib.*")) //
+                .then(helpCommand.build()) //
+                .then(reloadCommand.build()) //
+                .then(ruleCommand.build()) //
+                .then(blacklistCommand.build()) //
                 .build();
-    }
-
-    private int reloadKib(CommandContext<CommandSourceStack> ctx) {
-        settings.reloadConfig();
-        List<LoadResult> results = registryLoader.fillMaterialRegistry(settings);
-
-        for (LoadResult result : results) {
-            if (ctx.getSource().getExecutor() instanceof Player)
-                ctx.getSource().getSender().sendMessage(MiniMessage.miniMessage().deserialize(result.chatFormat()));
-
-            logger.info(result::consoleFormat);
-        }
-        return Command.SINGLE_SUCCESS;
     }
 }

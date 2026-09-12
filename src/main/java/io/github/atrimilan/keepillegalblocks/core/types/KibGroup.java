@@ -4,13 +4,21 @@ public enum KibGroup {
     INTERACTABLE("interactable"),
     REACTIVE("reactive");
 
-    private final String sectionKey;
+    private final String groupName;
 
-    KibGroup(String sectionKey) {
-        this.sectionKey = sectionKey;
+    KibGroup(String groupName) {
+        this.groupName = groupName;
     }
 
-    public String getSectionKey() {
-        return sectionKey + "-materials.";
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public String getBlacklistSectionKey() {
+        return groupName + "-materials.blacklist";
+    }
+
+    public String getCategoriesSectionKey() {
+        return groupName + "-materials.categories";
     }
 }
