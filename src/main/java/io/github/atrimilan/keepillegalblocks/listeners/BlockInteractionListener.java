@@ -1,6 +1,6 @@
 package io.github.atrimilan.keepillegalblocks.listeners;
 
-import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
+import io.github.atrimilan.keepillegalblocks.core.types.InteractableMaterial;
 import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
 import io.github.atrimilan.keepillegalblocks.core.Settings;
 import io.github.atrimilan.keepillegalblocks.models.BfsResult;
@@ -51,13 +51,13 @@ public class BlockInteractionListener implements Listener {
         Block sourceBlock = event.getClickedBlock();
         if (sourceBlock == null) return;
 
-        InteractableType interactableType = materialRegistry.getInteractableType(sourceBlock.getType());
-        if (InteractableType.NONE.equals(interactableType)) return;
+        InteractableMaterial interactableMaterial = materialRegistry.getInteractableMaterial(sourceBlock.getType());
+        if (InteractableMaterial.NONE.equals(interactableMaterial)) return;
 
         // Perform a BFS to record all reactive blocks
         BfsResult result = service.recordBlockStates(sourceBlock, settings.getMaxBlocks());
 
         // Schedule restoration of reactive blocks that may have been broken or updated due to the player interaction
-        service.scheduleRestoration(result, interactableType);
+        service.scheduleRestoration(result, interactableMaterial);
     }
 }

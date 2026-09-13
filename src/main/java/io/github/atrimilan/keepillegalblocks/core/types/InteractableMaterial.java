@@ -6,11 +6,11 @@ package io.github.atrimilan.keepillegalblocks.core.types;
  * blocks such as chests, grindstones, enchanting tables, etc. are not.
  * <p>
  * Some interactable blocks schedule a second physics update after a few ticks. Currently, only
- * {@link InteractableType#STONE_BUTTON} and {@link InteractableType#WOODEN_BUTTON} have this behavior.
+ * {@link InteractableMaterial#STONE_BUTTON} and {@link InteractableMaterial#WOODEN_BUTTON} have this behavior.
  *
- * @see ReactiveType
+ * @see ReactiveMaterial
  */
-public enum InteractableType implements KibBlockType {
+public enum InteractableMaterial implements MaterialType {
     CAMPFIRE("campfires"),
     CANDLE("candles"),
     CAULDRON("cauldrons"),
@@ -36,12 +36,12 @@ public enum InteractableType implements KibBlockType {
 
     private final long delayBeforeSecondUpdate;
 
-    InteractableType(String configKey) {
+    InteractableMaterial(String configKey) {
         this.configKey = configKey;
         this.delayBeforeSecondUpdate = 0L;
     }
 
-    InteractableType(String configKey, long delayBeforeSecondUpdate) {
+    InteractableMaterial(String configKey, long delayBeforeSecondUpdate) {
         this.configKey = configKey;
         this.delayBeforeSecondUpdate = delayBeforeSecondUpdate;
     }
@@ -52,7 +52,7 @@ public enum InteractableType implements KibBlockType {
     }
 
     @Override
-    public InteractableType getNone() {
+    public InteractableMaterial getNone() {
         return NONE;
     }
 

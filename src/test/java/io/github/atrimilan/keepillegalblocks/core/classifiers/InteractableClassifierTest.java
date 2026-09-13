@@ -1,6 +1,6 @@
 package io.github.atrimilan.keepillegalblocks.core.classifiers;
 
-import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
+import io.github.atrimilan.keepillegalblocks.core.types.InteractableMaterial;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Campfire;
@@ -32,27 +32,27 @@ class InteractableClassifierTest {
 
     static Stream<Arguments> provideMaterial() {
         return Stream.of( // Non-exhaustive list of materials to test
-                Arguments.of(Material.CAMPFIRE, Campfire.class, InteractableType.CAMPFIRE),
-                Arguments.of(Material.OAK_DOOR, Door.class, InteractableType.DOOR),
-//                Arguments.of(Material.STONE_BUTTON, Switch.class, InteractableType.STONE_BUTTON),
-                Arguments.of(Material.OAK_FENCE_GATE, Gate.class, InteractableType.GATE)
-//                Arguments.of(Material.COMPOSTER, BlockData.class, InteractableType.COMPOSTER),
-//                Arguments.of(Material.WATER_CAULDRON, BlockData.class, InteractableType.CAULDRON),
-//                Arguments.of(Material.OXIDIZED_CUT_COPPER_SLAB, BlockData.class, InteractableType.COPPER_BLOCK),
-//                Arguments.of(Material.WAXED_EXPOSED_CUT_COPPER_STAIRS, BlockData.class, InteractableType.COPPER_BLOCK)
+                Arguments.of(Material.CAMPFIRE, Campfire.class, InteractableMaterial.CAMPFIRE),
+                Arguments.of(Material.OAK_DOOR, Door.class, InteractableMaterial.DOOR),
+//                Arguments.of(Material.STONE_BUTTON, Switch.class, InteractableMaterial.STONE_BUTTON),
+                Arguments.of(Material.OAK_FENCE_GATE, Gate.class, InteractableMaterial.GATE)
+//                Arguments.of(Material.COMPOSTER, BlockData.class, InteractableMaterial.COMPOSTER),
+//                Arguments.of(Material.WATER_CAULDRON, BlockData.class, InteractableMaterial.CAULDRON),
+//                Arguments.of(Material.OXIDIZED_CUT_COPPER_SLAB, BlockData.class, InteractableMaterial.COPPER_BLOCK),
+//                Arguments.of(Material.WAXED_EXPOSED_CUT_COPPER_STAIRS, BlockData.class, InteractableMaterial.COPPER_BLOCK)
         );
     }
 
-    void prepareClassifierStubs(Material mat, InteractableType expected) {
-        lenient().doReturn(expected == InteractableType.CAULDRON).when(classifier).isCauldron(mat);
-        lenient().doReturn(expected == InteractableType.COPPER_BLOCK).when(classifier).isNonPlainCopperBlock(mat);
-        lenient().doReturn(expected == InteractableType.STONE_BUTTON).when(classifier).isStoneButton(mat);
-        lenient().doReturn(expected == InteractableType.WOODEN_BUTTON).when(classifier).isWoodenButton(mat);
+    void prepareClassifierStubs(Material mat, InteractableMaterial expected) {
+        lenient().doReturn(expected == InteractableMaterial.CAULDRON).when(classifier).isCauldron(mat);
+        lenient().doReturn(expected == InteractableMaterial.COPPER_BLOCK).when(classifier).isNonPlainCopperBlock(mat);
+        lenient().doReturn(expected == InteractableMaterial.STONE_BUTTON).when(classifier).isStoneButton(mat);
+        lenient().doReturn(expected == InteractableMaterial.WOODEN_BUTTON).when(classifier).isWoodenButton(mat);
     }
 
     @ParameterizedTest
     @MethodSource("provideMaterial")
-    void shouldClassify(Material mat, Class<? extends BlockData> dataClass, InteractableType expected) {
+    void shouldClassify(Material mat, Class<? extends BlockData> dataClass, InteractableMaterial expected) {
         BlockData blockData = mock(dataClass);
         Material materialMock = mock(Material.class);
 
@@ -62,7 +62,7 @@ class InteractableClassifierTest {
 
         this.prepareClassifierStubs(mat, expected);
 
-        InteractableType result = classifier.classify(materialMock);
+        InteractableMaterial result = classifier.classify(materialMock);
 
         assertEquals(expected, result);
     }

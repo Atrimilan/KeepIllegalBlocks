@@ -3,7 +3,7 @@ package io.github.atrimilan.keepillegalblocks.listeners;
 import io.github.atrimilan.keepillegalblocks.BukkitMockFactory;
 import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
 import io.github.atrimilan.keepillegalblocks.core.Settings;
-import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
+import io.github.atrimilan.keepillegalblocks.core.types.InteractableMaterial;
 import io.github.atrimilan.keepillegalblocks.models.BfsResult;
 import io.github.atrimilan.keepillegalblocks.models.InteractableBlockWrapper;
 import io.github.atrimilan.keepillegalblocks.services.BlockRestorationService;
@@ -58,7 +58,7 @@ class BlockInteractionListenerTest {
     @ValueSource(booleans = {true, false})
     void onPlayerInteract_ShouldRestore(boolean isSneaking) {
         Material interactableMat = Material.STONE_BUTTON;
-        InteractableType interactableType = InteractableType.STONE_BUTTON;
+        InteractableMaterial interactableMaterial = InteractableMaterial.STONE_BUTTON;
         BfsResult bfsResult = new BfsResult(
                 new InteractableBlockWrapper(BukkitMockFactory.mockBlockState(interactableMat), false), Set.of(),
                 mock(BoundingBox.class));
@@ -73,14 +73,14 @@ class BlockInteractionListenerTest {
             when(playerInteractEvent.getItem()).thenReturn(null);
         when(playerInteractEvent.getClickedBlock()).thenReturn(clickedBlock);
         when(clickedBlock.getType()).thenReturn(interactableMat);
-        when(materialRegistry.getInteractableType(interactableMat)).thenReturn(interactableType);
+        when(materialRegistry.getInteractableMaterial(interactableMat)).thenReturn(interactableMaterial);
         when(settings.getMaxBlocks()).thenReturn(50);
         when(service.recordBlockStates(clickedBlock, 50)).thenReturn(bfsResult);
 
         listener.onPlayerInteract(playerInteractEvent);
 
         verify(service).recordBlockStates(clickedBlock, 50);
-        verify(service).scheduleRestoration(bfsResult, interactableType);
+        verify(service).scheduleRestoration(bfsResult, interactableMaterial);
     }
 
     // ********** Should not restore **********
@@ -161,11 +161,11 @@ class BlockInteractionListenerTest {
         when(player.isSneaking()).thenReturn(false);
         when(playerInteractEvent.getClickedBlock()).thenReturn(clickedBlock);
         when(clickedBlock.getType()).thenReturn(clickedBlockMaterial);
-        when(materialRegistry.getInteractableType(clickedBlockMaterial)).thenReturn(InteractableType.NONE);
+        when(materialRegistry.getInteractableMaterial(clickedBlockMaterial)).thenReturn(InteractableMaterial.NONE);
 
         listener.onPlayerInteract(playerInteractEvent);
 
-        verify(materialRegistry).getInteractableType(clickedBlockMaterial);
+        verify(materialRegistry).getInteractableMaterial(clickedBlockMaterial);
         verifyNoInteractions(service);
     }
 }

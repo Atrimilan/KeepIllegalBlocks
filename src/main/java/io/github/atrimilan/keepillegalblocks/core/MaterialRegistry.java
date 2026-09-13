@@ -1,7 +1,7 @@
 package io.github.atrimilan.keepillegalblocks.core;
 
-import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
-import io.github.atrimilan.keepillegalblocks.core.types.ReactiveType;
+import io.github.atrimilan.keepillegalblocks.core.types.InteractableMaterial;
+import io.github.atrimilan.keepillegalblocks.core.types.ReactiveMaterial;
 import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import org.bukkit.Material;
 
@@ -16,14 +16,14 @@ import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType
  */
 public class MaterialRegistry {
 
-    private final Map<Material, ReactiveType> reactiveMaterials = new EnumMap<>(Material.class);
-    private final Map<Material, InteractableType> interactableMaterials = new EnumMap<>(Material.class);
+    private final Map<Material, ReactiveMaterial> reactiveMaterials = new EnumMap<>(Material.class);
+    private final Map<Material, InteractableMaterial> interactableMaterials = new EnumMap<>(Material.class);
 
-    public void registerReactive(Material mat, ReactiveType type) {
+    public void registerReactive(Material mat, ReactiveMaterial type) {
         reactiveMaterials.put(mat, type);
     }
 
-    public void registerInteractable(Material mat, InteractableType type) {
+    public void registerInteractable(Material mat, InteractableMaterial type) {
         interactableMaterials.put(mat, type);
     }
 
@@ -33,23 +33,23 @@ public class MaterialRegistry {
     }
 
     public boolean isReactive(Material mat) {
-        return getReactiveType(mat) != ReactiveType.NONE;
+        return getReactiveMaterial(mat) != ReactiveMaterial.NONE;
     }
 
-    public ReactiveType getReactiveType(Material mat) {
-        if (mat == null || reactiveMaterials.isEmpty()) return ReactiveType.NONE;
-        return reactiveMaterials.getOrDefault(mat, ReactiveType.NONE);
+    public ReactiveMaterial getReactiveMaterial(Material mat) {
+        if (mat == null || reactiveMaterials.isEmpty()) return ReactiveMaterial.NONE;
+        return reactiveMaterials.getOrDefault(mat, ReactiveMaterial.NONE);
     }
 
-    public InteractableType getInteractableType(Material mat) {
-        if (mat == null || interactableMaterials.isEmpty()) return InteractableType.NONE;
+    public InteractableMaterial getInteractableMaterial(Material mat) {
+        if (mat == null || interactableMaterials.isEmpty()) return InteractableMaterial.NONE;
 
-        InteractableType interactableType = interactableMaterials.getOrDefault(mat, InteractableType.NONE);
+        InteractableMaterial interactableMat = interactableMaterials.getOrDefault(mat, InteractableMaterial.NONE);
 
         DebugUtils.sendChat(() -> "Material <white>" + mat + "</white> " +
-                                  (interactableType != InteractableType.NONE ? ("is interactable: <white>" + mat) :
-                                   "is not interactable"), interactableType != InteractableType.NONE ? OK : ERROR);
-        return interactableType;
+                                  (interactableMat != InteractableMaterial.NONE ? ("is interactable: <white>" + mat) :
+                                   "is not interactable"), interactableMat != InteractableMaterial.NONE ? OK : ERROR);
+        return interactableMat;
     }
 
     public int getReactiveCount() {

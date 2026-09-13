@@ -63,7 +63,7 @@ class KibCommandTest {
         when(commandSourceStack.getSender()).thenReturn(sender);
         when(commandSourceStack.getExecutor()).thenReturn(mock(Player.class));
 
-        CommandNode<CommandSourceStack> node = kibCommand.create().getChild("reload");
+        CommandNode<CommandSourceStack> node = kibCommand.build().getChild("reload");
         node.getCommand().run(ctx);
 
         verify(settings).reloadConfig();
@@ -82,7 +82,7 @@ class KibCommandTest {
         when(ctx.getSource()).thenReturn(commandSourceStack);
         when(commandSourceStack.getExecutor()).thenReturn(null); // Console is not an Entity
 
-        CommandNode<CommandSourceStack> node = kibCommand.create().getChild("reload");
+        CommandNode<CommandSourceStack> node = kibCommand.build().getChild("reload");
         node.getCommand().run(ctx);
 
         verify(settings).reloadConfig();
@@ -96,7 +96,7 @@ class KibCommandTest {
     void shouldReloadKibWithNoResult() throws Exception { // From any source
         when(registryLoader.fillMaterialRegistry(settings)).thenReturn(Collections.emptyList());
 
-        CommandNode<CommandSourceStack> node = kibCommand.create().getChild("reload");
+        CommandNode<CommandSourceStack> node = kibCommand.build().getChild("reload");
         node.getCommand().run(ctx);
 
         verify(settings).reloadConfig();

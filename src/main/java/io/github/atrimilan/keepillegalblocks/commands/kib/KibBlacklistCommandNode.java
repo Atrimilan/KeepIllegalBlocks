@@ -5,7 +5,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.github.atrimilan.keepillegalblocks.core.Settings;
-import io.github.atrimilan.keepillegalblocks.core.types.KibGroup;
+import io.github.atrimilan.keepillegalblocks.core.types.MaterialGroup;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
@@ -31,21 +31,21 @@ public class KibBlacklistCommandNode extends AbstractKibCommandNode {
     public LiteralArgumentBuilder<CommandSourceStack> build() {
         return Commands.literal("blacklist") //
                 .requires(ctx -> hasPermission(ctx, "kib.blacklist"))
-                .then(this.buildBlacklistSubNode(KibGroup.INTERACTABLE))
-                .then(this.buildBlacklistSubNode(KibGroup.REACTIVE));
+                .then(this.buildBlacklistSubNode(MaterialGroup.INTERACTABLE))
+                .then(this.buildBlacklistSubNode(MaterialGroup.REACTIVE));
     }
 
-    private LiteralArgumentBuilder<CommandSourceStack> buildBlacklistSubNode(KibGroup kibGroup) {
-        return Commands.literal(kibGroup.getGroupName()) //
+    private LiteralArgumentBuilder<CommandSourceStack> buildBlacklistSubNode(MaterialGroup materialGroup) {
+        return Commands.literal(materialGroup.getName()) //
                 .then(Commands.literal("add") //
                               .then(Commands.argument(MATERIAL_ARG, ArgumentTypes.blockState()) //
-                                            .executes(ctx -> this.addToBlacklist(ctx, kibGroup))))
+                                            .executes(ctx -> this.addToBlacklist(ctx, materialGroup))))
                 .then(Commands.literal("remove") //
                               .then(Commands.argument(MATERIAL_ARG, ArgumentTypes.blockState()) //
-                                            .executes(ctx -> this.removeFromBlacklist(ctx, kibGroup))));
+                                            .executes(ctx -> this.removeFromBlacklist(ctx, materialGroup))));
     }
 
-    private int addToBlacklist(CommandContext<CommandSourceStack> ctx, KibGroup group) {
+    private int addToBlacklist(CommandContext<CommandSourceStack> ctx, MaterialGroup group) {
         String material = ctx.getArgument(MATERIAL_ARG, BlockState.class).getBlockData().getMaterial().name();
 
         settings.addToBlacklist(group, material);
@@ -55,7 +55,7 @@ public class KibBlacklistCommandNode extends AbstractKibCommandNode {
         return Command.SINGLE_SUCCESS;
     }
 
-    private int removeFromBlacklist(CommandContext<CommandSourceStack> ctx, KibGroup group) {
+    private int removeFromBlacklist(CommandContext<CommandSourceStack> ctx, MaterialGroup group) {
         String material = ctx.getArgument(MATERIAL_ARG, BlockState.class).getBlockData().getMaterial().name();
 
         settings.removeFromBlacklist(group, material);

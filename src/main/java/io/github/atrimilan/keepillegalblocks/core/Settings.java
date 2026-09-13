@@ -1,7 +1,7 @@
 package io.github.atrimilan.keepillegalblocks.core;
 
 import com.tchristofferson.configupdater.ConfigUpdater;
-import io.github.atrimilan.keepillegalblocks.core.types.KibGroup;
+import io.github.atrimilan.keepillegalblocks.core.types.MaterialGroup;
 import io.github.atrimilan.keepillegalblocks.core.types.KibRule;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -21,8 +21,8 @@ public class Settings {
     private int maxBlocks;
     private boolean onlyEnabledInCreativeMode;
     private boolean usePacketEventsIfDetected;
-    private final Map<KibGroup, Set<String>> blacklists = new EnumMap<>(KibGroup.class);
-    private final Map<KibGroup, Set<String>> enabledCategories = new EnumMap<>(KibGroup.class);
+    private final Map<MaterialGroup, Set<String>> blacklists = new EnumMap<>(MaterialGroup.class);
+    private final Map<MaterialGroup, Set<String>> enabledCategories = new EnumMap<>(MaterialGroup.class);
 
     public Settings(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -71,7 +71,7 @@ public class Settings {
         onlyEnabledInCreativeMode = config.getBoolean("only-use-kib-in-creative-mode");
         usePacketEventsIfDetected = config.getBoolean("use-packet-events-if-detected");
 
-        for (KibGroup group : KibGroup.values()) {
+        for (MaterialGroup group : MaterialGroup.values()) {
             loadGroupSettings(group);
         }
     }
@@ -79,17 +79,17 @@ public class Settings {
     /**
      * Load blacklist and enabled categories of the specified group, from config.yml.
      *
-     * @param kibGroup The {@link KibGroup} to load blacklist and enabled categories for.
+     * @param materialGroup The {@link MaterialGroup} to load blacklist and enabled categories for.
      */
-    private void loadGroupSettings(KibGroup kibGroup) {
+    private void loadGroupSettings(MaterialGroup materialGroup) {
         FileConfiguration config = plugin.getConfig();
 
         // Group's blacklist
-        blacklists.put(kibGroup, new HashSet<>(config.getStringList(kibGroup.getBlacklistSectionKey())));
+        blacklists.put(materialGroup, new HashSet<>(config.getStringList(materialGroup.getBlacklistSectionKey())));
 
         // Group's enabled categories
         Set<String> enabledSet = new HashSet<>();
-        ConfigurationSection section = config.getConfigurationSection(kibGroup.getCategoriesSectionKey());
+        ConfigurationSection section = config.getConfigurationSection(materialGroup.getCategoriesSectionKey());
         if (section != null) {
             for (String sKey : section.getKeys(false)) {
                 if (section.getBoolean(sKey, true)) {
@@ -97,7 +97,7 @@ public class Settings {
                 }
             }
         }
-        enabledCategories.put(kibGroup, enabledSet);
+        enabledCategories.put(materialGroup, enabledSet);
     }
 
     /**
@@ -122,18 +122,18 @@ public class Settings {
     }
 
     /**
-     * @param key The {@link KibGroup}
+     * @param key The {@link MaterialGroup}
      * @return A set of blacklisted material names for the specified group.
      */
-    public Set<String> getBlacklistedMaterialsForGroup(KibGroup key) {
+    public Set<String> getBlacklistedMaterialsForGroup(MaterialGroup key) {
         return blacklists.getOrDefault(key, Collections.emptySet());
     }
 
     /**
-     * @param key The {@link KibGroup}
+     * @param key The {@link MaterialGroup}
      * @return A set of enabled categories for the specified group.
      */
-    public Set<String> getEnabledCategoriesForGroup(KibGroup key) {
+    public Set<String> getEnabledCategoriesForGroup(MaterialGroup key) {
         return enabledCategories.getOrDefault(key, Collections.emptySet());
     }
 
@@ -162,10 +162,10 @@ public class Settings {
     /**
      * Add a material to the blacklist of the specified group.
      *
-     * @param group    The {@link KibGroup} to add the material to.
+     * @param group    The {@link MaterialGroup} to add the material to.
      * @param material The material name to add to the blacklist.
      */
-    public void addToBlacklist(KibGroup group, String material) {
+    public void addToBlacklist(MaterialGroup group, String material) {
         Set<String> blacklist = blacklists.getOrDefault(group, new HashSet<>());
         blacklist.add(material);
         blacklists.put(group, blacklist);
@@ -177,10 +177,10 @@ public class Settings {
     /**
      * Remove a material from the blacklist of the specified group.
      *
-     * @param group    The {@link KibGroup} to remove the material from.
+     * @param group    The {@link MaterialGroup} to remove the material from.
      * @param material The material name to remove from the blacklist.
      */
-    public void removeFromBlacklist(KibGroup group, String material) {
+    public void removeFromBlacklist(MaterialGroup group, String material) {
         Set<String> blacklist = blacklists.getOrDefault(group, new HashSet<>());
         blacklist.remove(material);
         blacklists.put(group, blacklist);

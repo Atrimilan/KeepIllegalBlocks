@@ -1,7 +1,7 @@
 package io.github.atrimilan.keepillegalblocks.core;
 
-import io.github.atrimilan.keepillegalblocks.core.types.ReactiveType;
-import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
+import io.github.atrimilan.keepillegalblocks.core.types.ReactiveMaterial;
+import io.github.atrimilan.keepillegalblocks.core.types.InteractableMaterial;
 import org.bukkit.Material;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,8 +18,8 @@ class MaterialRegistryTest {
 
     @Test
     void shouldGetCountsAndClearAll() {
-        materialRegistry.registerReactive(Material.RED_BED, ReactiveType.BED);
-        materialRegistry.registerInteractable(Material.STONE_BUTTON, InteractableType.STONE_BUTTON);
+        materialRegistry.registerReactive(Material.RED_BED, ReactiveMaterial.BED);
+        materialRegistry.registerInteractable(Material.STONE_BUTTON, InteractableMaterial.STONE_BUTTON);
 
         assertEquals(1, materialRegistry.getReactiveCount());
         assertEquals(1, materialRegistry.getInteractableCount());
@@ -36,26 +36,26 @@ class MaterialRegistryTest {
 
     @Test
     void shouldBeReactive() {
-        materialRegistry.registerReactive(Material.RED_BED, ReactiveType.BED);
+        materialRegistry.registerReactive(Material.RED_BED, ReactiveMaterial.BED);
         assertTrue(materialRegistry.isReactive(Material.RED_BED));
-        assertEquals(ReactiveType.BED, materialRegistry.getReactiveType(Material.RED_BED));
+        assertEquals(ReactiveMaterial.BED, materialRegistry.getReactiveMaterial(Material.RED_BED));
 
-        materialRegistry.registerReactive(Material.QUARTZ_BLOCK, ReactiveType.NONE);
+        materialRegistry.registerReactive(Material.QUARTZ_BLOCK, ReactiveMaterial.NONE);
         assertFalse(materialRegistry.isReactive(Material.QUARTZ_BLOCK));
-        assertEquals(ReactiveType.NONE, materialRegistry.getReactiveType(Material.QUARTZ_BLOCK));
+        assertEquals(ReactiveMaterial.NONE, materialRegistry.getReactiveMaterial(Material.QUARTZ_BLOCK));
 
         assertFalse(materialRegistry.isReactive(Material.CRAFTING_TABLE));
-        assertEquals(ReactiveType.NONE, materialRegistry.getReactiveType(Material.CRAFTING_TABLE));
+        assertEquals(ReactiveMaterial.NONE, materialRegistry.getReactiveMaterial(Material.CRAFTING_TABLE));
     }
 
     @Test
-    void shouldGetInteractableType() {
-        materialRegistry.registerInteractable(Material.STONE_BUTTON, InteractableType.STONE_BUTTON);
-        assertEquals(InteractableType.STONE_BUTTON, materialRegistry.getInteractableType(Material.STONE_BUTTON));
+    void shouldGetInteractableMaterial() {
+        materialRegistry.registerInteractable(Material.STONE_BUTTON, InteractableMaterial.STONE_BUTTON);
+        assertEquals(InteractableMaterial.STONE_BUTTON, materialRegistry.getInteractableMaterial(Material.STONE_BUTTON));
 
-        materialRegistry.registerInteractable(Material.QUARTZ_BLOCK, InteractableType.NONE);
-        assertEquals(InteractableType.NONE, materialRegistry.getInteractableType(Material.QUARTZ_BLOCK));
+        materialRegistry.registerInteractable(Material.QUARTZ_BLOCK, InteractableMaterial.NONE);
+        assertEquals(InteractableMaterial.NONE, materialRegistry.getInteractableMaterial(Material.QUARTZ_BLOCK));
 
-        assertEquals(InteractableType.NONE, materialRegistry.getInteractableType(Material.CRAFTING_TABLE));
+        assertEquals(InteractableMaterial.NONE, materialRegistry.getInteractableMaterial(Material.CRAFTING_TABLE));
     }
 }

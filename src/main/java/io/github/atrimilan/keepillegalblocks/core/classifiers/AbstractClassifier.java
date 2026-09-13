@@ -1,7 +1,7 @@
 package io.github.atrimilan.keepillegalblocks.core.classifiers;
 
 import com.destroystokyo.paper.MaterialTags;
-import io.github.atrimilan.keepillegalblocks.core.types.KibBlockType;
+import io.github.atrimilan.keepillegalblocks.core.types.MaterialType;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.data.BlockData;
@@ -9,25 +9,25 @@ import org.bukkit.block.data.BlockData;
 import java.util.Arrays;
 import java.util.Set;
 
-public abstract class AbstractClassifier<T extends KibBlockType> {
+public abstract class AbstractClassifier<T extends MaterialType> {
 
     /**
-     * Classify a material into a {@link KibBlockType}:
+     * Classify a material into a {@link MaterialType}:
      * <li>First, if the material is a block, it is classified based on its block data</li>
      * <li>If the material is not a block, or the previous step returns {@code NONE}, it is classified based on the
      * material itself.</li>
      *
      * @param material The material to classify
-     * @return The classified {@link KibBlockType}
+     * @return The classified {@link MaterialType}
      */
     public T classify(Material material) {
         if (material.isBlock()) {
             BlockData blockData = getBlockData(material);
 
             if (blockData != null) {
-                T kibBlockType = classifyBlockData(blockData);
-                if (!kibBlockType.getNone().equals(kibBlockType)) {
-                    return kibBlockType;
+                T materialType = classifyBlockData(blockData);
+                if (!materialType.getNone().equals(materialType)) {
+                    return materialType;
                 }
             }
         }

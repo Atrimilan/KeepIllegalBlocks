@@ -1,50 +1,50 @@
 package io.github.atrimilan.keepillegalblocks.core.classifiers;
 
-import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
+import io.github.atrimilan.keepillegalblocks.core.types.InteractableMaterial;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.*;
 
 /**
- * See more details about "interactable" blocks here: {@link InteractableType}.
+ * See more details about "interactable" blocks here: {@link InteractableMaterial}.
  *
  * @see ReactiveClassifier
  */
-public class InteractableClassifier extends AbstractClassifier<InteractableType> {
+public class InteractableClassifier extends AbstractClassifier<InteractableMaterial> {
 
     @Override
-    protected InteractableType classifyBlockData(BlockData blockData) {
+    protected InteractableMaterial classifyBlockData(BlockData blockData) {
         return switch (blockData) {
-            case Campfire ignored -> InteractableType.CAMPFIRE;
-            case Candle ignored -> InteractableType.CANDLE;
-            case CaveVines ignored -> InteractableType.CAVE_VINES;
-            case CaveVinesPlant ignored -> InteractableType.CAVE_VINES;
-            case ChiseledBookshelf ignored -> InteractableType.CHISELED_BOOKSHELF;
-            case Comparator ignored -> InteractableType.COMPARATOR;
-            case DaylightDetector ignored -> InteractableType.DAYLIGHT_DETECTOR;
-            case Door ignored -> InteractableType.DOOR;
-            case EndPortalFrame ignored -> InteractableType.END_PORTAL_FRAME;
-            case Gate ignored -> InteractableType.GATE;
-            case Lectern ignored -> InteractableType.LECTERN;
-            case Repeater ignored -> InteractableType.REPEATER;
-            case TrapDoor ignored -> InteractableType.TRAP_DOOR;
+            case Campfire ignored -> InteractableMaterial.CAMPFIRE;
+            case Candle ignored -> InteractableMaterial.CANDLE;
+            case CaveVines ignored -> InteractableMaterial.CAVE_VINES;
+            case CaveVinesPlant ignored -> InteractableMaterial.CAVE_VINES;
+            case ChiseledBookshelf ignored -> InteractableMaterial.CHISELED_BOOKSHELF;
+            case Comparator ignored -> InteractableMaterial.COMPARATOR;
+            case DaylightDetector ignored -> InteractableMaterial.DAYLIGHT_DETECTOR;
+            case Door ignored -> InteractableMaterial.DOOR;
+            case EndPortalFrame ignored -> InteractableMaterial.END_PORTAL_FRAME;
+            case Gate ignored -> InteractableMaterial.GATE;
+            case Lectern ignored -> InteractableMaterial.LECTERN;
+            case Repeater ignored -> InteractableMaterial.REPEATER;
+            case TrapDoor ignored -> InteractableMaterial.TRAP_DOOR;
 
-            default -> InteractableType.NONE;
+            default -> InteractableMaterial.NONE;
         };
     }
 
     @Override
-    protected InteractableType classifyMaterial(Material material) {
+    protected InteractableMaterial classifyMaterial(Material material) {
         return switch (material) {
-            case Material m when isCauldron(m) -> InteractableType.CAULDRON;
-            case Material m when isNonPlainCopperBlock(m) -> InteractableType.COPPER_BLOCK;
-            case Material m when isStoneButton(m) -> InteractableType.STONE_BUTTON;
-            case Material m when isWoodenButton(m) -> InteractableType.WOODEN_BUTTON;
-            case COMPOSTER -> InteractableType.COMPOSTER;
-            case LEVER -> InteractableType.LEVER;
-            case SWEET_BERRY_BUSH -> InteractableType.SWEET_BERRY_BUSH;
+            case Material m when isCauldron(m) -> InteractableMaterial.CAULDRON;
+            case Material m when isNonPlainCopperBlock(m) -> InteractableMaterial.COPPER_BLOCK;
+            case Material m when isStoneButton(m) -> InteractableMaterial.STONE_BUTTON;
+            case Material m when isWoodenButton(m) -> InteractableMaterial.WOODEN_BUTTON;
+            case COMPOSTER -> InteractableMaterial.COMPOSTER;
+            case LEVER -> InteractableMaterial.LEVER;
+            case SWEET_BERRY_BUSH -> InteractableMaterial.SWEET_BERRY_BUSH;
 
-            default -> InteractableType.NONE;
+            default -> InteractableMaterial.NONE;
         };
     }
 }

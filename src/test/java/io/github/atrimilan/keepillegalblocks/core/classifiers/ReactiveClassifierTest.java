@@ -1,6 +1,6 @@
 package io.github.atrimilan.keepillegalblocks.core.classifiers;
 
-import io.github.atrimilan.keepillegalblocks.core.types.ReactiveType;
+import io.github.atrimilan.keepillegalblocks.core.types.ReactiveMaterial;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.*;
@@ -30,48 +30,48 @@ class ReactiveClassifierTest {
 
     static Stream<Arguments> provideMaterial() {
         return Stream.of( // Non-exhaustive list of materials to test
-                Arguments.of(Material.RED_BED, Bed.class, ReactiveType.BED),
-                Arguments.of(Material.CAKE, Cake.class, ReactiveType.CAKE),
-                Arguments.of(Material.OAK_DOOR, Door.class, ReactiveType.DOOR),
-                Arguments.of(Material.STONE_BUTTON, Switch.class, ReactiveType.SWITCH),
-//                Arguments.of(Material.BLUE_BANNER, BlockData.class, ReactiveType.BANNER),
-//                Arguments.of(Material.GREEN_CARPET, BlockData.class, ReactiveType.CARPET),
-//                Arguments.of(Material.MOSS_CARPET, BlockData.class, ReactiveType.CARPET),
-//                Arguments.of(Material.PITCHER_CROP, BlockData.class, ReactiveType.CROP),
-//                Arguments.of(Material.WHEAT_SEEDS, BlockData.class, ReactiveType.CROP),
-//                Arguments.of(Material.ATTACHED_PUMPKIN_STEM, BlockData.class, ReactiveType.CROP),
-//                Arguments.of(Material.LIGHT_WEIGHTED_PRESSURE_PLATE, BlockData.class, ReactiveType.PRESSURE_PLATE),
-//                Arguments.of(Material.TORCH, BlockData.class, ReactiveType.TORCH),
-//                Arguments.of(Material.REDSTONE_WALL_TORCH, BlockData.class, ReactiveType.TORCH),
-//                Arguments.of(Material.CACTUS, BlockData.class, ReactiveType.CACTUS),
-//                Arguments.of(Material.CRIMSON_FUNGUS, BlockData.class, ReactiveType.FUNGUS),
-//                Arguments.of(Material.SUGAR_CANE, BlockData.class, ReactiveType.SUGAR_CANE),
+                Arguments.of(Material.RED_BED, Bed.class, ReactiveMaterial.BED),
+                Arguments.of(Material.CAKE, Cake.class, ReactiveMaterial.CAKE),
+                Arguments.of(Material.OAK_DOOR, Door.class, ReactiveMaterial.DOOR),
+                Arguments.of(Material.STONE_BUTTON, Switch.class, ReactiveMaterial.SWITCH),
+//                Arguments.of(Material.BLUE_BANNER, BlockData.class, ReactiveMaterial.BANNER),
+//                Arguments.of(Material.GREEN_CARPET, BlockData.class, ReactiveMaterial.CARPET),
+//                Arguments.of(Material.MOSS_CARPET, BlockData.class, ReactiveMaterial.CARPET),
+//                Arguments.of(Material.PITCHER_CROP, BlockData.class, ReactiveMaterial.CROP),
+//                Arguments.of(Material.WHEAT_SEEDS, BlockData.class, ReactiveMaterial.CROP),
+//                Arguments.of(Material.ATTACHED_PUMPKIN_STEM, BlockData.class, ReactiveMaterial.CROP),
+//                Arguments.of(Material.LIGHT_WEIGHTED_PRESSURE_PLATE, BlockData.class, ReactiveMaterial.PRESSURE_PLATE),
+//                Arguments.of(Material.TORCH, BlockData.class, ReactiveMaterial.TORCH),
+//                Arguments.of(Material.REDSTONE_WALL_TORCH, BlockData.class, ReactiveMaterial.TORCH),
+//                Arguments.of(Material.CACTUS, BlockData.class, ReactiveMaterial.CACTUS),
+//                Arguments.of(Material.CRIMSON_FUNGUS, BlockData.class, ReactiveMaterial.FUNGUS),
+//                Arguments.of(Material.SUGAR_CANE, BlockData.class, ReactiveMaterial.SUGAR_CANE),
 
-                Arguments.of(Material.CRIMSON_FENCE, Fence.class, ReactiveType.FENCE),
-                Arguments.of(Material.IRON_BARS, Fence.class, ReactiveType.FENCE),
-//                Arguments.of(Material.OXIDIZED_COPPER_BARS, Fence.class, ReactiveType.FENCE),
-                Arguments.of(Material.GLASS_PANE, GlassPane.class, ReactiveType.GLASS_PANE),
-                Arguments.of(Material.CYAN_STAINED_GLASS_PANE, GlassPane.class, ReactiveType.GLASS_PANE),
-                Arguments.of(Material.BRICK_WALL, Wall.class, ReactiveType.WALL)
+                Arguments.of(Material.CRIMSON_FENCE, Fence.class, ReactiveMaterial.FENCE),
+                Arguments.of(Material.IRON_BARS, Fence.class, ReactiveMaterial.FENCE),
+//                Arguments.of(Material.OXIDIZED_COPPER_BARS, Fence.class, ReactiveMaterial.FENCE),
+                Arguments.of(Material.GLASS_PANE, GlassPane.class, ReactiveMaterial.GLASS_PANE),
+                Arguments.of(Material.CYAN_STAINED_GLASS_PANE, GlassPane.class, ReactiveMaterial.GLASS_PANE),
+                Arguments.of(Material.BRICK_WALL, Wall.class, ReactiveMaterial.WALL)
         );
     }
 
-    void prepareClassifierStubs(Material mat, ReactiveType expected) {
-        lenient().doReturn(expected == ReactiveType.BANNER).when(classifier).isBanner(mat);
-        lenient().doReturn(expected == ReactiveType.CARPET).when(classifier).isCarpet(mat);
-        lenient().doReturn(expected == ReactiveType.CORAL).when(classifier).isCoral(mat);
-        lenient().doReturn(expected == ReactiveType.CROP).when(classifier).isCrops(mat);
-        lenient().doReturn(expected == ReactiveType.FLOWER).when(classifier).isFlower(mat);
-        lenient().doReturn(expected == ReactiveType.MUSHROOM).when(classifier).isMushroom(mat);
-        lenient().doReturn(expected == ReactiveType.PRESSURE_PLATE).when(classifier).isPressurePlate(mat);
-        lenient().doReturn(expected == ReactiveType.SAPLING).when(classifier).isSapling(mat);
-        lenient().doReturn(expected == ReactiveType.SIGN).when(classifier).isSign(mat);
-        lenient().doReturn(expected == ReactiveType.TORCH).when(classifier).isTorch(mat);
+    void prepareClassifierStubs(Material mat, ReactiveMaterial expected) {
+        lenient().doReturn(expected == ReactiveMaterial.BANNER).when(classifier).isBanner(mat);
+        lenient().doReturn(expected == ReactiveMaterial.CARPET).when(classifier).isCarpet(mat);
+        lenient().doReturn(expected == ReactiveMaterial.CORAL).when(classifier).isCoral(mat);
+        lenient().doReturn(expected == ReactiveMaterial.CROP).when(classifier).isCrops(mat);
+        lenient().doReturn(expected == ReactiveMaterial.FLOWER).when(classifier).isFlower(mat);
+        lenient().doReturn(expected == ReactiveMaterial.MUSHROOM).when(classifier).isMushroom(mat);
+        lenient().doReturn(expected == ReactiveMaterial.PRESSURE_PLATE).when(classifier).isPressurePlate(mat);
+        lenient().doReturn(expected == ReactiveMaterial.SAPLING).when(classifier).isSapling(mat);
+        lenient().doReturn(expected == ReactiveMaterial.SIGN).when(classifier).isSign(mat);
+        lenient().doReturn(expected == ReactiveMaterial.TORCH).when(classifier).isTorch(mat);
     }
 
     @ParameterizedTest
     @MethodSource("provideMaterial")
-    void shouldClassify(Material mat, Class<? extends BlockData> dataClass, ReactiveType expected) {
+    void shouldClassify(Material mat, Class<? extends BlockData> dataClass, ReactiveMaterial expected) {
         BlockData blockData = mock(dataClass);
         Material materialMock = mock(Material.class);
 
@@ -81,7 +81,7 @@ class ReactiveClassifierTest {
 
         this.prepareClassifierStubs(mat, expected);
 
-        ReactiveType result = classifier.classify(materialMock);
+        ReactiveMaterial result = classifier.classify(materialMock);
 
         assertEquals(expected, result);
     }

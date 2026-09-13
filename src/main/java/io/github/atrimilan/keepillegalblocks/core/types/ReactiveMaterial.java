@@ -18,9 +18,9 @@ package io.github.atrimilan.keepillegalblocks.core.types;
  * connections can also be modified illegally, and they will return to their normal connection state when a physics
  * update is triggered on an adjacent block.
  *
- * @see InteractableType
+ * @see InteractableMaterial
  */
-public enum ReactiveType implements KibBlockType {
+public enum ReactiveMaterial implements MaterialType {
     AMETHYST_CLUSTER("amethyst-clusters"),
     BAMBOO("bamboos"),
     BANNER("banners"),
@@ -83,12 +83,12 @@ public enum ReactiveType implements KibBlockType {
 
     private final boolean isConnectable;
 
-    ReactiveType(String configKey) {
+    ReactiveMaterial(String configKey) {
         this.configKey = configKey;
         this.isConnectable = false;
     }
 
-    ReactiveType(String configKey, boolean isConnectable) {
+    ReactiveMaterial(String configKey, boolean isConnectable) {
         this.configKey = configKey;
         this.isConnectable = isConnectable;
     }
@@ -99,7 +99,7 @@ public enum ReactiveType implements KibBlockType {
     }
 
     @Override
-    public ReactiveType getNone() {
+    public ReactiveMaterial getNone() {
         return NONE;
     }
 

@@ -1,7 +1,7 @@
 package io.github.atrimilan.keepillegalblocks.core;
 
 import com.tchristofferson.configupdater.ConfigUpdater;
-import io.github.atrimilan.keepillegalblocks.core.types.KibGroup;
+import io.github.atrimilan.keepillegalblocks.core.types.MaterialGroup;
 import org.bukkit.Server;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -137,7 +137,7 @@ class SettingsTest {
     void shouldLoadGroupSettings() {
         // Given
         ConfigurationSection configurationSection = mock(ConfigurationSection.class);
-        KibGroup kibGroup = mock(KibGroup.class);
+        MaterialGroup materialGroup = mock(MaterialGroup.class);
 
         when(fileConfig.getStringList(anyString())).thenReturn(List.of("DIRT", "STONE"));
         when(fileConfig.getConfigurationSection(anyString())).thenReturn(configurationSection);
@@ -150,8 +150,8 @@ class SettingsTest {
         settings.reloadConfig(); // This calls the loadGroupSettings() method
 
         // Then
-        Set<String> blacklist = settings.getBlacklistedMaterialsForGroup(kibGroup);
-        Set<String> enabledCategories = settings.getEnabledCategoriesForGroup(kibGroup);
+        Set<String> blacklist = settings.getBlacklistedMaterialsForGroup(materialGroup);
+        Set<String> enabledCategories = settings.getEnabledCategoriesForGroup(materialGroup);
 
         assertEquals(2, blacklist.size());
         assertTrue(blacklist.contains("DIRT"));
@@ -165,9 +165,9 @@ class SettingsTest {
     void shouldLoadGroupSettingsWhenConfigurationIsEmpty() {
         settings.reloadConfig(); // This calls the loadGroupSettings() method
 
-        KibGroup kibGroup = mock(KibGroup.class);
-        Set<String> blacklist = settings.getBlacklistedMaterialsForGroup(kibGroup);
-        Set<String> enabledCategories = settings.getEnabledCategoriesForGroup(kibGroup);
+        MaterialGroup materialGroup = mock(MaterialGroup.class);
+        Set<String> blacklist = settings.getBlacklistedMaterialsForGroup(materialGroup);
+        Set<String> enabledCategories = settings.getEnabledCategoriesForGroup(materialGroup);
 
         assertEquals(0, blacklist.size());
         assertEquals(0, enabledCategories.size());

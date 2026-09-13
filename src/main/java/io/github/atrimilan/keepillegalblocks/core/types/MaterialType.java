@@ -1,8 +1,8 @@
 package io.github.atrimilan.keepillegalblocks.core.types;
 
-public interface KibBlockType {
+public interface MaterialType {
 
     String getConfigKey();
 
-    KibBlockType getNone();
+    MaterialType getNone();
 }

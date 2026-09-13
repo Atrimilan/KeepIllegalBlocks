@@ -2,8 +2,8 @@ package io.github.atrimilan.keepillegalblocks.core;
 
 import io.github.atrimilan.keepillegalblocks.core.classifiers.ReactiveClassifier;
 import io.github.atrimilan.keepillegalblocks.core.classifiers.InteractableClassifier;
-import io.github.atrimilan.keepillegalblocks.core.types.KibBlockType;
-import io.github.atrimilan.keepillegalblocks.core.types.KibGroup;
+import io.github.atrimilan.keepillegalblocks.core.types.MaterialType;
+import io.github.atrimilan.keepillegalblocks.core.types.MaterialGroup;
 import io.github.atrimilan.keepillegalblocks.models.LoadResult;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import static io.github.atrimilan.keepillegalblocks.core.types.KibGroup.*;
+import static io.github.atrimilan.keepillegalblocks.core.types.MaterialGroup.*;
 
 /**
  * Handle the loading of materials into the registry.
@@ -33,7 +33,7 @@ public class RegistryLoader {
      * initialized before calling this method.</b>
      *
      * @param settings The {@link Settings} to use to load the registry
-     * @return A list of {@link LoadResult}, containing the count of blacklisted materials for each {@link KibGroup}
+     * @return A list of {@link LoadResult} containing the count of blacklisted materials for each {@link MaterialGroup}
      */
     public List<LoadResult> fillMaterialRegistry(Settings settings) {
         registry.clearAll();
@@ -51,15 +51,15 @@ public class RegistryLoader {
      * Classify material of the given group, and add it to the material registry.
      *
      * @param settings                      The {@link Settings} to use to load the registry
-     * @param group                         The {@link KibGroup}
+     * @param group                         The {@link MaterialGroup}
      * @param classifierMethod              The classifier method to execute
      * @param registrySetter                The registry setter to execute
      * @param propagateToPlacementMaterials Whether to propagate the classification to placement materials (see
      *                                      {@link BlockData#getPlacementMaterial})
-     * @param <T>                           An implementation of {@link KibBlockType}
+     * @param <T>                           An implementation of {@link MaterialType}
      * @return The count of blacklisted materials
      */
-    protected <T extends KibBlockType> int loadRegistry(Settings settings, KibGroup group,
+    protected <T extends MaterialType> int loadRegistry(Settings settings, MaterialGroup group,
                                                         Function<Material, T> classifierMethod,
                                                         BiConsumer<Material, T> registrySetter,
                                                         boolean propagateToPlacementMaterials) {

@@ -4,8 +4,8 @@ import com.github.retrooper.packetevents.event.PacketListenerCommon;
 import io.github.atrimilan.keepillegalblocks.BukkitMockFactory;
 import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
 import io.github.atrimilan.keepillegalblocks.core.Settings;
-import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
-import io.github.atrimilan.keepillegalblocks.core.types.ReactiveType;
+import io.github.atrimilan.keepillegalblocks.core.types.InteractableMaterial;
+import io.github.atrimilan.keepillegalblocks.core.types.ReactiveMaterial;
 import io.github.atrimilan.keepillegalblocks.listeners.ItemSpawnListener;
 import io.github.atrimilan.keepillegalblocks.models.BfsResult;
 import io.github.atrimilan.keepillegalblocks.models.InteractableBlockWrapper;
@@ -76,7 +76,7 @@ class BlockRestorationServiceTest {
                                   boolean withConnectableReactiveRelatives) {
         Block source = BukkitMockFactory.mockBlock(sourceMaterial);
 
-        lenient().when(materialRegistry.getReactiveType(any(Material.class))).thenReturn(ReactiveType.NONE);
+        lenient().when(materialRegistry.getReactiveMaterial(any(Material.class))).thenReturn(ReactiveMaterial.NONE);
 
         if (withReactiveRelatives) {
             Block north = BukkitMockFactory.mockBlock(Material.STONE_BUTTON);
@@ -86,9 +86,9 @@ class BlockRestorationServiceTest {
             BukkitMockFactory.setBlockRelative(source, BlockFace.EAST, east);
             BukkitMockFactory.setBlockRelative(source, BlockFace.UP, up);
 
-            ReactiveType reactiveType = mock(ReactiveType.class);
-            lenient().when(reactiveType.isConnectable()).thenReturn(false);
-            lenient().when(materialRegistry.getReactiveType(Material.STONE_BUTTON)).thenReturn(reactiveType);
+            ReactiveMaterial reactiveMaterial = mock(ReactiveMaterial.class);
+            lenient().when(reactiveMaterial.isConnectable()).thenReturn(false);
+            lenient().when(materialRegistry.getReactiveMaterial(Material.STONE_BUTTON)).thenReturn(reactiveMaterial);
         }
         if (withConnectableReactiveRelatives) {
             Block south = BukkitMockFactory.mockBlock(Material.BRICK_WALL);
@@ -96,9 +96,9 @@ class BlockRestorationServiceTest {
             BukkitMockFactory.setBlockRelative(source, BlockFace.SOUTH, south);
             BukkitMockFactory.setBlockRelative(source, BlockFace.DOWN, down);
 
-            ReactiveType reactiveType = mock(ReactiveType.class);
-            lenient().when(reactiveType.isConnectable()).thenReturn(true);
-            lenient().when(materialRegistry.getReactiveType(Material.BRICK_WALL)).thenReturn(reactiveType);
+            ReactiveMaterial reactiveMaterial = mock(ReactiveMaterial.class);
+            lenient().when(reactiveMaterial.isConnectable()).thenReturn(true);
+            lenient().when(materialRegistry.getReactiveMaterial(Material.BRICK_WALL)).thenReturn(reactiveMaterial);
         }
 
         return source;
@@ -118,8 +118,8 @@ class BlockRestorationServiceTest {
         assertEquals(5, res.reactiveBlocks().size());
         assertTrue(res.interactableBlock().isAlsoReactive()); // Interactable is also reactive
         assertEquals(6, res.getAllReactiveBlocks().size());
-        verify(materialRegistry, times(3)).getReactiveType(Material.STONE_BUTTON);
-        verify(materialRegistry, times(2)).getReactiveType(Material.BRICK_WALL);
+        verify(materialRegistry, times(3)).getReactiveMaterial(Material.STONE_BUTTON);
+        verify(materialRegistry, times(2)).getReactiveMaterial(Material.BRICK_WALL);
         verify(materialRegistry).isReactive(Material.OAK_DOOR);
     }
 
@@ -132,8 +132,8 @@ class BlockRestorationServiceTest {
         assertEquals(source.getState(), res.interactableBlock().blockState());
         assertEquals(3, res.reactiveBlocks().size());
         assertFalse(res.interactableBlock().isAlsoReactive()); // Interactable is not reactive
-        verify(materialRegistry, times(3)).getReactiveType(Material.STONE_BUTTON);
-        verify(materialRegistry, never()).getReactiveType(Material.BRICK_WALL);
+        verify(materialRegistry, times(3)).getReactiveMaterial(Material.STONE_BUTTON);
+        verify(materialRegistry, never()).getReactiveMaterial(Material.BRICK_WALL);
         verify(materialRegistry).isReactive(Material.COMPOSTER);
     }
 
@@ -147,8 +147,8 @@ class BlockRestorationServiceTest {
         assertEquals(2, res.reactiveBlocks().size()); // Only 2 blocks can be recorded
         assertFalse(res.interactableBlock().isAlsoReactive());
         // In the BFS method, 1st scanned block is a normal reactive (BlockFace.UP), and 2nd is a connectable reactive (BlockFace.DOWN)
-        verify(materialRegistry, times(1)).getReactiveType(Material.STONE_BUTTON);
-        verify(materialRegistry, times(1)).getReactiveType(Material.BRICK_WALL);
+        verify(materialRegistry, times(1)).getReactiveMaterial(Material.STONE_BUTTON);
+        verify(materialRegistry, times(1)).getReactiveMaterial(Material.BRICK_WALL);
         verify(materialRegistry).isReactive(Material.COMPOSTER);
     }
 
@@ -161,9 +161,9 @@ class BlockRestorationServiceTest {
         assertEquals(source.getState(), res.interactableBlock().blockState());
         assertEquals(0, res.getAllReactiveBlocks().size());
         assertFalse(res.interactableBlock().isAlsoReactive()); // Interactable is not reactive
-        verify(materialRegistry, never()).getReactiveType(Material.STONE_BUTTON);
-        verify(materialRegistry, never()).getReactiveType(Material.BRICK_WALL);
-        verify(materialRegistry, atLeastOnce()).getReactiveType(Material.AIR);
+        verify(materialRegistry, never()).getReactiveMaterial(Material.STONE_BUTTON);
+        verify(materialRegistry, never()).getReactiveMaterial(Material.BRICK_WALL);
+        verify(materialRegistry, atLeastOnce()).getReactiveMaterial(Material.AIR);
         verify(materialRegistry).isReactive(Material.COMPOSTER);
     }
 
@@ -179,9 +179,9 @@ class BlockRestorationServiceTest {
         assertEquals(0, res.reactiveBlocks().size());
         assertTrue(res.interactableBlock().isAlsoReactive()); // Interactable is reactive
         assertEquals(1, res.getAllReactiveBlocks().size());
-        verify(materialRegistry, never()).getReactiveType(Material.STONE_BUTTON);
-        verify(materialRegistry, never()).getReactiveType(Material.BRICK_WALL);
-        verify(materialRegistry, atLeastOnce()).getReactiveType(Material.AIR);
+        verify(materialRegistry, never()).getReactiveMaterial(Material.STONE_BUTTON);
+        verify(materialRegistry, never()).getReactiveMaterial(Material.BRICK_WALL);
+        verify(materialRegistry, atLeastOnce()).getReactiveMaterial(Material.AIR);
         verify(materialRegistry).isReactive(Material.OAK_DOOR);
     }
 
@@ -209,17 +209,17 @@ class BlockRestorationServiceTest {
     // ********** Tests - Should schedule restoration **********
 
     static Stream<Arguments> provideRestorationParameters() {
-        return Stream.of( // isPacketEventsPresent, currentInteractableMaterial, interactableType
-                Arguments.of(true, Material.COMPOSTER, InteractableType.COMPOSTER),
-                Arguments.of(false, Material.AIR, InteractableType.STONE_BUTTON), // AIR -> Is also reactive
-                Arguments.of(true, Material.AIR, InteractableType.WOODEN_BUTTON), // AIR -> Is also reactive
-                Arguments.of(false, Material.COMPOSTER, InteractableType.COMPOSTER));
+        return Stream.of( // isPacketEventsPresent, currentInteractableMaterial, interactableMaterial
+                Arguments.of(true, Material.COMPOSTER, InteractableMaterial.COMPOSTER),
+                Arguments.of(false, Material.AIR, InteractableMaterial.STONE_BUTTON), // AIR -> Is also reactive
+                Arguments.of(true, Material.AIR, InteractableMaterial.WOODEN_BUTTON), // AIR -> Is also reactive
+                Arguments.of(false, Material.COMPOSTER, InteractableMaterial.COMPOSTER));
     }
 
     @ParameterizedTest
     @MethodSource("provideRestorationParameters")
     void shouldScheduleRestorationTest(boolean isPacketEventsPresent, Material currentInteractableMaterial,
-                                       InteractableType interactableType) {
+                                       InteractableMaterial interactableMaterial) {
         when(settings.isPacketEventsEnabled()).thenReturn(isPacketEventsPresent);
         when(plugin.getServer()).thenReturn(server);
         when(server.getScheduler()).thenReturn(scheduler);
@@ -256,7 +256,7 @@ class BlockRestorationServiceTest {
                         .thenReturn(packetEventsListener);
             }
 
-            service.scheduleRestoration(res, interactableType);
+            service.scheduleRestoration(res, interactableMaterial);
 
             // Capture and execute scheduled tasks
             verify(scheduler, times(1)).runTaskLater(eq(plugin), tick1Captor.capture(), eq(1L));
@@ -268,8 +268,8 @@ class BlockRestorationServiceTest {
             assertEquals(1, itemSpawnListenerMock.constructed().size());
             ItemSpawnListener listenerInstance = itemSpawnListenerMock.constructed().getFirst();
 
-            boolean hasSecondUpdate = interactableType.hasSecondUpdate(); // Whether a second restoration must be scheduled
-            long delay = interactableType.getDelayBeforeSecondUpdate();
+            boolean hasSecondUpdate = interactableMaterial.hasSecondUpdate(); // Whether a second restoration must be scheduled
+            long delay = interactableMaterial.getDelayBeforeSecondUpdate();
 
             if (hasSecondUpdate) {
                 // Listeners must not be unregistered yet
@@ -299,7 +299,7 @@ class BlockRestorationServiceTest {
     void shouldNotScheduleRestorationWhenBfsResultIsNull() {
         clearInvocations(settings);
 
-        service.scheduleRestoration(null, InteractableType.CAULDRON);
+        service.scheduleRestoration(null, InteractableMaterial.CAULDRON);
 
         verifyNoInteractions(scheduler);
         verifyNoInteractions(settings);
@@ -313,7 +313,7 @@ class BlockRestorationServiceTest {
                                                              false);
         BfsResult res = new BfsResult(interactableBlock, Collections.emptySet(), boundingBox);
 
-        service.scheduleRestoration(res, InteractableType.CAULDRON);
+        service.scheduleRestoration(res, InteractableMaterial.CAULDRON);
 
         verifyNoInteractions(scheduler);
         verifyNoInteractions(settings);

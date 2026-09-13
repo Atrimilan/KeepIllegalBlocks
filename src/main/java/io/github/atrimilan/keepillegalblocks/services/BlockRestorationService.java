@@ -2,8 +2,8 @@ package io.github.atrimilan.keepillegalblocks.services;
 
 import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
 import io.github.atrimilan.keepillegalblocks.core.Settings;
-import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
-import io.github.atrimilan.keepillegalblocks.core.types.ReactiveType;
+import io.github.atrimilan.keepillegalblocks.core.types.InteractableMaterial;
+import io.github.atrimilan.keepillegalblocks.core.types.ReactiveMaterial;
 import io.github.atrimilan.keepillegalblocks.listeners.ItemSpawnListener;
 import io.github.atrimilan.keepillegalblocks.models.BfsResult;
 import io.github.atrimilan.keepillegalblocks.models.InteractableBlockWrapper;
@@ -72,10 +72,10 @@ public class BlockRestorationService {
             Block currentBlock = queue.poll();
 
             if (currentBlock != sourceBlock) { // Skip interactable source block
-                ReactiveType reactiveType = materialRegistry.getReactiveType(currentBlock.getType());
-                if (reactiveType == ReactiveType.NONE) continue;
+                ReactiveMaterial reactiveMaterial = materialRegistry.getReactiveMaterial(currentBlock.getType());
+                if (reactiveMaterial == ReactiveMaterial.NONE) continue;
 
-                reactiveBlocks.add(new ReactiveBlockWrapper(currentBlock.getState(), reactiveType.isConnectable()));
+                reactiveBlocks.add(new ReactiveBlockWrapper(currentBlock.getState(), reactiveMaterial.isConnectable()));
                 nbBlocks++;
 
                 // Update bounding box
@@ -115,13 +115,13 @@ public class BlockRestorationService {
      * <li>Tick 1 - Connectable reactive blocks are restored if they have been updated.</li>
      * <li>Tick 2 - Reactive blocks (connectable or not) are restored if they have been broken. This restoration is not
      * scheduled for Tick 1, because the reactive blocks that break in cascade only start breaking starting from Tick 2.
-     * See which blocks are involved in {@link ReactiveType}.</li>
+     * See which blocks are involved in {@link ReactiveMaterial}.</li>
      * <li>If the interactable block triggers a second update after a delay (such as a button), an additional
-     * restoration is scheduled after that delay. See which blocks are involved in {@link InteractableType}.</li>
+     * restoration is scheduled after that delay. See which blocks are involved in {@link InteractableMaterial}.</li>
      *
      * @param bfsResult All block states and their bounding box.
      */
-    public void scheduleRestoration(BfsResult bfsResult, InteractableType interactableType) {
+    public void scheduleRestoration(BfsResult bfsResult, InteractableMaterial interactableMaterial) {
         if (bfsResult == null || !bfsResult.hasBlocksToRestore()) return; // Return if there's nothing to restore
 
         /* Prepare block sets */
@@ -148,20 +148,20 @@ public class BlockRestorationService {
         scheduler.runTaskLater(plugin, () -> {
             restoreUpdatedConnectableBlocks(connectableReactiveBlocks); // Restore blocks that may have been updated
 
-            if (interactableType.hasSecondUpdate()) {
+            if (interactableMaterial.hasSecondUpdate()) {
                 scheduler.runTaskLater(plugin, () -> restoreUpdatedConnectableBlocks(connectableReactiveBlocks),
-                                       interactableType.getDelayBeforeSecondUpdate());
+                                       interactableMaterial.getDelayBeforeSecondUpdate());
             }
         }, 1L);
 
         scheduler.runTaskLater(plugin, () -> {
             restoreBrokenBlocks(reactiveBlocks); // Restore blocks that may have been broken
 
-            if (interactableType.hasSecondUpdate()) {
+            if (interactableMaterial.hasSecondUpdate()) {
                 scheduler.runTaskLater(plugin, () -> {
                     restoreBrokenBlocks(reactiveBlocks);
                     unregisterListeners(packetListener, itemSpawnListener);
-                }, interactableType.getDelayBeforeSecondUpdate());
+                }, interactableMaterial.getDelayBeforeSecondUpdate());
             } else {
                 unregisterListeners(packetListener, itemSpawnListener);
             }
