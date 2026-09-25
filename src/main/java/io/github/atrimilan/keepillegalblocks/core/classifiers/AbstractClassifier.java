@@ -1,7 +1,7 @@
 package io.github.atrimilan.keepillegalblocks.core.classifiers;
 
 import com.destroystokyo.paper.MaterialTags;
-import io.github.atrimilan.keepillegalblocks.core.types.MaterialType;
+import io.github.atrimilan.keepillegalblocks.models.MaterialType;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.data.BlockData;

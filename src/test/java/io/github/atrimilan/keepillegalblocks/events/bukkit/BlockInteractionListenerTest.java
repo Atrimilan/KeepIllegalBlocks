@@ -1,11 +1,11 @@
-package io.github.atrimilan.keepillegalblocks.listeners;
+package io.github.atrimilan.keepillegalblocks.events.bukkit;
 
 import io.github.atrimilan.keepillegalblocks.BukkitMockFactory;
 import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
-import io.github.atrimilan.keepillegalblocks.core.Settings;
-import io.github.atrimilan.keepillegalblocks.core.types.InteractableMaterial;
-import io.github.atrimilan.keepillegalblocks.models.BfsResult;
-import io.github.atrimilan.keepillegalblocks.models.InteractableBlockWrapper;
+import io.github.atrimilan.keepillegalblocks.config.Settings;
+import io.github.atrimilan.keepillegalblocks.models.InteractableMaterial;
+import io.github.atrimilan.keepillegalblocks.data.BfsResult;
+import io.github.atrimilan.keepillegalblocks.data.InteractableBlockWrapper;
 import io.github.atrimilan.keepillegalblocks.services.BlockRestorationService;
 import org.bukkit.GameMode;
 import org.bukkit.Material;

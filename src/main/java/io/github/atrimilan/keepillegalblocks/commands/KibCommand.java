@@ -6,7 +6,7 @@ import io.github.atrimilan.keepillegalblocks.commands.kib.KibHelpCommandNode;
 import io.github.atrimilan.keepillegalblocks.commands.kib.KibReloadCommandNode;
 import io.github.atrimilan.keepillegalblocks.commands.kib.KibRuleCommandNode;
 import io.github.atrimilan.keepillegalblocks.core.RegistryLoader;
-import io.github.atrimilan.keepillegalblocks.core.Settings;
+import io.github.atrimilan.keepillegalblocks.config.Settings;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 

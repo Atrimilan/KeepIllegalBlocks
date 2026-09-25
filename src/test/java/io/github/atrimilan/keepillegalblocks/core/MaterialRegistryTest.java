@@ -1,7 +1,7 @@
 package io.github.atrimilan.keepillegalblocks.core;
 
-import io.github.atrimilan.keepillegalblocks.core.types.ReactiveMaterial;
-import io.github.atrimilan.keepillegalblocks.core.types.InteractableMaterial;
+import io.github.atrimilan.keepillegalblocks.models.ReactiveMaterial;
+import io.github.atrimilan.keepillegalblocks.models.InteractableMaterial;
 import org.bukkit.Material;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

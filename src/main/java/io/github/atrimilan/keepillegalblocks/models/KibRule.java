@@ -1,4 +1,4 @@
-package io.github.atrimilan.keepillegalblocks.core.types;
+package io.github.atrimilan.keepillegalblocks.models;
 
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;

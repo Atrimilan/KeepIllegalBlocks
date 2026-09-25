@@ -1,10 +1,11 @@
 package io.github.atrimilan.keepillegalblocks.core;
 
+import io.github.atrimilan.keepillegalblocks.config.Settings;
 import io.github.atrimilan.keepillegalblocks.core.classifiers.ReactiveClassifier;
 import io.github.atrimilan.keepillegalblocks.core.classifiers.InteractableClassifier;
-import io.github.atrimilan.keepillegalblocks.core.types.MaterialType;
-import io.github.atrimilan.keepillegalblocks.core.types.MaterialGroup;
-import io.github.atrimilan.keepillegalblocks.models.LoadResult;
+import io.github.atrimilan.keepillegalblocks.models.MaterialType;
+import io.github.atrimilan.keepillegalblocks.models.MaterialGroup;
+import io.github.atrimilan.keepillegalblocks.data.LoadResult;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 
@@ -12,7 +13,7 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import static io.github.atrimilan.keepillegalblocks.core.types.MaterialGroup.*;
+import static io.github.atrimilan.keepillegalblocks.models.MaterialGroup.*;
 
 /**
  * Handle the loading of materials into the registry.

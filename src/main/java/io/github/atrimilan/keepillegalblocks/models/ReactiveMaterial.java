@@ -1,4 +1,4 @@
-package io.github.atrimilan.keepillegalblocks.core.types;
+package io.github.atrimilan.keepillegalblocks.models;
 
 /**
  * A reactive block is one that reacts to a physics update triggered on one of its adjacent blocks and may therefore

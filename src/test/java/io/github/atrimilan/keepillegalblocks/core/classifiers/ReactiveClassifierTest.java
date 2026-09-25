@@ -1,6 +1,6 @@
 package io.github.atrimilan.keepillegalblocks.core.classifiers;
 
-import io.github.atrimilan.keepillegalblocks.core.types.ReactiveMaterial;
+import io.github.atrimilan.keepillegalblocks.models.ReactiveMaterial;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.*;

@@ -1,8 +1,9 @@
-package io.github.atrimilan.keepillegalblocks.listeners;
+package io.github.atrimilan.keepillegalblocks.events.bukkit;
 
 import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
-import io.github.atrimilan.keepillegalblocks.models.BfsResult;
-import io.github.atrimilan.keepillegalblocks.models.InteractableBlockWrapper;
+import io.github.atrimilan.keepillegalblocks.events.bukkit.ItemSpawnListener;
+import io.github.atrimilan.keepillegalblocks.data.BfsResult;
+import io.github.atrimilan.keepillegalblocks.data.InteractableBlockWrapper;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.block.BlockState;

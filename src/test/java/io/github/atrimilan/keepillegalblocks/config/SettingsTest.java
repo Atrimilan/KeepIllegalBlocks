@@ -1,7 +1,7 @@
-package io.github.atrimilan.keepillegalblocks.core;
+package io.github.atrimilan.keepillegalblocks.config;
 
 import com.tchristofferson.configupdater.ConfigUpdater;
-import io.github.atrimilan.keepillegalblocks.core.types.MaterialGroup;
+import io.github.atrimilan.keepillegalblocks.models.MaterialGroup;
 import org.bukkit.Server;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;

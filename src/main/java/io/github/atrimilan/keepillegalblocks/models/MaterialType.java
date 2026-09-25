@@ -1,4 +1,4 @@
-package io.github.atrimilan.keepillegalblocks.core.types;
+package io.github.atrimilan.keepillegalblocks.models;
 
 public interface MaterialType {
 

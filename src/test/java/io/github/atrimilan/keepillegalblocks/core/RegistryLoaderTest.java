@@ -1,8 +1,9 @@
 package io.github.atrimilan.keepillegalblocks.core;
 
-import io.github.atrimilan.keepillegalblocks.core.types.MaterialGroup;
-import io.github.atrimilan.keepillegalblocks.core.types.ReactiveMaterial;
-import io.github.atrimilan.keepillegalblocks.models.LoadResult;
+import io.github.atrimilan.keepillegalblocks.config.Settings;
+import io.github.atrimilan.keepillegalblocks.models.MaterialGroup;
+import io.github.atrimilan.keepillegalblocks.models.ReactiveMaterial;
+import io.github.atrimilan.keepillegalblocks.data.LoadResult;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Cocoa;

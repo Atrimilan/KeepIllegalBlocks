@@ -1,4 +1,4 @@
-package io.github.atrimilan.keepillegalblocks.models;
+package io.github.atrimilan.keepillegalblocks.data;
 
 import org.bukkit.World;
 import org.bukkit.util.BoundingBox;

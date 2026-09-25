@@ -1,12 +1,12 @@
-package io.github.atrimilan.keepillegalblocks.packets;
+package io.github.atrimilan.keepillegalblocks.events.packets;
 
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEffect;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerMultiBlockChange;
-import io.github.atrimilan.keepillegalblocks.models.BfsResult;
-import io.github.atrimilan.keepillegalblocks.models.ReactiveBlockWrapper;
+import io.github.atrimilan.keepillegalblocks.data.BfsResult;
+import io.github.atrimilan.keepillegalblocks.data.ReactiveBlockWrapper;
 import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import org.bukkit.World;

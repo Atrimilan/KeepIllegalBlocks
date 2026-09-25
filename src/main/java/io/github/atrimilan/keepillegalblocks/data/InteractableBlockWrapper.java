@@ -1,4 +1,4 @@
-package io.github.atrimilan.keepillegalblocks.models;
+package io.github.atrimilan.keepillegalblocks.data;
 
 import org.bukkit.block.BlockState;
 import org.jetbrains.annotations.NotNull;

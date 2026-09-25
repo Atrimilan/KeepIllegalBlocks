@@ -1,14 +1,14 @@
 package io.github.atrimilan.keepillegalblocks.services;
 
 import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
-import io.github.atrimilan.keepillegalblocks.core.Settings;
-import io.github.atrimilan.keepillegalblocks.core.types.InteractableMaterial;
-import io.github.atrimilan.keepillegalblocks.core.types.ReactiveMaterial;
-import io.github.atrimilan.keepillegalblocks.listeners.ItemSpawnListener;
-import io.github.atrimilan.keepillegalblocks.models.BfsResult;
-import io.github.atrimilan.keepillegalblocks.models.InteractableBlockWrapper;
-import io.github.atrimilan.keepillegalblocks.models.ReactiveBlockWrapper;
-import io.github.atrimilan.keepillegalblocks.packets.PacketEventsAdapter;
+import io.github.atrimilan.keepillegalblocks.config.Settings;
+import io.github.atrimilan.keepillegalblocks.models.InteractableMaterial;
+import io.github.atrimilan.keepillegalblocks.models.ReactiveMaterial;
+import io.github.atrimilan.keepillegalblocks.events.bukkit.ItemSpawnListener;
+import io.github.atrimilan.keepillegalblocks.data.BfsResult;
+import io.github.atrimilan.keepillegalblocks.data.InteractableBlockWrapper;
+import io.github.atrimilan.keepillegalblocks.data.ReactiveBlockWrapper;
+import io.github.atrimilan.keepillegalblocks.events.packets.PacketEventsAdapter;
 import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
