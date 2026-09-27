@@ -1,14 +1,14 @@
 package io.github.atrimilan.keepillegalblocks.services;
 
+import io.github.atrimilan.keepillegalblocks.config.ConfigManager;
 import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
-import io.github.atrimilan.keepillegalblocks.config.Settings;
 import io.github.atrimilan.keepillegalblocks.models.InteractableMaterial;
 import io.github.atrimilan.keepillegalblocks.models.ReactiveMaterial;
 import io.github.atrimilan.keepillegalblocks.events.bukkit.ItemSpawnListener;
 import io.github.atrimilan.keepillegalblocks.data.BfsResult;
 import io.github.atrimilan.keepillegalblocks.data.InteractableBlockWrapper;
 import io.github.atrimilan.keepillegalblocks.data.ReactiveBlockWrapper;
-import io.github.atrimilan.keepillegalblocks.events.packets.PacketEventsAdapter;
+import io.github.atrimilan.keepillegalblocks.events.packets.PacketEventsManager;
 import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,15 +30,15 @@ public class BlockRestorationService {
 
     private final JavaPlugin plugin;
     private final MaterialRegistry materialRegistry;
-    private final Settings settings;
+    private final ConfigManager configManager;
 
     private static final BlockFace[] FACES = {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH,
                                               BlockFace.EAST, BlockFace.WEST};
 
-    public BlockRestorationService(JavaPlugin plugin, MaterialRegistry materialRegistry, Settings settings) {
+    public BlockRestorationService(JavaPlugin plugin, MaterialRegistry materialRegistry, ConfigManager configManager) {
         this.plugin = plugin;
         this.materialRegistry = materialRegistry;
-        this.settings = settings;
+        this.configManager = configManager;
     }
 
     /**
@@ -138,8 +138,8 @@ public class BlockRestorationService {
         /* Register listeners */
 
         ItemSpawnListener itemSpawnListener = new ItemSpawnListener(plugin, bfsResult, materialRegistry);
-        Object packetListener = settings.isPacketEventsEnabled() ? //
-                                PacketEventsAdapter.registerReactiveBlockUpdateListener(bfsResult) : null;
+        Object packetListener = configManager.getConfig().isPacketEventsEnabled() ? //
+                                PacketEventsManager.registerReactiveBlockUpdateListener(bfsResult) : null;
 
         /* Schedule restorations */
 
@@ -219,7 +219,7 @@ public class BlockRestorationService {
      * @param itemSpawnListener The ItemSpawnListener to unregister
      */
     private void unregisterListeners(Object packetListener, ItemSpawnListener itemSpawnListener) {
-        if (packetListener != null) PacketEventsAdapter.unregisterListener(packetListener);
+        if (packetListener != null) PacketEventsManager.unregisterListener(packetListener);
         if (itemSpawnListener != null) itemSpawnListener.unregister();
     }
 }

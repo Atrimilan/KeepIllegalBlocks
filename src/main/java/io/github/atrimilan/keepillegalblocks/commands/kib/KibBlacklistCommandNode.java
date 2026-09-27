@@ -4,7 +4,8 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import io.github.atrimilan.keepillegalblocks.config.Settings;
+import io.github.atrimilan.keepillegalblocks.config.ConfigManager;
+import io.github.atrimilan.keepillegalblocks.core.RegistryLoader;
 import io.github.atrimilan.keepillegalblocks.models.MaterialGroup;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -14,12 +15,14 @@ import org.bukkit.block.BlockState;
 
 public class KibBlacklistCommandNode extends AbstractKibCommandNode {
 
-    private final Settings settings;
+    private final ConfigManager configManager;
+    private final RegistryLoader registryLoader;
 
     private static final String MATERIAL_ARG = "material";
 
-    public KibBlacklistCommandNode(Settings settings) {
-        this.settings = settings;
+    public KibBlacklistCommandNode(ConfigManager configManager, RegistryLoader registryLoader) {
+        this.configManager = configManager;
+        this.registryLoader = registryLoader;
     }
 
     /**
@@ -48,20 +51,28 @@ public class KibBlacklistCommandNode extends AbstractKibCommandNode {
     private int addToBlacklist(CommandContext<CommandSourceStack> ctx, MaterialGroup group) {
         String material = ctx.getArgument(MATERIAL_ARG, BlockState.class).getBlockData().getMaterial().name();
 
-        settings.addToBlacklist(group, material);
-        ctx.getSource().getSender().sendMessage(MiniMessage.miniMessage().deserialize(
-                "<white>" + material + "<red> is now in the " + group.name().toLowerCase() + " blacklist"));
-
+        if (configManager.addToBlacklist(group, material)) {
+            registryLoader.loadMaterialRegistry(configManager.getConfig()); // Reload material registry
+            sendMessage(ctx, material + "<red> is now in the " + group.name().toLowerCase() + " blacklist");
+        } else {
+            sendMessage(ctx, material + "<yellow> is already in the " + group.name().toLowerCase() + " blacklist");
+        }
         return Command.SINGLE_SUCCESS;
     }
 
     private int removeFromBlacklist(CommandContext<CommandSourceStack> ctx, MaterialGroup group) {
         String material = ctx.getArgument(MATERIAL_ARG, BlockState.class).getBlockData().getMaterial().name();
 
-        settings.removeFromBlacklist(group, material);
-        ctx.getSource().getSender().sendMessage(MiniMessage.miniMessage().deserialize(
-                "<white>" + material + "<green> is no longer in the " + group.name().toLowerCase() + " blacklist"));
-
+        if (configManager.removeFromBlacklist(group, material)) {
+            registryLoader.loadMaterialRegistry(configManager.getConfig()); // Reload material registry
+            sendMessage(ctx, material + "<green> is no longer in the " + group.name().toLowerCase() + " blacklist");
+        } else {
+            sendMessage(ctx, material + "<yellow> is not in the " + group.name().toLowerCase() + " blacklist");
+        }
         return Command.SINGLE_SUCCESS;
+    }
+
+    private void sendMessage(CommandContext<CommandSourceStack> ctx, String message) {
+        ctx.getSource().getSender().sendMessage(MiniMessage.miniMessage().deserialize(message));
     }
 }

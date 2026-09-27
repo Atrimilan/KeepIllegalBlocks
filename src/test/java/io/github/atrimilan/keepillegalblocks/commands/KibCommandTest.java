@@ -57,7 +57,7 @@ class KibCommandTest {
         LoadResult mockResult = mock(LoadResult.class);
         when(mockResult.consoleFormat()).thenReturn("Reload - Console message");
         when(mockResult.chatFormat()).thenReturn("Reload - Chat message");
-        when(registryLoader.fillMaterialRegistry(settings)).thenReturn(List.of(mockResult));
+        when(registryLoader.loadMaterialRegistry(settings)).thenReturn(List.of(mockResult));
 
         when(ctx.getSource()).thenReturn(commandSourceStack);
         when(commandSourceStack.getSender()).thenReturn(sender);
@@ -67,7 +67,7 @@ class KibCommandTest {
         node.getCommand().run(ctx);
 
         verify(settings).reloadConfig();
-        verify(registryLoader).fillMaterialRegistry(settings);
+        verify(registryLoader).loadMaterialRegistry(settings);
         verify(sender).sendMessage(Component.text("Reload - Chat message"));
         verify(logger).info(captor.capture());
         assertEquals("Reload - Console message", captor.getValue().get());
@@ -77,7 +77,7 @@ class KibCommandTest {
     void shouldReloadKibFromConsole() throws Exception {
         LoadResult mockResult = mock(LoadResult.class);
         when(mockResult.consoleFormat()).thenReturn("Reload - Console message");
-        when(registryLoader.fillMaterialRegistry(settings)).thenReturn(List.of(mockResult));
+        when(registryLoader.loadMaterialRegistry(settings)).thenReturn(List.of(mockResult));
 
         when(ctx.getSource()).thenReturn(commandSourceStack);
         when(commandSourceStack.getExecutor()).thenReturn(null); // Console is not an Entity
@@ -86,7 +86,7 @@ class KibCommandTest {
         node.getCommand().run(ctx);
 
         verify(settings).reloadConfig();
-        verify(registryLoader).fillMaterialRegistry(settings);
+        verify(registryLoader).loadMaterialRegistry(settings);
         verifyNoInteractions(sender);
         verify(logger).info(captor.capture());
         assertEquals("Reload - Console message", captor.getValue().get());
@@ -94,13 +94,13 @@ class KibCommandTest {
 
     @Test
     void shouldReloadKibWithNoResult() throws Exception { // From any source
-        when(registryLoader.fillMaterialRegistry(settings)).thenReturn(Collections.emptyList());
+        when(registryLoader.loadMaterialRegistry(settings)).thenReturn(Collections.emptyList());
 
         CommandNode<CommandSourceStack> node = kibCommand.build().getChild("reload");
         node.getCommand().run(ctx);
 
         verify(settings).reloadConfig();
-        verify(registryLoader).fillMaterialRegistry(settings);
+        verify(registryLoader).loadMaterialRegistry(settings);
         verifyNoInteractions(sender);
         verifyNoInteractions(logger);
     }

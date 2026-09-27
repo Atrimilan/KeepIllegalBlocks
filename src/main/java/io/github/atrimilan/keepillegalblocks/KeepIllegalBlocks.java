@@ -1,9 +1,9 @@
 package io.github.atrimilan.keepillegalblocks;
 
 import io.github.atrimilan.keepillegalblocks.commands.KibCommand;
+import io.github.atrimilan.keepillegalblocks.config.ConfigManager;
 import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
 import io.github.atrimilan.keepillegalblocks.core.RegistryLoader;
-import io.github.atrimilan.keepillegalblocks.config.Settings;
 import io.github.atrimilan.keepillegalblocks.events.bukkit.BlockInteractionListener;
 import io.github.atrimilan.keepillegalblocks.data.LoadResult;
 import io.github.atrimilan.keepillegalblocks.services.BlockRestorationService;
@@ -17,14 +17,14 @@ import java.util.List;
 
 public class KeepIllegalBlocks extends JavaPlugin {
 
-    private final Settings settings = new Settings(this);
+    private final ConfigManager configManager = new ConfigManager(this);
     private final MaterialRegistry materialRegistry = new MaterialRegistry();
     private final RegistryLoader registryLoader = new RegistryLoader(materialRegistry);
 
     @Override
     public void onEnable() {
-        settings.initConfig();
-        List<LoadResult> results = registryLoader.fillMaterialRegistry(settings);
+        configManager.initConfig();
+        List<LoadResult> results = registryLoader.loadMaterialRegistry(configManager.getConfig());
 
         for (LoadResult result : results) {
             getLogger().info(result::consoleFormat);
@@ -39,13 +39,13 @@ public class KeepIllegalBlocks extends JavaPlugin {
     }
 
     private void registerPluginEvents() {
-        var blockRestorationService = new BlockRestorationService(this, materialRegistry, settings);
-        var blockInteractionListener = new BlockInteractionListener(blockRestorationService, materialRegistry, settings);
+        var blockRestorationService = new BlockRestorationService(this, materialRegistry, configManager);
+        var blockInteractionListener = new BlockInteractionListener(blockRestorationService, materialRegistry, configManager);
         getServer().getPluginManager().registerEvents(blockInteractionListener, this);
     }
 
     private void registerPluginCommands() {
-        KibCommand kibCommand = new KibCommand(settings, registryLoader, getLogger());
+        KibCommand kibCommand = new KibCommand(configManager, registryLoader, getLogger());
 
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             final Commands commands = event.registrar();

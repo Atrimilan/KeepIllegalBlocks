@@ -35,7 +35,7 @@ class RegistryLoaderTest {
     private Settings settings;
 
     @Test
-    void shouldFillMaterialRegistry() {
+    void shouldLoadMaterialRegistry() {
         // Given
         Material cocoa = mock(Material.class);
         BlockData cocoaBD = mock(Cocoa.class);
@@ -61,7 +61,7 @@ class RegistryLoaderTest {
         when(materialRegistry.getInteractableCount()).thenReturn(20);
 
         // When
-        List<LoadResult> results = registryLoader.fillMaterialRegistry(settings);
+        List<LoadResult> results = registryLoader.loadMaterialRegistry(settings);
 
         // Then
         verify(materialRegistry).clearAll();

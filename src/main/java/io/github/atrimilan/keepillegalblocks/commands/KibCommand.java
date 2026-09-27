@@ -5,8 +5,8 @@ import io.github.atrimilan.keepillegalblocks.commands.kib.KibBlacklistCommandNod
 import io.github.atrimilan.keepillegalblocks.commands.kib.KibHelpCommandNode;
 import io.github.atrimilan.keepillegalblocks.commands.kib.KibReloadCommandNode;
 import io.github.atrimilan.keepillegalblocks.commands.kib.KibRuleCommandNode;
+import io.github.atrimilan.keepillegalblocks.config.ConfigManager;
 import io.github.atrimilan.keepillegalblocks.core.RegistryLoader;
-import io.github.atrimilan.keepillegalblocks.config.Settings;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 
@@ -23,11 +23,11 @@ public class KibCommand {
     private final KibBlacklistCommandNode blacklistCommand;
     private final KibRuleCommandNode ruleCommand;
 
-    public KibCommand(Settings settings, RegistryLoader registryLoader, Logger logger) {
-        this.reloadCommand = new KibReloadCommandNode(settings, registryLoader, logger);
+    public KibCommand(ConfigManager configManager, RegistryLoader registryLoader, Logger logger) {
+        this.reloadCommand = new KibReloadCommandNode(configManager, registryLoader, logger);
         this.helpCommand = new KibHelpCommandNode();
-        this.blacklistCommand = new KibBlacklistCommandNode(settings);
-        this.ruleCommand = new KibRuleCommandNode(settings);
+        this.blacklistCommand = new KibBlacklistCommandNode(configManager, registryLoader);
+        this.ruleCommand = new KibRuleCommandNode(configManager);
     }
 
     /**

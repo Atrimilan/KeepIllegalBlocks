@@ -5,9 +5,9 @@ import com.github.retrooper.packetevents.event.PacketListenerCommon;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import io.github.atrimilan.keepillegalblocks.data.BfsResult;
 
-public class PacketEventsAdapter {
+public class PacketEventsManager {
 
-    private PacketEventsAdapter() {
+    private PacketEventsManager() {
     }
 
     public static Object registerReactiveBlockUpdateListener(BfsResult bfsResult) {

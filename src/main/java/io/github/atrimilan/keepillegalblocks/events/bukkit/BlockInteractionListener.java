@@ -1,8 +1,9 @@
 package io.github.atrimilan.keepillegalblocks.events.bukkit;
 
+import io.github.atrimilan.keepillegalblocks.config.Config;
+import io.github.atrimilan.keepillegalblocks.config.ConfigManager;
 import io.github.atrimilan.keepillegalblocks.models.InteractableMaterial;
 import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
-import io.github.atrimilan.keepillegalblocks.config.Settings;
 import io.github.atrimilan.keepillegalblocks.data.BfsResult;
 import io.github.atrimilan.keepillegalblocks.services.BlockRestorationService;
 import org.bukkit.GameMode;
@@ -18,13 +19,13 @@ public class BlockInteractionListener implements Listener {
 
     private final BlockRestorationService service;
     private final MaterialRegistry materialRegistry;
-    private final Settings settings;
+    private final ConfigManager configManager;
 
     public BlockInteractionListener(BlockRestorationService service, MaterialRegistry materialRegistry,
-                                    Settings settings) {
+                                    ConfigManager configManager) {
         this.service = service;
         this.materialRegistry = materialRegistry;
-        this.settings = settings;
+        this.configManager = configManager;
     }
 
     /**
@@ -42,8 +43,9 @@ public class BlockInteractionListener implements Listener {
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (settings.isOnlyEnabledInCreativeMode() && !GameMode.CREATIVE.equals(event.getPlayer().getGameMode()))
-            return;
+        Config config = configManager.getConfig();
+
+        if (config.onlyEnabledInCreativeMode() && !GameMode.CREATIVE.equals(event.getPlayer().getGameMode())) return;
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (event.getHand() != EquipmentSlot.HAND) return;
         if (event.getPlayer().isSneaking() && event.getItem() != null) return;
@@ -55,7 +57,7 @@ public class BlockInteractionListener implements Listener {
         if (InteractableMaterial.NONE.equals(interactableMaterial)) return;
 
         // Perform a BFS to record all reactive blocks
-        BfsResult result = service.recordBlockStates(sourceBlock, settings.getMaxBlocks());
+        BfsResult result = service.recordBlockStates(sourceBlock, config.maxBlocks());
 
         // Schedule restoration of reactive blocks that may have been broken or updated due to the player interaction
         service.scheduleRestoration(result, interactableMaterial);

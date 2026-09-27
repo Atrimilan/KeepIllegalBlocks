@@ -1,4 +1,4 @@
-package io.github.atrimilan.keepillegalblocks.models;
+package io.github.atrimilan.keepillegalblocks.config;
 
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
@@ -8,7 +8,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 
 import java.util.function.Function;
 
-public enum KibRule {
+public enum Rule {
     MAX_BLOCKS(
             "max_blocks",
             IntegerArgumentType.integer(0), // Max: Integer.MAX_VALUE
@@ -29,7 +29,7 @@ public enum KibRule {
     private final ArgumentType<?> argumentType;
     private final Function<CommandContext<CommandSourceStack>, ?> value;
 
-    <T> KibRule(String name, ArgumentType<T> argumentType, Function<CommandContext<CommandSourceStack>, T> value) {
+    <T> Rule(String name, ArgumentType<T> argumentType, Function<CommandContext<CommandSourceStack>, T> value) {
         this.name = name;
         this.argumentType = argumentType;
         this.value = value;

@@ -4,8 +4,8 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.github.atrimilan.keepillegalblocks.config.ConfigManager;
 import io.github.atrimilan.keepillegalblocks.core.RegistryLoader;
-import io.github.atrimilan.keepillegalblocks.config.Settings;
 import io.github.atrimilan.keepillegalblocks.data.LoadResult;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -17,12 +17,12 @@ import java.util.logging.Logger;
 
 public class KibReloadCommandNode extends AbstractKibCommandNode {
 
-    private final Settings settings;
+    private final ConfigManager configManager;
     private final RegistryLoader registryLoader;
     private final Logger logger;
 
-    public KibReloadCommandNode(Settings settings, RegistryLoader registryLoader, Logger logger) {
-        this.settings = settings;
+    public KibReloadCommandNode(ConfigManager configManager, RegistryLoader registryLoader, Logger logger) {
+        this.configManager = configManager;
         this.registryLoader = registryLoader;
         this.logger = logger;
     }
@@ -40,8 +40,8 @@ public class KibReloadCommandNode extends AbstractKibCommandNode {
     }
 
     private int reloadKib(CommandContext<CommandSourceStack> ctx) {
-        settings.reloadConfig();
-        List<LoadResult> results = registryLoader.fillMaterialRegistry(settings);
+        configManager.reloadConfig();
+        List<LoadResult> results = registryLoader.loadMaterialRegistry(configManager.getConfig());
 
         for (LoadResult result : results) {
             if (ctx.getSource().getExecutor() instanceof Player) {

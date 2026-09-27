@@ -2,6 +2,7 @@ package io.github.atrimilan.keepillegalblocks.services;
 
 import com.github.retrooper.packetevents.event.PacketListenerCommon;
 import io.github.atrimilan.keepillegalblocks.BukkitMockFactory;
+import io.github.atrimilan.keepillegalblocks.config.Config;
 import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
 import io.github.atrimilan.keepillegalblocks.config.Settings;
 import io.github.atrimilan.keepillegalblocks.models.InteractableMaterial;
@@ -10,7 +11,7 @@ import io.github.atrimilan.keepillegalblocks.events.bukkit.ItemSpawnListener;
 import io.github.atrimilan.keepillegalblocks.data.BfsResult;
 import io.github.atrimilan.keepillegalblocks.data.InteractableBlockWrapper;
 import io.github.atrimilan.keepillegalblocks.data.ReactiveBlockWrapper;
-import io.github.atrimilan.keepillegalblocks.events.packets.PacketEventsAdapter;
+import io.github.atrimilan.keepillegalblocks.events.packets.PacketEventsManager;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.block.Block;
@@ -41,7 +42,7 @@ class BlockRestorationServiceTest {
     private BlockRestorationService service;
 
     @Mock
-    private Settings settings;
+    private Config config;
 
     @Mock
     private MaterialRegistry materialRegistry;
@@ -69,7 +70,7 @@ class BlockRestorationServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = spy(new BlockRestorationService(plugin, materialRegistry, settings));
+        service = spy(new BlockRestorationService(plugin, materialRegistry, config));
     }
 
     private Block mockSourceBlock(Material sourceMaterial, boolean withReactiveRelatives,
@@ -220,7 +221,7 @@ class BlockRestorationServiceTest {
     @MethodSource("provideRestorationParameters")
     void shouldScheduleRestorationTest(boolean isPacketEventsPresent, Material currentInteractableMaterial,
                                        InteractableMaterial interactableMaterial) {
-        when(settings.isPacketEventsEnabled()).thenReturn(isPacketEventsPresent);
+        when(config.isPacketEventsEnabled()).thenReturn(isPacketEventsPresent);
         when(plugin.getServer()).thenReturn(server);
         when(server.getScheduler()).thenReturn(scheduler);
 
@@ -247,12 +248,12 @@ class BlockRestorationServiceTest {
 
         Object packetEventsListener = mock(PacketListenerCommon.class);
 
-        try (MockedStatic<PacketEventsAdapter> packetEventsMock = mockStatic(PacketEventsAdapter.class); //
+        try (MockedStatic<PacketEventsManager> packetEventsMock = mockStatic(PacketEventsManager.class); //
              MockedConstruction<ItemSpawnListener> itemSpawnListenerMock = mockConstruction(ItemSpawnListener.class)) {
 
             if (isPacketEventsPresent) {
                 packetEventsMock //
-                        .when(() -> PacketEventsAdapter.registerReactiveBlockUpdateListener(res))
+                        .when(() -> PacketEventsManager.registerReactiveBlockUpdateListener(res))
                         .thenReturn(packetEventsListener);
             }
 
@@ -281,8 +282,8 @@ class BlockRestorationServiceTest {
             // Listeners must now be unregistered once
             verify(listenerInstance, times(1)).unregister();
             if (isPacketEventsPresent) {
-                packetEventsMock.verify(() -> PacketEventsAdapter.registerReactiveBlockUpdateListener(res), times(1));
-                packetEventsMock.verify(() -> PacketEventsAdapter.unregisterListener(packetEventsListener), times(1));
+                packetEventsMock.verify(() -> PacketEventsManager.registerReactiveBlockUpdateListener(res), times(1));
+                packetEventsMock.verify(() -> PacketEventsManager.unregisterListener(packetEventsListener), times(1));
             } else {
                 packetEventsMock.verifyNoInteractions();
             }
@@ -297,17 +298,17 @@ class BlockRestorationServiceTest {
 
     @Test
     void shouldNotScheduleRestorationWhenBfsResultIsNull() {
-        clearInvocations(settings);
+        clearInvocations(config);
 
         service.scheduleRestoration(null, InteractableMaterial.CAULDRON);
 
         verifyNoInteractions(scheduler);
-        verifyNoInteractions(settings);
+        verifyNoInteractions(config);
     }
 
     @Test
     void shouldNotScheduleRestorationWhenThereAreNoReactiveBlocks() {
-        clearInvocations(settings);
+        clearInvocations(config);
 
         var interactableBlock = new InteractableBlockWrapper(BukkitMockFactory.mockBlockState(Material.CAULDRON),
                                                              false);
@@ -316,6 +317,6 @@ class BlockRestorationServiceTest {
         service.scheduleRestoration(res, InteractableMaterial.CAULDRON);
 
         verifyNoInteractions(scheduler);
-        verifyNoInteractions(settings);
+        verifyNoInteractions(config);
     }
 }
