@@ -8,7 +8,6 @@ import io.github.atrimilan.keepillegalblocks.config.ConfigManager;
 import io.github.atrimilan.keepillegalblocks.config.Rule;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 
 public class KibRuleCommandNode extends AbstractKibCommandNode {
 
@@ -40,8 +39,7 @@ public class KibRuleCommandNode extends AbstractKibCommandNode {
         Object newValue = rule.getValue(ctx);
 
         configManager.setRule(rule, newValue);
-        ctx.getSource().getSender().sendMessage(MiniMessage.miniMessage().deserialize(
-                "<green>Rule <white>" + rule.getName() + "<green> has been set to: <white>" + newValue));
+        sendMessage(ctx, "<green>Rule <white>" + rule.getName() + "<green> has been set to: <white>" + newValue);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -50,8 +48,8 @@ public class KibRuleCommandNode extends AbstractKibCommandNode {
         Object currentValue = configManager.getConfig().getRule(rule);
         if (currentValue == null) return 0;
 
-        ctx.getSource().getSender().sendMessage(MiniMessage.miniMessage().deserialize(
-                "<yellow>Rule <white>" + rule.getName() + "<yellow> is currently set to: <white>" + currentValue));
+        sendMessage(ctx,
+                    "<yellow>Rule <white>" + rule.getName() + "<yellow> is currently set to: <white>" + currentValue);
 
         return Command.SINGLE_SUCCESS;
     }

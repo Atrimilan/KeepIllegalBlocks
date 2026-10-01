@@ -35,7 +35,7 @@ public class KibCommand {
      */
     public LiteralCommandNode<CommandSourceStack> build() {
         return Commands.literal("kib") //
-                .requires(ctx -> ctx.getSender().hasPermission("kib.*")) //
+                .requires(ctx -> ctx.getSender().hasPermission("kib")) //
                 .then(helpCommand.build()) //
                 .then(reloadCommand.build()) //
                 .then(ruleCommand.build()) //

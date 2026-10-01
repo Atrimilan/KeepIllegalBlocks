@@ -10,7 +10,6 @@ import io.github.atrimilan.keepillegalblocks.models.MaterialGroup;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.block.BlockState;
 
 public class KibBlacklistCommandNode extends AbstractKibCommandNode {
@@ -70,9 +69,5 @@ public class KibBlacklistCommandNode extends AbstractKibCommandNode {
             sendMessage(ctx, material + "<yellow> is not in the " + group.name().toLowerCase() + " blacklist");
         }
         return Command.SINGLE_SUCCESS;
-    }
-
-    private void sendMessage(CommandContext<CommandSourceStack> ctx, String message) {
-        ctx.getSource().getSender().sendMessage(MiniMessage.miniMessage().deserialize(message));
     }
 }

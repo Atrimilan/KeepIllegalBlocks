@@ -35,7 +35,7 @@ public class KibReloadCommandNode extends AbstractKibCommandNode {
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> build() {
         return Commands.literal("reload") //
-                .requires(ctx -> this.hasPermission(ctx, "kib.reload")) //
+                .requires(ctx -> hasPermission(ctx, "kib.reload")) //
                 .executes(this::reloadKib);
     }
 

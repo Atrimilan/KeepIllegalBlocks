@@ -6,11 +6,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 
 public class KibHelpCommandNode extends AbstractKibCommandNode {
-
-    private final MiniMessage miniMessage = MiniMessage.miniMessage();
 
     /**
      * Build {@code /kib help}
@@ -24,7 +21,7 @@ public class KibHelpCommandNode extends AbstractKibCommandNode {
     }
 
     private int sendHelpMessage(CommandContext<CommandSourceStack> ctx) {
-        String helpMessage = """
+        sendMessage(ctx, """
                 <shadow:black><yellow>
                 
                 <gold><st>                    </st> [</gold> <white>Keep Illegal Blocks</white> <gold>] <st>                    </st></gold>
@@ -55,10 +52,7 @@ public class KibHelpCommandNode extends AbstractKibCommandNode {
                 <click:suggest_command:'/kib blacklist interactable add minecraft:oak_door'>\
                 Example: /kib blacklist interactable add minecraft:oak_door\
                 </click></hover></italic></gray>
-                """;
-
-        ctx.getSource().getSender().sendMessage(miniMessage.deserialize(helpMessage));
-
+                """);
         return Command.SINGLE_SUCCESS;
     }
 }
