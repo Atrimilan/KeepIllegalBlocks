@@ -3,8 +3,8 @@ package io.github.atrimilan.keepillegalblocks.commands;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.CommandNode;
 import io.github.atrimilan.keepillegalblocks.core.RegistryLoader;
-import io.github.atrimilan.keepillegalblocks.core.Settings;
-import io.github.atrimilan.keepillegalblocks.models.LoadResult;
+import io.github.atrimilan.keepillegalblocks.config.Settings;
+import io.github.atrimilan.keepillegalblocks.data.LoadResult;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
@@ -57,17 +57,17 @@ class KibCommandTest {
         LoadResult mockResult = mock(LoadResult.class);
         when(mockResult.consoleFormat()).thenReturn("Reload - Console message");
         when(mockResult.chatFormat()).thenReturn("Reload - Chat message");
-        when(registryLoader.fillMaterialRegistry(settings)).thenReturn(List.of(mockResult));
+        when(registryLoader.loadMaterialRegistry(settings)).thenReturn(List.of(mockResult));
 
         when(ctx.getSource()).thenReturn(commandSourceStack);
         when(commandSourceStack.getSender()).thenReturn(sender);
         when(commandSourceStack.getExecutor()).thenReturn(mock(Player.class));
 
-        CommandNode<CommandSourceStack> node = kibCommand.create().getChild("reload");
+        CommandNode<CommandSourceStack> node = kibCommand.build().getChild("reload");
         node.getCommand().run(ctx);
 
         verify(settings).reloadConfig();
-        verify(registryLoader).fillMaterialRegistry(settings);
+        verify(registryLoader).loadMaterialRegistry(settings);
         verify(sender).sendMessage(Component.text("Reload - Chat message"));
         verify(logger).info(captor.capture());
         assertEquals("Reload - Console message", captor.getValue().get());
@@ -77,16 +77,16 @@ class KibCommandTest {
     void shouldReloadKibFromConsole() throws Exception {
         LoadResult mockResult = mock(LoadResult.class);
         when(mockResult.consoleFormat()).thenReturn("Reload - Console message");
-        when(registryLoader.fillMaterialRegistry(settings)).thenReturn(List.of(mockResult));
+        when(registryLoader.loadMaterialRegistry(settings)).thenReturn(List.of(mockResult));
 
         when(ctx.getSource()).thenReturn(commandSourceStack);
         when(commandSourceStack.getExecutor()).thenReturn(null); // Console is not an Entity
 
-        CommandNode<CommandSourceStack> node = kibCommand.create().getChild("reload");
+        CommandNode<CommandSourceStack> node = kibCommand.build().getChild("reload");
         node.getCommand().run(ctx);
 
         verify(settings).reloadConfig();
-        verify(registryLoader).fillMaterialRegistry(settings);
+        verify(registryLoader).loadMaterialRegistry(settings);
         verifyNoInteractions(sender);
         verify(logger).info(captor.capture());
         assertEquals("Reload - Console message", captor.getValue().get());
@@ -94,13 +94,13 @@ class KibCommandTest {
 
     @Test
     void shouldReloadKibWithNoResult() throws Exception { // From any source
-        when(registryLoader.fillMaterialRegistry(settings)).thenReturn(Collections.emptyList());
+        when(registryLoader.loadMaterialRegistry(settings)).thenReturn(Collections.emptyList());
 
-        CommandNode<CommandSourceStack> node = kibCommand.create().getChild("reload");
+        CommandNode<CommandSourceStack> node = kibCommand.build().getChild("reload");
         node.getCommand().run(ctx);
 
         verify(settings).reloadConfig();
-        verify(registryLoader).fillMaterialRegistry(settings);
+        verify(registryLoader).loadMaterialRegistry(settings);
         verifyNoInteractions(sender);
         verifyNoInteractions(logger);
     }

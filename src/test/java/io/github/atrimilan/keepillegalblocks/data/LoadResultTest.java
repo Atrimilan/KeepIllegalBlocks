@@ -1,4 +1,4 @@
-package io.github.atrimilan.keepillegalblocks.models;
+package io.github.atrimilan.keepillegalblocks.data;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,7 +1,7 @@
-package io.github.atrimilan.keepillegalblocks.listeners;
+package io.github.atrimilan.keepillegalblocks.events.bukkit;
 
 import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
-import io.github.atrimilan.keepillegalblocks.models.BfsResult;
+import io.github.atrimilan.keepillegalblocks.data.BfsResult;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;

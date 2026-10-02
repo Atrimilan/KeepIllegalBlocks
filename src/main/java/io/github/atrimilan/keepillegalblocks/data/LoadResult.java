@@ -1,4 +1,4 @@
-package io.github.atrimilan.keepillegalblocks.models;
+package io.github.atrimilan.keepillegalblocks.data;
 
 public record LoadResult(String type, long total, int blacklisted) {
 

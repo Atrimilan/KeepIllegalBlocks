@@ -1,4 +1,4 @@
-package io.github.atrimilan.keepillegalblocks.packets;
+package io.github.atrimilan.keepillegalblocks.events.packets;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -6,9 +6,10 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEffect;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerMultiBlockChange;
 import io.github.atrimilan.keepillegalblocks.BukkitMockFactory;
-import io.github.atrimilan.keepillegalblocks.models.BfsResult;
-import io.github.atrimilan.keepillegalblocks.models.InteractableBlockWrapper;
-import io.github.atrimilan.keepillegalblocks.models.ReactiveBlockWrapper;
+import io.github.atrimilan.keepillegalblocks.events.packets.ReactiveBlockUpdateListener;
+import io.github.atrimilan.keepillegalblocks.data.BfsResult;
+import io.github.atrimilan.keepillegalblocks.data.InteractableBlockWrapper;
+import io.github.atrimilan.keepillegalblocks.data.ReactiveBlockWrapper;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
