@@ -1,0 +1,23 @@
+package io.github.atrimilan.keepillegalblocks.events.packets;
+
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListenerCommon;
+import com.github.retrooper.packetevents.event.PacketListenerPriority;
+import io.github.atrimilan.keepillegalblocks.data.BfsResult;
+
+public class PacketEventsManager {
+
+    private PacketEventsManager() {
+    }
+
+    public static Object registerReactiveBlockUpdateListener(BfsResult bfsResult) {
+        ReactiveBlockUpdateListener listener = new ReactiveBlockUpdateListener(bfsResult);
+        return PacketEvents.getAPI().getEventManager().registerListener(listener, PacketListenerPriority.NORMAL);
+    }
+
+    public static void unregisterListener(Object listenerObject) {
+        if (listenerObject instanceof PacketListenerCommon listener) {
+            PacketEvents.getAPI().getEventManager().unregisterListener(listener);
+        }
+    }
+}

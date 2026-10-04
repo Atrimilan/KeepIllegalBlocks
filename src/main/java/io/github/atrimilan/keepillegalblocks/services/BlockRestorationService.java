@@ -1,14 +1,14 @@
 package io.github.atrimilan.keepillegalblocks.services;
 
+import io.github.atrimilan.keepillegalblocks.config.ConfigManager;
 import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
-import io.github.atrimilan.keepillegalblocks.core.Settings;
-import io.github.atrimilan.keepillegalblocks.core.types.InteractableType;
-import io.github.atrimilan.keepillegalblocks.core.types.ReactiveType;
-import io.github.atrimilan.keepillegalblocks.listeners.ItemSpawnListener;
-import io.github.atrimilan.keepillegalblocks.models.BfsResult;
-import io.github.atrimilan.keepillegalblocks.models.InteractableBlockWrapper;
-import io.github.atrimilan.keepillegalblocks.models.ReactiveBlockWrapper;
-import io.github.atrimilan.keepillegalblocks.packets.PacketEventsAdapter;
+import io.github.atrimilan.keepillegalblocks.models.InteractableMaterial;
+import io.github.atrimilan.keepillegalblocks.models.ReactiveMaterial;
+import io.github.atrimilan.keepillegalblocks.events.bukkit.ItemSpawnListener;
+import io.github.atrimilan.keepillegalblocks.data.BfsResult;
+import io.github.atrimilan.keepillegalblocks.data.InteractableBlockWrapper;
+import io.github.atrimilan.keepillegalblocks.data.ReactiveBlockWrapper;
+import io.github.atrimilan.keepillegalblocks.events.packets.PacketEventsManager;
 import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,15 +30,15 @@ public class BlockRestorationService {
 
     private final JavaPlugin plugin;
     private final MaterialRegistry materialRegistry;
-    private final Settings settings;
+    private final ConfigManager configManager;
 
     private static final BlockFace[] FACES = {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH,
                                               BlockFace.EAST, BlockFace.WEST};
 
-    public BlockRestorationService(JavaPlugin plugin, MaterialRegistry materialRegistry, Settings settings) {
+    public BlockRestorationService(JavaPlugin plugin, MaterialRegistry materialRegistry, ConfigManager configManager) {
         this.plugin = plugin;
         this.materialRegistry = materialRegistry;
-        this.settings = settings;
+        this.configManager = configManager;
     }
 
     /**
@@ -72,10 +72,10 @@ public class BlockRestorationService {
             Block currentBlock = queue.poll();
 
             if (currentBlock != sourceBlock) { // Skip interactable source block
-                ReactiveType reactiveType = materialRegistry.getReactiveType(currentBlock.getType());
-                if (reactiveType == ReactiveType.NONE) continue;
+                ReactiveMaterial reactiveMaterial = materialRegistry.getReactiveMaterial(currentBlock.getType());
+                if (reactiveMaterial == ReactiveMaterial.NONE) continue;
 
-                reactiveBlocks.add(new ReactiveBlockWrapper(currentBlock.getState(), reactiveType.isConnectable()));
+                reactiveBlocks.add(new ReactiveBlockWrapper(currentBlock.getState(), reactiveMaterial.isConnectable()));
                 nbBlocks++;
 
                 // Update bounding box
@@ -115,13 +115,13 @@ public class BlockRestorationService {
      * <li>Tick 1 - Connectable reactive blocks are restored if they have been updated.</li>
      * <li>Tick 2 - Reactive blocks (connectable or not) are restored if they have been broken. This restoration is not
      * scheduled for Tick 1, because the reactive blocks that break in cascade only start breaking starting from Tick 2.
-     * See which blocks are involved in {@link ReactiveType}.</li>
+     * See which blocks are involved in {@link ReactiveMaterial}.</li>
      * <li>If the interactable block triggers a second update after a delay (such as a button), an additional
-     * restoration is scheduled after that delay. See which blocks are involved in {@link InteractableType}.</li>
+     * restoration is scheduled after that delay. See which blocks are involved in {@link InteractableMaterial}.</li>
      *
      * @param bfsResult All block states and their bounding box.
      */
-    public void scheduleRestoration(BfsResult bfsResult, InteractableType interactableType) {
+    public void scheduleRestoration(BfsResult bfsResult, InteractableMaterial interactableMaterial) {
         if (bfsResult == null || !bfsResult.hasBlocksToRestore()) return; // Return if there's nothing to restore
 
         /* Prepare block sets */
@@ -138,8 +138,8 @@ public class BlockRestorationService {
         /* Register listeners */
 
         ItemSpawnListener itemSpawnListener = new ItemSpawnListener(plugin, bfsResult, materialRegistry);
-        Object packetListener = settings.isPacketEventsEnabled() ? //
-                                PacketEventsAdapter.registerReactiveBlockUpdateListener(bfsResult) : null;
+        Object packetListener = configManager.getConfig().isPacketEventsEnabled() ? //
+                                PacketEventsManager.registerReactiveBlockUpdateListener(bfsResult) : null;
 
         /* Schedule restorations */
 
@@ -148,20 +148,20 @@ public class BlockRestorationService {
         scheduler.runTaskLater(plugin, () -> {
             restoreUpdatedConnectableBlocks(connectableReactiveBlocks); // Restore blocks that may have been updated
 
-            if (interactableType.hasSecondUpdate()) {
+            if (interactableMaterial.hasSecondUpdate()) {
                 scheduler.runTaskLater(plugin, () -> restoreUpdatedConnectableBlocks(connectableReactiveBlocks),
-                                       interactableType.getDelayBeforeSecondUpdate());
+                                       interactableMaterial.getDelayBeforeSecondUpdate());
             }
         }, 1L);
 
         scheduler.runTaskLater(plugin, () -> {
             restoreBrokenBlocks(reactiveBlocks); // Restore blocks that may have been broken
 
-            if (interactableType.hasSecondUpdate()) {
+            if (interactableMaterial.hasSecondUpdate()) {
                 scheduler.runTaskLater(plugin, () -> {
                     restoreBrokenBlocks(reactiveBlocks);
                     unregisterListeners(packetListener, itemSpawnListener);
-                }, interactableType.getDelayBeforeSecondUpdate());
+                }, interactableMaterial.getDelayBeforeSecondUpdate());
             } else {
                 unregisterListeners(packetListener, itemSpawnListener);
             }
@@ -219,7 +219,7 @@ public class BlockRestorationService {
      * @param itemSpawnListener The ItemSpawnListener to unregister
      */
     private void unregisterListeners(Object packetListener, ItemSpawnListener itemSpawnListener) {
-        if (packetListener != null) PacketEventsAdapter.unregisterListener(packetListener);
+        if (packetListener != null) PacketEventsManager.unregisterListener(packetListener);
         if (itemSpawnListener != null) itemSpawnListener.unregister();
     }
 }

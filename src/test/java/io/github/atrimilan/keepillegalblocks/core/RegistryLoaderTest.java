@@ -1,8 +1,9 @@
 package io.github.atrimilan.keepillegalblocks.core;
 
-import io.github.atrimilan.keepillegalblocks.core.types.KibGroup;
-import io.github.atrimilan.keepillegalblocks.core.types.ReactiveType;
-import io.github.atrimilan.keepillegalblocks.models.LoadResult;
+import io.github.atrimilan.keepillegalblocks.config.Config;
+import io.github.atrimilan.keepillegalblocks.models.MaterialGroup;
+import io.github.atrimilan.keepillegalblocks.models.ReactiveMaterial;
+import io.github.atrimilan.keepillegalblocks.data.LoadResult;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Cocoa;
@@ -31,10 +32,10 @@ class RegistryLoaderTest {
     private MaterialRegistry materialRegistry;
 
     @Mock
-    private Settings settings;
+    private Config config;
 
     @Test
-    void shouldFillMaterialRegistry() {
+    void shouldLoadMaterialRegistry() {
         // Given
         Material cocoa = mock(Material.class);
         BlockData cocoaBD = mock(Cocoa.class);
@@ -50,22 +51,22 @@ class RegistryLoaderTest {
         doReturn(cocoaBD).when(registryLoader).getBlockData(any(Material.class));
 
         // Mock settings for REACTIVE
-        when(settings.getBlacklistedMaterialsForGroup(KibGroup.REACTIVE)).thenReturn(Collections.emptySet());
-        when(settings.getEnabledCategoriesForGroup(KibGroup.REACTIVE)).thenReturn(Set.of("cocoa"));
+        when(config.getBlacklistedMaterialsForGroup(MaterialGroup.REACTIVE)).thenReturn(Collections.emptySet());
+        when(config.getEnabledCategoriesForGroup(MaterialGroup.REACTIVE)).thenReturn(Set.of("cocoa"));
         when(materialRegistry.getReactiveCount()).thenReturn(10);
 
         // Stub loadRegistry for INTERACTABLE
         lenient().doReturn(5).when(registryLoader)
-                .loadRegistry(eq(settings), eq(KibGroup.INTERACTABLE), any(), any(), eq(false));
+                .loadRegistry(eq(config), eq(MaterialGroup.INTERACTABLE), any(), any(), eq(false));
         when(materialRegistry.getInteractableCount()).thenReturn(20);
 
         // When
-        List<LoadResult> results = registryLoader.fillMaterialRegistry(settings);
+        List<LoadResult> results = registryLoader.loadMaterialRegistry(config);
 
         // Then
         verify(materialRegistry).clearAll();
-        verify(materialRegistry).registerReactive(cocoa, ReactiveType.COCOA);
-        verify(materialRegistry).registerReactive(cocoaBeans, ReactiveType.COCOA); // Placement material
+        verify(materialRegistry).registerReactive(cocoa, ReactiveMaterial.COCOA);
+        verify(materialRegistry).registerReactive(cocoaBeans, ReactiveMaterial.COCOA); // Placement material
         // INTERACTABLE was not registered because it is stubbed
 
         assertEquals(2, results.size());

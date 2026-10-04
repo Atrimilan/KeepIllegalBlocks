@@ -1,10 +1,11 @@
 package io.github.atrimilan.keepillegalblocks.core;
 
+import io.github.atrimilan.keepillegalblocks.config.Config;
 import io.github.atrimilan.keepillegalblocks.core.classifiers.ReactiveClassifier;
 import io.github.atrimilan.keepillegalblocks.core.classifiers.InteractableClassifier;
-import io.github.atrimilan.keepillegalblocks.core.types.KibBlockType;
-import io.github.atrimilan.keepillegalblocks.core.types.KibGroup;
-import io.github.atrimilan.keepillegalblocks.models.LoadResult;
+import io.github.atrimilan.keepillegalblocks.models.MaterialType;
+import io.github.atrimilan.keepillegalblocks.models.MaterialGroup;
+import io.github.atrimilan.keepillegalblocks.data.LoadResult;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 
@@ -12,7 +13,7 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import static io.github.atrimilan.keepillegalblocks.core.types.KibGroup.*;
+import static io.github.atrimilan.keepillegalblocks.models.MaterialGroup.*;
 
 /**
  * Handle the loading of materials into the registry.
@@ -29,18 +30,17 @@ public class RegistryLoader {
     }
 
     /**
-     * Clear the material registry and fill it again based on the given settings. <b>Therefore, settings must be
-     * initialized before calling this method.</b>
+     * (Re)load the materials registry, taking into account materials blacklisted in the config.
      *
-     * @param settings The {@link Settings} to use to load the registry
-     * @return A list of {@link LoadResult}, containing the count of blacklisted materials for each {@link KibGroup}
+     * @param config The {@link Config} to use to load the registry
+     * @return A list of {@link LoadResult} containing the count of blacklisted materials for each {@link MaterialGroup}
      */
-    public List<LoadResult> fillMaterialRegistry(Settings settings) {
+    public List<LoadResult> loadMaterialRegistry(Config config) {
         registry.clearAll();
 
-        int blacklistedReactiveCount = loadRegistry(settings, REACTIVE, reactiveClassifier::classify,
+        int blacklistedReactiveCount = loadRegistry(config, REACTIVE, reactiveClassifier::classify,
                                                     registry::registerReactive, true);
-        int blacklistedInteractableCount = loadRegistry(settings, INTERACTABLE, interactableClassifier::classify,
+        int blacklistedInteractableCount = loadRegistry(config, INTERACTABLE, interactableClassifier::classify,
                                                         registry::registerInteractable, false);
 
         return List.of(new LoadResult("Reactive", registry.getReactiveCount(), blacklistedReactiveCount),
@@ -50,21 +50,21 @@ public class RegistryLoader {
     /**
      * Classify material of the given group, and add it to the material registry.
      *
-     * @param settings                      The {@link Settings} to use to load the registry
-     * @param group                         The {@link KibGroup}
+     * @param config                      The {@link Config} to use to load the registry
+     * @param group                         The {@link MaterialGroup}
      * @param classifierMethod              The classifier method to execute
      * @param registrySetter                The registry setter to execute
      * @param propagateToPlacementMaterials Whether to propagate the classification to placement materials (see
      *                                      {@link BlockData#getPlacementMaterial})
-     * @param <T>                           An implementation of {@link KibBlockType}
+     * @param <T>                           An implementation of {@link MaterialType}
      * @return The count of blacklisted materials
      */
-    protected <T extends KibBlockType> int loadRegistry(Settings settings, KibGroup group,
+    protected <T extends MaterialType> int loadRegistry(Config config, MaterialGroup group,
                                                         Function<Material, T> classifierMethod,
                                                         BiConsumer<Material, T> registrySetter,
                                                         boolean propagateToPlacementMaterials) {
-        Set<String> blacklist = settings.getBlacklistedMaterialsForGroup(group);
-        Set<String> enabledCategories = settings.getEnabledCategoriesForGroup(group);
+        Set<String> blacklist = config.getBlacklistedMaterialsForGroup(group);
+        Set<String> enabledCategories = config.getEnabledCategoriesForGroup(group);
 
         int blacklistedCount = 0;
         Map<Material, T> classifiedMaterials = new EnumMap<>(Material.class);

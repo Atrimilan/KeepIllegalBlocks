@@ -1,28 +1,20 @@
 package io.github.atrimilan.keepillegalblocks.commands;
 
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.tree.CommandNode;
-import io.github.atrimilan.keepillegalblocks.core.RegistryLoader;
-import io.github.atrimilan.keepillegalblocks.core.Settings;
-import io.github.atrimilan.keepillegalblocks.models.LoadResult;
+import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import net.kyori.adventure.text.Component;
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Supplier;
-import java.util.logging.Logger;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,76 +24,42 @@ class KibCommandTest {
     private KibCommand kibCommand;
 
     @Mock
-    private Settings settings;
-
-    @Mock
-    private RegistryLoader registryLoader;
-
-    @Mock
-    private CommandSourceStack commandSourceStack;
-
-    @Mock
-    private CommandContext<CommandSourceStack> ctx;
+    private CommandSourceStack source;
 
     @Mock
     private CommandSender sender;
 
-    @Mock
-    private Logger logger;
+    private MockedStatic<ArgumentTypes> mockedArgumentTypes;
 
-    @Captor
-    private ArgumentCaptor<Supplier<String>> captor;
+    @BeforeEach
+    void setUp() {
+        mockedArgumentTypes = mockStatic(ArgumentTypes.class);
+        mockedArgumentTypes.when(ArgumentTypes::blockState).thenReturn(mock(ArgumentType.class));
+    }
 
-    @Test
-    void shouldReloadKibFromPlayer() throws Exception {
-        LoadResult mockResult = mock(LoadResult.class);
-        when(mockResult.consoleFormat()).thenReturn("Reload - Console message");
-        when(mockResult.chatFormat()).thenReturn("Reload - Chat message");
-        when(registryLoader.fillMaterialRegistry(settings)).thenReturn(List.of(mockResult));
-
-        when(ctx.getSource()).thenReturn(commandSourceStack);
-        when(commandSourceStack.getSender()).thenReturn(sender);
-        when(commandSourceStack.getExecutor()).thenReturn(mock(Player.class));
-
-        CommandNode<CommandSourceStack> node = kibCommand.create().getChild("reload");
-        node.getCommand().run(ctx);
-
-        verify(settings).reloadConfig();
-        verify(registryLoader).fillMaterialRegistry(settings);
-        verify(sender).sendMessage(Component.text("Reload - Chat message"));
-        verify(logger).info(captor.capture());
-        assertEquals("Reload - Console message", captor.getValue().get());
+    @AfterEach
+    void tearDown() {
+        if (mockedArgumentTypes != null) mockedArgumentTypes.close();
     }
 
     @Test
-    void shouldReloadKibFromConsole() throws Exception {
-        LoadResult mockResult = mock(LoadResult.class);
-        when(mockResult.consoleFormat()).thenReturn("Reload - Console message");
-        when(registryLoader.fillMaterialRegistry(settings)).thenReturn(List.of(mockResult));
+    void shouldBuild() {
+        when(source.getSender()).thenReturn(sender);
 
-        when(ctx.getSource()).thenReturn(commandSourceStack);
-        when(commandSourceStack.getExecutor()).thenReturn(null); // Console is not an Entity
+        LiteralCommandNode<CommandSourceStack> node = kibCommand.build();
 
-        CommandNode<CommandSourceStack> node = kibCommand.create().getChild("reload");
-        node.getCommand().run(ctx);
+        assertEquals("kib", node.getName());
 
-        verify(settings).reloadConfig();
-        verify(registryLoader).fillMaterialRegistry(settings);
-        verifyNoInteractions(sender);
-        verify(logger).info(captor.capture());
-        assertEquals("Reload - Console message", captor.getValue().get());
-    }
+        assertEquals(4, node.getChildren().size());
+        assertNotNull(node.getChild("blacklist"));
+        assertNotNull(node.getChild("help"));
+        assertNotNull(node.getChild("reload"));
+        assertNotNull(node.getChild("rule"));
 
-    @Test
-    void shouldReloadKibWithNoResult() throws Exception { // From any source
-        when(registryLoader.fillMaterialRegistry(settings)).thenReturn(Collections.emptyList());
+        when(sender.hasPermission("kib")).thenReturn(false);
+        assertFalse(node.getRequirement().test(source));
 
-        CommandNode<CommandSourceStack> node = kibCommand.create().getChild("reload");
-        node.getCommand().run(ctx);
-
-        verify(settings).reloadConfig();
-        verify(registryLoader).fillMaterialRegistry(settings);
-        verifyNoInteractions(sender);
-        verifyNoInteractions(logger);
+        when(sender.hasPermission("kib")).thenReturn(true);
+        assertTrue(node.getRequirement().test(source));
     }
 }

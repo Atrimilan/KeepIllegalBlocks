@@ -1,0 +1,65 @@
+package io.github.atrimilan.keepillegalblocks.events.bukkit;
+
+import io.github.atrimilan.keepillegalblocks.config.Config;
+import io.github.atrimilan.keepillegalblocks.config.ConfigManager;
+import io.github.atrimilan.keepillegalblocks.models.InteractableMaterial;
+import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
+import io.github.atrimilan.keepillegalblocks.data.BfsResult;
+import io.github.atrimilan.keepillegalblocks.services.BlockRestorationService;
+import org.bukkit.GameMode;
+import org.bukkit.block.Block;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
+
+public class BlockInteractionListener implements Listener {
+
+    private final BlockRestorationService service;
+    private final MaterialRegistry materialRegistry;
+    private final ConfigManager configManager;
+
+    public BlockInteractionListener(BlockRestorationService service, MaterialRegistry materialRegistry,
+                                    ConfigManager configManager) {
+        this.service = service;
+        this.materialRegistry = materialRegistry;
+        this.configManager = configManager;
+    }
+
+    /**
+     * Listen to player interactions with interactable blocks, and restore any reactive blocks that were broken or had
+     * their block data updated as a result of the interaction.
+     * <p>
+     * The event will be ignored if:
+     * <li>KIB is only enabled in Creative mode and player is not in Creative mode</li>
+     * <li>The action is not a right click</li>
+     * <li>The hand is not the right hand</li>
+     * <li>The player is sneaking and holding an item</li>
+     * <li>The block is not interactable</li>
+     *
+     * @param event The player's interaction event
+     */
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        Config config = configManager.getConfig();
+
+        if (config.onlyEnabledInCreativeMode() && !GameMode.CREATIVE.equals(event.getPlayer().getGameMode())) return;
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        if (event.getHand() != EquipmentSlot.HAND) return;
+        if (event.getPlayer().isSneaking() && event.getItem() != null) return;
+
+        Block sourceBlock = event.getClickedBlock();
+        if (sourceBlock == null) return;
+
+        InteractableMaterial interactableMaterial = materialRegistry.getInteractableMaterial(sourceBlock.getType());
+        if (InteractableMaterial.NONE.equals(interactableMaterial)) return;
+
+        // Perform a BFS to record all reactive blocks
+        BfsResult result = service.recordBlockStates(sourceBlock, config.maxBlocks());
+
+        // Schedule restoration of reactive blocks that may have been broken or updated due to the player interaction
+        service.scheduleRestoration(result, interactableMaterial);
+    }
+}
