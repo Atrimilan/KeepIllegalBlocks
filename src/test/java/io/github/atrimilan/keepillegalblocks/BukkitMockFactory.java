@@ -29,6 +29,7 @@ public class BukkitMockFactory {
 
         // Define default BlockData (for connectable blocks comparison)
         BlockData defaultBlockData = mock(BlockData.class);
+        lenient().when(defaultBlockData.getMaterial()).thenReturn(currentMaterial);
         lenient().when(block.getBlockData()).thenReturn(defaultBlockData);
         lenient().when(state.getBlockData()).thenReturn(defaultBlockData);
 

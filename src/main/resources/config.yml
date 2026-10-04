@@ -9,49 +9,49 @@
 # Maximum number of reactive blocks to record.
 # Setting this value too high is not recommended, as it could be exploited by a lag machine on your server.
 # 500 is sufficient as you will rarely reach that many blocks.
-max-blocks: 500
+max_blocks: 500
 
 # By default, KIB is only enabled in Creative mode.
-only-use-kib-in-creative-mode: true
+only_use_kib_in_creative_mode: true
 
 # Toggle the use of the "PacketEvents" plugin if it is detected.
 # KIB will use it to improve client-side rendering and performance, for example by canceling break sounds and particles.
-use-packet-events-if-detected: true
+use_packet_events_if_detected: true
 
 # Blacklist interactable materials by their name, or disable categories below.
-interactable-materials:
+interactable_materials:
   blacklist: [ ]
   categories:
     campfires: true
     candles: true
     cauldrons: true
     # Taking vine berries (Cave vines + Cave vine plants)
-    cave-vines: true
+    cave_vines: true
     # Putting or taking a book from a chiseled bookshelf
-    chiseled-bookshelves: true
+    chiseled_bookshelves: true
     comparators: true
     composters: true
     # Non-plain copper blocks that can be waxed or scraped
-    copper-blocks: true
-    daylight-detectors: true
+    copper_blocks: true
+    daylight_detectors: true
     doors: true
-    end-portal-frames: true
+    end_portal_frames: true
     gates: true
     # Putting a book on a lectern
     lecterns: true
     levers: true
     repeaters: true
-    stone-buttons: true
+    stone_buttons: true
     # Taking bush berries
-    sweet-berry-bushes: true
-    trap-doors: true
-    wooden-buttons: true
+    sweet_berry_bushes: true
+    trap_doors: true
+    wooden_buttons: true
 
 # Blacklist reactive materials by their name, or disable categories below.
-reactive-materials:
+reactive_materials:
   blacklist: [ ]
   categories:
-    amethyst-clusters: true
+    amethyst_clusters: true
     bamboos: true
     banners: true
     beds: true
@@ -60,15 +60,15 @@ reactive-materials:
     cakes: true
     carpets: true
     # Cave vines + Cave vine plants
-    cave-vines: true
+    cave_vines: true
     # Chorus plants only (chorus flowers are not supported yet)
-    chorus-plants: true
+    chorus_plants: true
     cocoa: true
     crops: true
     comparators: true
     # Does not apply to waterlogged corals
     corals: true
-    dead-bushes: true
+    dead_bushes: true
     doors: true
     dripleaves: true
     # Fences + Iron bars + Copper bars
@@ -78,41 +78,41 @@ reactive-materials:
     flowers: true
     frogspawn: true
     fungus: true
-    glass-panes: true
-    glow-lichens: true
+    glass_panes: true
+    glow_lichens: true
     grass: true
-    hanging-roots: true
-    hanging-signs: true
+    hanging_roots: true
+    hanging_signs: true
     ladders: true
     lanterns: true
-    leaf-litters: true
-    lily-pads: true
-    mangrove-propagules: true
+    leaf_litters: true
+    lily_pads: true
+    mangrove_propagules: true
     mushrooms: true
-    nether-roots: true
-    nether-sprouts: true
-    nether-warts: true
-    pressure-plates: true
+    nether_roots: true
+    nether_sprouts: true
+    nether_warts: true
+    pressure_plates: true
     rails: true
-    redstone-wires: true
+    redstone_wires: true
     repeaters: true
     saplings: true
     scaffolding: true
-    sculk-veins: true
-    sea-pickles: true
+    sculk_veins: true
+    sea_pickles: true
     signs: true
     snow: true
     # Pointed dripstones + Sulfur spikes
     speleothems: true
-    sugar-canes: true
-    sweet-berry-bushes: true
+    sugar_canes: true
+    sweet_berry_bushes: true
     # Levers + Stone buttons + Wooden buttons
     switches: true
     torches: true
-    tripwire-hooks: true
+    tripwire_hooks: true
     # Twisting vines + Twisting vine plants
-    twisting-vines: true
+    twisting_vines: true
     vines: true
     walls: true
     # Weeping vines + Weeping vine plants
-    weeping-vines: true
+    weeping_vines: true

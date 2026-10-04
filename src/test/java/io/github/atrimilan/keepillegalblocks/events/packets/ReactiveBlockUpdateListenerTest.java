@@ -6,7 +6,6 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEffect;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerMultiBlockChange;
 import io.github.atrimilan.keepillegalblocks.BukkitMockFactory;
-import io.github.atrimilan.keepillegalblocks.events.packets.ReactiveBlockUpdateListener;
 import io.github.atrimilan.keepillegalblocks.data.BfsResult;
 import io.github.atrimilan.keepillegalblocks.data.InteractableBlockWrapper;
 import io.github.atrimilan.keepillegalblocks.data.ReactiveBlockWrapper;

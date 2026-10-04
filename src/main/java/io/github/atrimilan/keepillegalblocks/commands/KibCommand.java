@@ -18,15 +18,15 @@ public class KibCommand {
     public static final String DESCRIPTION = "Manage KIB configuration";
     public static final Set<String> ALIASES = Set.of("keepillegalblocks");
 
-    private final KibReloadCommandNode reloadCommand;
-    private final KibHelpCommandNode helpCommand;
     private final KibBlacklistCommandNode blacklistCommand;
+    private final KibHelpCommandNode helpCommand;
+    private final KibReloadCommandNode reloadCommand;
     private final KibRuleCommandNode ruleCommand;
 
     public KibCommand(ConfigManager configManager, RegistryLoader registryLoader, Logger logger) {
-        this.reloadCommand = new KibReloadCommandNode(configManager, registryLoader, logger);
-        this.helpCommand = new KibHelpCommandNode();
         this.blacklistCommand = new KibBlacklistCommandNode(configManager, registryLoader);
+        this.helpCommand = new KibHelpCommandNode();
+        this.reloadCommand = new KibReloadCommandNode(configManager, registryLoader, logger);
         this.ruleCommand = new KibRuleCommandNode(configManager);
     }
 
@@ -35,11 +35,11 @@ public class KibCommand {
      */
     public LiteralCommandNode<CommandSourceStack> build() {
         return Commands.literal("kib") //
-                .requires(ctx -> ctx.getSender().hasPermission("kib")) //
+                .requires(ctx -> ctx.getSender().hasPermission("kib"))
+                .then(blacklistCommand.build()) //
                 .then(helpCommand.build()) //
                 .then(reloadCommand.build()) //
                 .then(ruleCommand.build()) //
-                .then(blacklistCommand.build()) //
                 .build();
     }
 }

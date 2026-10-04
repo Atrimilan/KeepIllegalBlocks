@@ -22,12 +22,13 @@ public class ConfigManager {
     }
 
     /**
-     * Initialize config.yml by saving the default config, then load the settings.
+     * Save the default config.yml file, then load the config.
      */
     public void initConfig() {
-        plugin.saveDefaultConfig(); // Save a full copy of the default config.yml file
+        plugin.saveDefaultConfig(); // Create config.yml file with default values, if it doesn't exist
 
         try {
+            // Update config.yml (useful if there are new default values after a plugin update)
             ConfigUpdater.update(plugin, "config.yml", new File(plugin.getDataFolder(), "config.yml"));
         } catch (Exception ignored) {
             plugin.getLogger().severe("Failed to update config.yml, copying defaults instead.");
@@ -37,7 +38,7 @@ public class ConfigManager {
 
         boolean packetEventsPresent = plugin.getServer().getPluginManager().isPluginEnabled("packetevents");
         plugin.getLogger().info(packetEventsPresent ?
-                                "PacketEvents is present, it will be used if \"use-packet-events-if-detected\" is enabled in the config." :
+                                "PacketEvents is present, it will be used if \"use_packet_events_if_detected\" is enabled in the config." :
                                 "PacketEvents is not present, it is recommended for a smoother client-side experience.");
         loadConfig();
     }
@@ -54,6 +55,9 @@ public class ConfigManager {
         loadConfig();
     }
 
+    /**
+     * (Re)load config.yml data into the config record
+     */
     private void loadConfig() {
         FileConfiguration configFile = plugin.getConfig();
 
@@ -73,21 +77,17 @@ public class ConfigManager {
             enabledCategories.put(group, enabledSet);
         }
 
-        config = new Config(plugin.getServer().getPluginManager().isPluginEnabled("packetevents"), //
-                            configFile.getInt("max-blocks"), //
-                            configFile.getBoolean("only-use-kib-in-creative-mode"), //
-                            configFile.getBoolean("use-packet-events-if-detected"),  //
-                            blacklists, //
-                            enabledCategories);
+        config = new Config( //
+                plugin.getServer().getPluginManager().isPluginEnabled("packetevents"), //
+                configFile.getInt(Rule.MAX_BLOCKS.getName()), //
+                configFile.getBoolean(Rule.ONLY_USE_KIB_IN_CREATIVE_MODE.getName()), //
+                configFile.getBoolean(Rule.USE_PACKET_EVENTS_IF_DETECTED.getName()),  //
+                blacklists, //
+                enabledCategories);
     }
 
     public void setRule(Rule rule, Object value) {
-        String key = switch (rule) {
-            case Rule.MAX_BLOCKS -> "max-blocks";
-            case Rule.ONLY_USE_KIB_IN_CREATIVE_MODE -> "only-use-kib-in-creative-mode";
-            case Rule.USE_PACKET_EVENTS_IF_DETECTED -> "use-packet-events-if-detected";
-        };
-        saveAndReload(key, value);
+        saveAndReload(rule.getName(), value);
     }
 
     public boolean addToBlacklist(MaterialGroup group, String material) {

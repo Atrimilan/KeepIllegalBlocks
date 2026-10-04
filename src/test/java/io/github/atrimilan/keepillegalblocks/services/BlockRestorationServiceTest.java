@@ -3,15 +3,15 @@ package io.github.atrimilan.keepillegalblocks.services;
 import com.github.retrooper.packetevents.event.PacketListenerCommon;
 import io.github.atrimilan.keepillegalblocks.BukkitMockFactory;
 import io.github.atrimilan.keepillegalblocks.config.Config;
+import io.github.atrimilan.keepillegalblocks.config.ConfigManager;
 import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
-import io.github.atrimilan.keepillegalblocks.config.Settings;
-import io.github.atrimilan.keepillegalblocks.models.InteractableMaterial;
-import io.github.atrimilan.keepillegalblocks.models.ReactiveMaterial;
-import io.github.atrimilan.keepillegalblocks.events.bukkit.ItemSpawnListener;
 import io.github.atrimilan.keepillegalblocks.data.BfsResult;
 import io.github.atrimilan.keepillegalblocks.data.InteractableBlockWrapper;
 import io.github.atrimilan.keepillegalblocks.data.ReactiveBlockWrapper;
+import io.github.atrimilan.keepillegalblocks.events.bukkit.ItemSpawnListener;
 import io.github.atrimilan.keepillegalblocks.events.packets.PacketEventsManager;
+import io.github.atrimilan.keepillegalblocks.models.InteractableMaterial;
+import io.github.atrimilan.keepillegalblocks.models.ReactiveMaterial;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.block.Block;
@@ -45,6 +45,9 @@ class BlockRestorationServiceTest {
     private Config config;
 
     @Mock
+    private ConfigManager configManager;
+
+    @Mock
     private MaterialRegistry materialRegistry;
 
     @Mock
@@ -70,7 +73,8 @@ class BlockRestorationServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = spy(new BlockRestorationService(plugin, materialRegistry, config));
+        lenient().when(configManager.getConfig()).thenReturn(config);
+        service = spy(new BlockRestorationService(plugin, materialRegistry, configManager));
     }
 
     private Block mockSourceBlock(Material sourceMaterial, boolean withReactiveRelatives,

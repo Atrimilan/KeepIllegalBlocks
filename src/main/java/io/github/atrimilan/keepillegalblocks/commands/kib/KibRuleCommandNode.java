@@ -35,21 +35,21 @@ public class KibRuleCommandNode extends AbstractKibCommandNode {
         return ruleNode;
     }
 
-    private int setRule(CommandContext<CommandSourceStack> ctx, Rule rule) {
-        Object newValue = rule.getValue(ctx);
-
-        configManager.setRule(rule, newValue);
-        sendMessage(ctx, "<green>Rule <white>" + rule.getName() + "<green> has been set to: <white>" + newValue);
-
-        return Command.SINGLE_SUCCESS;
-    }
-
     private int getRule(CommandContext<CommandSourceStack> ctx, Rule rule) {
         Object currentValue = configManager.getConfig().getRule(rule);
         if (currentValue == null) return 0;
 
         sendMessage(ctx,
                     "<yellow>Rule <white>" + rule.getName() + "<yellow> is currently set to: <white>" + currentValue);
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int setRule(CommandContext<CommandSourceStack> ctx, Rule rule) {
+        Object newValue = rule.getValue(ctx);
+
+        configManager.setRule(rule, newValue);
+        sendMessage(ctx, "<green>Rule <white>" + rule.getName() + "<green> has been set to: <white>" + newValue);
 
         return Command.SINGLE_SUCCESS;
     }

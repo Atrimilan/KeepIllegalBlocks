@@ -15,10 +15,10 @@ public enum MaterialGroup {
     }
 
     public String getBlacklistSectionKey() {
-        return name + "-materials.blacklist";
+        return name + "_materials.blacklist";
     }
 
     public String getCategoriesSectionKey() {
-        return name + "-materials.categories";
+        return name + "_materials.categories";
     }
 }

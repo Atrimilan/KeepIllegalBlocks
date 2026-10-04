@@ -143,6 +143,7 @@ tasks {
 
     test {
         useJUnitPlatform()
+        jvmArgs("-XX:+EnableDynamicAgentLoading")
     }
 }
 

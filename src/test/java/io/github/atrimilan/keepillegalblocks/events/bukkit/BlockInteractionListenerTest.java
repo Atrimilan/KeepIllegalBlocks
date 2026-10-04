@@ -1,8 +1,9 @@
 package io.github.atrimilan.keepillegalblocks.events.bukkit;
 
 import io.github.atrimilan.keepillegalblocks.BukkitMockFactory;
+import io.github.atrimilan.keepillegalblocks.config.Config;
+import io.github.atrimilan.keepillegalblocks.config.ConfigManager;
 import io.github.atrimilan.keepillegalblocks.core.MaterialRegistry;
-import io.github.atrimilan.keepillegalblocks.config.Settings;
 import io.github.atrimilan.keepillegalblocks.models.InteractableMaterial;
 import io.github.atrimilan.keepillegalblocks.data.BfsResult;
 import io.github.atrimilan.keepillegalblocks.data.InteractableBlockWrapper;
@@ -16,6 +17,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -38,7 +40,10 @@ class BlockInteractionListenerTest {
     private BlockRestorationService service;
 
     @Mock
-    private Settings settings;
+    private Config config;
+
+    @Mock
+    private ConfigManager configManager;
 
     @Mock
     private MaterialRegistry materialRegistry;
@@ -52,6 +57,11 @@ class BlockInteractionListenerTest {
     @Mock
     private Block clickedBlock;
 
+    @BeforeEach
+    void setUp() {
+        when(configManager.getConfig()).thenReturn(config);
+    }
+
     // ********** Should restore **********
 
     @ParameterizedTest
@@ -63,7 +73,7 @@ class BlockInteractionListenerTest {
                 new InteractableBlockWrapper(BukkitMockFactory.mockBlockState(interactableMat), false), Set.of(),
                 mock(BoundingBox.class));
 
-        when(settings.isOnlyEnabledInCreativeMode()).thenReturn(true);
+        when(config.onlyEnabledInCreativeMode()).thenReturn(true);
         when(playerInteractEvent.getPlayer()).thenReturn(player);
         when(player.getGameMode()).thenReturn(GameMode.CREATIVE);
         when(playerInteractEvent.getAction()).thenReturn(Action.RIGHT_CLICK_BLOCK);
@@ -74,7 +84,7 @@ class BlockInteractionListenerTest {
         when(playerInteractEvent.getClickedBlock()).thenReturn(clickedBlock);
         when(clickedBlock.getType()).thenReturn(interactableMat);
         when(materialRegistry.getInteractableMaterial(interactableMat)).thenReturn(interactableMaterial);
-        when(settings.getMaxBlocks()).thenReturn(50);
+        when(config.maxBlocks()).thenReturn(50);
         when(service.recordBlockStates(clickedBlock, 50)).thenReturn(bfsResult);
 
         listener.onPlayerInteract(playerInteractEvent);
@@ -87,7 +97,7 @@ class BlockInteractionListenerTest {
 
     @Test
     void onPlayerInteract_ShouldNotRestoreWhenGamemodeIsNotValid() {
-        when(settings.isOnlyEnabledInCreativeMode()).thenReturn(true);
+        when(config.onlyEnabledInCreativeMode()).thenReturn(true);
         when(playerInteractEvent.getPlayer()).thenReturn(player);
         when(player.getGameMode()).thenReturn(GameMode.SURVIVAL);
 
@@ -99,7 +109,7 @@ class BlockInteractionListenerTest {
 
     @Test
     void onPlayerInteract_ShouldNotRestoreWhenInteractionIsNotRightClickBlock() {
-        when(settings.isOnlyEnabledInCreativeMode()).thenReturn(false);
+        when(config.onlyEnabledInCreativeMode()).thenReturn(false);
         when(playerInteractEvent.getAction()).thenReturn(Action.LEFT_CLICK_BLOCK);
 
         listener.onPlayerInteract(playerInteractEvent);
@@ -110,7 +120,7 @@ class BlockInteractionListenerTest {
 
     @Test
     void onPlayerInteract_ShouldNotRestoreWhenPlayerIsUsingWrongEquipmentSlot() {
-        when(settings.isOnlyEnabledInCreativeMode()).thenReturn(false);
+        when(config.onlyEnabledInCreativeMode()).thenReturn(false);
         when(playerInteractEvent.getAction()).thenReturn(Action.RIGHT_CLICK_BLOCK);
         when(playerInteractEvent.getHand()).thenReturn(EquipmentSlot.OFF_HAND);
 
@@ -122,7 +132,7 @@ class BlockInteractionListenerTest {
 
     @Test
     void onPlayerInteract_ShouldNotRestoreWhenPlayerIsSneakingAndHoldingAnItem() {
-        when(settings.isOnlyEnabledInCreativeMode()).thenReturn(false);
+        when(config.onlyEnabledInCreativeMode()).thenReturn(false);
         when(playerInteractEvent.getAction()).thenReturn(Action.RIGHT_CLICK_BLOCK);
         when(playerInteractEvent.getHand()).thenReturn(EquipmentSlot.HAND);
         when(playerInteractEvent.getPlayer()).thenReturn(player);
@@ -137,7 +147,7 @@ class BlockInteractionListenerTest {
 
     @Test
     void onPlayerInteract_ShouldNotRestoreWhenSourceBlockIsNull() {
-        when(settings.isOnlyEnabledInCreativeMode()).thenReturn(false);
+        when(config.onlyEnabledInCreativeMode()).thenReturn(false);
         when(playerInteractEvent.getAction()).thenReturn(Action.RIGHT_CLICK_BLOCK);
         when(playerInteractEvent.getHand()).thenReturn(EquipmentSlot.HAND);
         when(playerInteractEvent.getPlayer()).thenReturn(player);
@@ -154,7 +164,7 @@ class BlockInteractionListenerTest {
     void onPlayerInteract_ShouldNotRestoreWhenBlockIsNotInteractable() {
         Material clickedBlockMaterial = Material.COBBLESTONE;
 
-        when(settings.isOnlyEnabledInCreativeMode()).thenReturn(false);
+        when(config.onlyEnabledInCreativeMode()).thenReturn(false);
         when(playerInteractEvent.getAction()).thenReturn(Action.RIGHT_CLICK_BLOCK);
         when(playerInteractEvent.getHand()).thenReturn(EquipmentSlot.HAND);
         when(playerInteractEvent.getPlayer()).thenReturn(player);
