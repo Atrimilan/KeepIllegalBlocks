@@ -75,9 +75,16 @@ public abstract class AbstractClassifier<T extends MaterialType> {
     }
 
     /**
-     * Cached tags for faster lookup
+     * Cached tags for faster lookup.
      */
     private final Map<String, Tag<Material>> tagCache = new HashMap<>();
+
+    /**
+     * Get the {@link MaterialTags} class using reflection.
+     */
+    protected Class<?> getMaterialTagsClass() throws ClassNotFoundException {
+        return Class.forName("com.destroystokyo.paper.MaterialTags");
+    }
 
     /**
      * Check whether a {@link Material} belongs to a specific {@link Tag} in the {@code "items"} registry. Falls back to
@@ -94,14 +101,11 @@ public abstract class AbstractClassifier<T extends MaterialType> {
             // Try to resolve the tag in the Bukkit "items" registry
             Tag<Material> modernTag = Bukkit.getTag(Tag.REGISTRY_ITEMS, NamespacedKey.minecraft(tagName),
                                                     Material.class);
-            if (modernTag != null) {
-                return modernTag;
-            }
+            if (modernTag != null) return modernTag;
 
             // Fallback to Paper MaterialTags using reflection
             try {
-                Class<?> clazz = Class.forName("com.destroystokyo.paper.MaterialTags");
-                Object legacyTagObj = clazz.getField(legacyMaterialTagName).get(null);
+                Object legacyTagObj = getMaterialTagsClass().getField(legacyMaterialTagName).get(null);
                 if (legacyTagObj instanceof Tag<?> t) {
                     @SuppressWarnings("unchecked") Tag<Material> legacyTag = (Tag<Material>) t;
                     return legacyTag;
@@ -167,7 +171,7 @@ public abstract class AbstractClassifier<T extends MaterialType> {
         return Tag.SAPLINGS.isTagged(m);
     }
 
-    protected boolean isShrub(Material m) {
+    protected boolean isRedShrub(Material m) {
         return matchAnyMaterial(m, "RED_SHRUB");
     }
 

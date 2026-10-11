@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -22,7 +23,6 @@ class DebugUtilsTest {
         verify(mockServer).broadcast(MiniMessage.miniMessage().deserialize("<aqua>test"));
     }
 
-
     @Test
     void shouldNotSendChatWhenDebugIsDisabled() {
         DebugUtils.setDebugEnabled(false);
@@ -34,7 +34,6 @@ class DebugUtilsTest {
         verifyNoInteractions(mockServer);
     }
 
-
     @Test
     void shouldNotSendChatByDefault() {
         Server mockServer = mock(Server.class);
@@ -42,5 +41,13 @@ class DebugUtilsTest {
 
         DebugUtils.sendChat(() -> "test", DebugUtils.MessageType.INFO);
         verifyNoInteractions(mockServer);
+    }
+
+    @Test
+    void shouldNotThrowExceptionWhenServerIsNull() {
+        DebugUtils.setDebugEnabled(true);
+        DebugUtils.setServer(null);
+
+        assertDoesNotThrow(() -> DebugUtils.sendChat(() -> "test", DebugUtils.MessageType.INFO));
     }
 }

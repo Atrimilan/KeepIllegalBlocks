@@ -66,7 +66,7 @@ public class ReactiveClassifier extends AbstractClassifier<ReactiveMaterial> {
             case Material m when isMushroom(m) -> ReactiveMaterial.MUSHROOM;
             case Material m when isPressurePlate(m) -> ReactiveMaterial.PRESSURE_PLATE;
             case Material m when isSapling(m) -> ReactiveMaterial.SAPLING;
-            case Material m when isShrub(m) -> ReactiveMaterial.RED_SHRUB;
+            case Material m when isRedShrub(m) -> ReactiveMaterial.RED_SHRUB;
             case Material m when isSign(m) -> ReactiveMaterial.SIGN; // Normal + Wall
             case Material m when isTorch(m) -> ReactiveMaterial.TORCH; // Normal + Redstone + Soul
 
