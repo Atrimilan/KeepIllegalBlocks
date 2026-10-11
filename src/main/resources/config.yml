@@ -56,12 +56,13 @@ reactive_materials:
     banners: true
     beds: true
     bells: true
+    bushes: true
     cactus: true
     cakes: true
     carpets: true
     # Cave vines + Cave vine plants
     cave_vines: true
-    # Chorus plants only (chorus flowers are not supported yet)
+    # Chorus plants only (chorus flowers are in the "flowers" category)
     chorus_plants: true
     cocoa: true
     crops: true
@@ -94,6 +95,7 @@ reactive_materials:
     nether_warts: true
     pressure_plates: true
     rails: true
+    red_shrubs: true
     redstone_wires: true
     repeaters: true
     saplings: true

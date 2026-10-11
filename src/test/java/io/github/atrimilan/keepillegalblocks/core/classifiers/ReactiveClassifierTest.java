@@ -58,6 +58,7 @@ class ReactiveClassifierTest {
 
     void prepareClassifierStubs(Material mat, ReactiveMaterial expected) {
         lenient().doReturn(expected == ReactiveMaterial.BANNER).when(classifier).isBanner(mat);
+        lenient().doReturn(expected == ReactiveMaterial.BUSH).when(classifier).isBush(mat);
         lenient().doReturn(expected == ReactiveMaterial.CARPET).when(classifier).isCarpet(mat);
         lenient().doReturn(expected == ReactiveMaterial.CORAL).when(classifier).isCoral(mat);
         lenient().doReturn(expected == ReactiveMaterial.CROP).when(classifier).isCrops(mat);
@@ -65,6 +66,7 @@ class ReactiveClassifierTest {
         lenient().doReturn(expected == ReactiveMaterial.MUSHROOM).when(classifier).isMushroom(mat);
         lenient().doReturn(expected == ReactiveMaterial.PRESSURE_PLATE).when(classifier).isPressurePlate(mat);
         lenient().doReturn(expected == ReactiveMaterial.SAPLING).when(classifier).isSapling(mat);
+        lenient().doReturn(expected == ReactiveMaterial.RED_SHRUB).when(classifier).isRedShrub(mat);
         lenient().doReturn(expected == ReactiveMaterial.SIGN).when(classifier).isSign(mat);
         lenient().doReturn(expected == ReactiveMaterial.TORCH).when(classifier).isTorch(mat);
     }

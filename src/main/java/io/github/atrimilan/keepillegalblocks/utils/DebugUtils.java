@@ -35,7 +35,8 @@ public class DebugUtils {
      * @param type            Type of the message
      */
     public static void sendChat(Supplier<String> messageSupplier, MessageType type) {
-        if (debugEnabled) {
+        // Server initialized + Debug mode enabled
+        if (server != null && debugEnabled) {
             server.broadcast(MiniMessage.miniMessage().deserialize(switch (type) {
                 case OK -> "<green>";
                 case INFO -> "<aqua>";
