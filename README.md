@@ -103,7 +103,7 @@ List of reactive material categories that are automatically restored by KIB when
 * `cakes`
 * `carpets`
 * `cave_vines` _- Cave vines + Cave vine plants_
-* `chorus_plants` _- Chorus plants only (chorus flowers is in the "flowers" category)_
+* `chorus_plants` _- Chorus plants only (chorus flowers are in the "flowers" category)_
 * `cocoa`
 * `crops`
 * `comparators`
@@ -305,7 +305,7 @@ which allows you to run a local Paper server.
   ```
 * By default, the server will start at `localhost:25565`, but you can configure server properties
   in [build.gradle.kts](build.gradle.kts).
-* If you want to try with Purpur, or with another Paper version, edit [gradle.propertie](gradle.properties).
+* If you want to try with Purpur, or with another Paper version, edit [gradle.properties](gradle.properties).
 
 ### 2. Build the JAR file
 
