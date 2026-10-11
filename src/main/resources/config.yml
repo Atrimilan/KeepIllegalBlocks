@@ -62,7 +62,7 @@ reactive_materials:
     carpets: true
     # Cave vines + Cave vine plants
     cave_vines: true
-    # Chorus plants only (chorus flowers is in the "flowers" category)
+    # Chorus plants only (chorus flowers are in the "flowers" category)
     chorus_plants: true
     cocoa: true
     crops: true
