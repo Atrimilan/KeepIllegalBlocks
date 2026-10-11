@@ -45,6 +45,8 @@ public class ReactiveClassifier extends AbstractClassifier<ReactiveMaterial> {
             case Switch ignored -> ReactiveMaterial.SWITCH; // Lever + Button
             case TripwireHook ignored -> ReactiveMaterial.TRIPWIRE_HOOK;
             case Wall ignored -> ReactiveMaterial.WALL;
+
+            // Backward & forward compatibility (for interface that does not exist in all Minecraft versions)
             case BlockData bd when hasAnyInterface(bd, "LeafLitter") -> ReactiveMaterial.LEAF_LITTER;
             case BlockData bd when hasAnyInterface(bd, "Speleothem", "PointedDripstone") -> ReactiveMaterial.SPELEOTHEM;
 
@@ -56,6 +58,7 @@ public class ReactiveClassifier extends AbstractClassifier<ReactiveMaterial> {
     protected ReactiveMaterial classifyMaterial(Material material) {
         return switch (material) {
             case Material m when isBanner(m) -> ReactiveMaterial.BANNER; // Normal + Wall
+            case Material m when isBush(m) -> ReactiveMaterial.BUSH;
             case Material m when isCarpet(m) -> ReactiveMaterial.CARPET;
             case Material m when isCoral(m) -> ReactiveMaterial.CORAL; // Normal + Wall
             case Material m when isCrops(m) -> ReactiveMaterial.CROP;
@@ -63,13 +66,14 @@ public class ReactiveClassifier extends AbstractClassifier<ReactiveMaterial> {
             case Material m when isMushroom(m) -> ReactiveMaterial.MUSHROOM;
             case Material m when isPressurePlate(m) -> ReactiveMaterial.PRESSURE_PLATE;
             case Material m when isSapling(m) -> ReactiveMaterial.SAPLING;
+            case Material m when isShrub(m) -> ReactiveMaterial.RED_SHRUB;
             case Material m when isSign(m) -> ReactiveMaterial.SIGN; // Normal + Wall
             case Material m when isTorch(m) -> ReactiveMaterial.TORCH; // Normal + Redstone + Soul
 
-            case AMETHYST_SHARD -> ReactiveMaterial.AMETHYST_CLUSTER; // Prevent shards duplication (on restore)
+            case AMETHYST_SHARD -> ReactiveMaterial.AMETHYST_CLUSTER; // Prevent amethyst clusters dropping shards
             case BAMBOO_SAPLING -> ReactiveMaterial.BAMBOO;
             case CACTUS -> ReactiveMaterial.CACTUS;
-            case CHORUS_PLANT, CHORUS_FRUIT -> ReactiveMaterial.CHORUS_PLANT; // FIXME: Add support for CHORUS_FLOWER
+            case CHORUS_PLANT, CHORUS_FRUIT -> ReactiveMaterial.CHORUS_PLANT;
             case DEAD_BUSH -> ReactiveMaterial.DEAD_BUSH;
             case BIG_DRIPLEAF_STEM -> ReactiveMaterial.DRIPLEAF;
             case FERN, LARGE_FERN -> ReactiveMaterial.FERN;
@@ -82,6 +86,7 @@ public class ReactiveClassifier extends AbstractClassifier<ReactiveMaterial> {
             case CRIMSON_ROOTS, WARPED_ROOTS -> ReactiveMaterial.NETHER_ROOTS;
             case NETHER_SPROUTS -> ReactiveMaterial.NETHER_SPROUTS;
             case NETHER_WART -> ReactiveMaterial.NETHER_WART;
+            case STICK -> ReactiveMaterial.DEAD_BUSH; // Prevent dead bushes from dropping sticks
             case SUGAR_CANE -> ReactiveMaterial.SUGAR_CANE;
             case SWEET_BERRY_BUSH -> ReactiveMaterial.SWEET_BERRY_BUSH;
             case TWISTING_VINES, TWISTING_VINES_PLANT -> ReactiveMaterial.TWISTING_VINES;

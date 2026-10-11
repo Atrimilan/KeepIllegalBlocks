@@ -1,19 +1,27 @@
 package io.github.atrimilan.keepillegalblocks.core;
 
 import io.github.atrimilan.keepillegalblocks.config.Config;
-import io.github.atrimilan.keepillegalblocks.core.classifiers.ReactiveClassifier;
 import io.github.atrimilan.keepillegalblocks.core.classifiers.InteractableClassifier;
-import io.github.atrimilan.keepillegalblocks.models.MaterialType;
-import io.github.atrimilan.keepillegalblocks.models.MaterialGroup;
+import io.github.atrimilan.keepillegalblocks.core.classifiers.ReactiveClassifier;
 import io.github.atrimilan.keepillegalblocks.data.LoadResult;
+import io.github.atrimilan.keepillegalblocks.models.MaterialGroup;
+import io.github.atrimilan.keepillegalblocks.models.MaterialType;
+import io.github.atrimilan.keepillegalblocks.utils.DebugUtils;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 
-import java.util.*;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import static io.github.atrimilan.keepillegalblocks.models.MaterialGroup.*;
+import static io.github.atrimilan.keepillegalblocks.models.MaterialGroup.INTERACTABLE;
+import static io.github.atrimilan.keepillegalblocks.models.MaterialGroup.REACTIVE;
+import static io.github.atrimilan.keepillegalblocks.utils.DebugUtils.MessageType.INFO;
 
 /**
  * Handle the loading of materials into the registry.
@@ -36,12 +44,16 @@ public class RegistryLoader {
      * @return A list of {@link LoadResult} containing the count of blacklisted materials for each {@link MaterialGroup}
      */
     public List<LoadResult> loadMaterialRegistry(Config config) {
+        Instant start = Instant.now();
         registry.clearAll();
 
         int blacklistedReactiveCount = loadRegistry(config, REACTIVE, reactiveClassifier::classify,
                                                     registry::registerReactive, true);
         int blacklistedInteractableCount = loadRegistry(config, INTERACTABLE, interactableClassifier::classify,
                                                         registry::registerInteractable, false);
+
+        DebugUtils.sendChat(() -> "The KIB material registry took <white>" + //
+                                  Duration.between(start, Instant.now()).toMillis() + " ms</white> to load", INFO);
 
         return List.of(new LoadResult("Reactive", registry.getReactiveCount(), blacklistedReactiveCount),
                        new LoadResult("Interactable", registry.getInteractableCount(), blacklistedInteractableCount));
@@ -50,7 +62,7 @@ public class RegistryLoader {
     /**
      * Classify material of the given group, and add it to the material registry.
      *
-     * @param config                      The {@link Config} to use to load the registry
+     * @param config                        The {@link Config} to use to load the registry
      * @param group                         The {@link MaterialGroup}
      * @param classifierMethod              The classifier method to execute
      * @param registrySetter                The registry setter to execute
